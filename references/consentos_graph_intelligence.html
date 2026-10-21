@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConsentOS — Enterprise Graph Intelligence</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {
+      --bg:      #0a0e1a;
+      --bg2:     #111827;
+      --bg3:     #1f2937;
+      --border:  #2d3748;
+      --text:    #e2e8f0;
+      --muted:   #94a3b8;
+      --accent:  #3b82f6;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background:var(--bg); color:var(--text);
+      font-family:'Inter',-apple-system,system-ui,sans-serif;
+      height:100vh; overflow:hidden;
+      display:flex; flex-direction:column;
+    }
+
+    /* ── Header ──────────────────────────────────────────────── */
+    .header {
+      background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%);
+      border-bottom:1px solid var(--border);
+      padding:10px 20px;
+      display:flex; align-items:center; justify-content:space-between;
+      flex-shrink:0;
+    }
+    .header h1 {
+      font-size:16px; font-weight:700;
+      background:linear-gradient(135deg,#60a5fa,#a78bfa);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .header p { font-size:11px; color:var(--muted); margin-top:2px; }
+    .header-chips { display:flex; gap:10px; flex-wrap:wrap; }
+    .chip {
+      background:var(--bg3); border:1px solid var(--border);
+      border-radius:20px; padding:3px 10px; font-size:11px;
+      display:flex; align-items:center; gap:5px;
+    }
+    .chip .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+    /* ── Layout ──────────────────────────────────────────────── */
+    .main { display:flex; flex:1; overflow:hidden; }
+
+    /* ── Left sidebar ────────────────────────────────────────── */
+    .sidebar {
+      width:185px; background:var(--bg2);
+      border-right:1px solid var(--border);
+      padding:14px 12px; overflow-y:auto; flex-shrink:0;
+    }
+    .sb-title {
+      font-size:9px; font-weight:700; text-transform:uppercase;
+      letter-spacing:1px; color:var(--muted); margin-bottom:6px;
+    }
+    .sb-section { margin-bottom:18px; }
+    .filter-item {
+      display:flex; align-items:center; gap:7px;
+      padding:4px 6px; border-radius:6px; cursor:pointer;
+      font-size:11px; transition:background .15s; user-select:none;
+    }
+    .filter-item:hover { background:var(--bg3); }
+    .filter-item.active { background:rgba(59,130,246,.12); }
+    .f-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+    .f-count {
+      margin-left:auto; background:var(--bg3);
+      border-radius:10px; padding:1px 5px; font-size:9px; color:var(--muted);
+    }
+    .sb-note { font-size:10px; color:var(--muted); line-height:1.6; }
+
+    /* ── Graph ───────────────────────────────────────────────── */
+    .graph-wrap { flex:1; position:relative; overflow:hidden; }
+    #gsvg { width:100%; height:100%; cursor:grab; }
+    #gsvg:active { cursor:grabbing; }
+    .graph-controls {
+      position:absolute; bottom:14px; right:14px;
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .ctrl-btn {
+      width:30px; height:30px; background:var(--bg3);
+      border:1px solid var(--border); border-radius:6px;
+      color:var(--text); font-size:15px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:background .15s;
+    }
+    .ctrl-btn:hover { background:var(--bg2); border-color:var(--accent); }
+
+    /* ── Tooltip ─────────────────────────────────────────────── */
+    #tip {
+      position:absolute; background:var(--bg3); border:1px solid var(--border);
+      border-radius:8px; padding:7px 11px; font-size:11px;
+      pointer-events:none; opacity:0; transition:opacity .15s;
+      max-width:190px; z-index:200; box-shadow:0 4px 20px rgba(0,0,0,.6);
+    }
+    #tip.on { opacity:1; }
+
+    /* ── Detail panel ────────────────────────────────────────── */
+    .detail {
+      width:250px; background:var(--bg2);
+      border-left:1px solid var(--border);
+      padding:14px; overflow-y:auto; flex-shrink:0;
+    }
+    .det-empty {
+      text-align:center; color:var(--muted);
+      font-size:12px; margin-top:55px; line-height:1.7;
+    }
+    .det-empty .ico { font-size:28px; display:block; margin-bottom:6px; }
+    .det-hdr {
+      display:flex; align-items:flex-start; gap:9px;
+      margin-bottom:14px; padding-bottom:14px;
+      border-bottom:1px solid var(--border);
+    }
+    .det-icon {
+      width:34px; height:34px; border-radius:8px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:16px; flex-shrink:0;
+    }
+    .det-name { font-size:13px; font-weight:600; line-height:1.3; }
+    .det-type { font-size:10px; color:var(--muted); margin-top:2px; }
+    .rbadge {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:2px 7px; border-radius:10px; font-size:10px;
+      font-weight:600; margin-top:6px;
+    }
+    .metric {
+      background:var(--bg3); border-radius:7px;
+      padding:9px 11px; margin-bottom:7px;
+    }
+    .metric-lbl { font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+    .metric-val { font-size:19px; font-weight:700; margin-top:1px; }
+    .metric-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+    .bar { height:5px; background:var(--bg); border-radius:3px; margin-top:5px; overflow:hidden; }
+    .bar-fill { height:100%; border-radius:3px; transition:width .5s; }
+    .slbl {
+      font-size:10px; font-weight:600; color:var(--muted);
+      text-transform:uppercase; letter-spacing:.5px; margin:11px 0 5px;
+    }
+    .analysis {
+      font-size:11px; color:#cbd5e1; line-height:1.6;
+      background:var(--bg3); padding:9px; border-radius:7px; margin-bottom:10px;
+    }
+    .conn-item {
+      display:flex; align-items:center; gap:7px;
+      padding:5px 0; border-bottom:1px solid var(--border);
+      font-size:11px; cursor:pointer; transition:color .15s;
+    }
+    .conn-item:last-child { border-bottom:none; }
+    .conn-item:hover { color:var(--accent); }
+
+    /* ── Bottom bar ──────────────────────────────────────────── */
+    .bottom-bar {
+      background:var(--bg2); border-top:1px solid var(--border);
+      padding:7px 20px; display:flex; gap:10px; align-items:center;
+      flex-shrink:0; flex-wrap:wrap; font-size:11px;
+    }
+    .bb-lbl {
+      font-weight:600; color:var(--muted);
+      font-size:9px; text-transform:uppercase; letter-spacing:1px;
+    }
+    .finding {
+      display:flex; align-items:center; gap:5px;
+      padding:3px 9px; border-radius:5px;
+      background:var(--bg3); border:1px solid var(--border);
+    }
+    .finding.alert  { border-color:rgba(220,38,38,.4);  background:rgba(220,38,38,.07); }
+    .finding.warn   { border-color:rgba(217,119,6,.4);  background:rgba(217,119,6,.07); }
+
+    /* ── Scrollbars ──────────────────────────────────────────── */
+    ::-webkit-scrollbar { width:3px; }
+    ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────────────────────────────── -->
+<div class="header">
+  <div>
+    <h1>⬡ ConsentOS — Enterprise Graph Intelligence</h1>
+    <p>Knowledge graph connecting enterprises through directors, addresses, PANs, templates, brands &amp; DLT behaviour</p>
+  </div>
+  <div class="header-chips">
+    <div class="chip"><div class="dot" style="background:#3b82f6"></div>5 Enterprises</div>
+    <div class="chip"><div class="dot" style="background:#7c3aed"></div>2 Blacklisted</div>
+    <div class="chip"><div class="dot" style="background:#dc2626"></div>1 Critical</div>
+    <div class="chip"><div class="dot" style="background:#ef4444"></div>3 Malicious CTAs</div>
+    <div class="chip"><div class="dot" style="background:#f59e0b"></div>1 Director Network</div>
+    <div class="chip"><div class="dot" style="background:#10b981"></div>1 Address Farm</div>
+  </div>
+</div>
+
+<!-- ── Main ────────────────────────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- Left sidebar -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-title">Node Types</div>
+      <div class="filter-item active" data-type="enterprise" onclick="toggleFilter(this)"><div class="f-dot" style="background:#3b82f6"></div>Enterprise<span class="f-count">5</span></div>
+      <div class="filter-item active" data-type="director"   onclick="toggleFilter(this)"><div class="f-dot" style="background:#f59e0b"></div>Director<span class="f-count">3</span></div>
+      <div class="filter-item active" data-type="address"    onclick="toggleFilter(this)"><div class="f-dot" style="background:#10b981"></div>Address<span class="f-count">2</span></div>
+      <div class="filter-item active" data-type="pan"        onclick="toggleFilter(this)"><div class="f-dot" style="background:#8b5cf6"></div>PAN<span class="f-count">2</span></div>
+      <div class="filter-item active" data-type="cta"        onclick="toggleFilter(this)"><div class="f-dot" style="background:#ef4444"></div>CTA Domain<span class="f-count">3</span></div>
+      <div class="filter-item active" data-type="header"     onclick="toggleFilter(this)"><div class="f-dot" style="background:#64748b"></div>DLT Header<span class="f-count">2</span></div>
+      <div class="filter-item active" data-type="template"   onclick="toggleFilter(this)"><div class="f-dot" style="background:#06b6d4"></div>Template<span class="f-count">1</span></div>
+      <div class="filter-item active" data-type="brand"      onclick="toggleFilter(this)"><div class="f-dot" style="background:#ec4899"></div>Brand<span class="f-count">2</span></div>
+      <div class="filter-item active" data-type="complaint"  onclick="toggleFilter(this)"><div class="f-dot" style="background:#f97316"></div>Complaints<span class="f-count">2</span></div>
+      <div class="filter-item active" data-type="traffic"    onclick="toggleFilter(this)"><div class="f-dot" style="background:#84cc16"></div>DLT Traffic<span class="f-count">2</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-title">Highlight by Risk</div>
+      <div class="filter-item" onclick="highlightRisk('blacklisted')"><div class="f-dot" style="background:#7c3aed"></div>Blacklisted</div>
+      <div class="filter-item" onclick="highlightRisk('critical')">  <div class="f-dot" style="background:#dc2626"></div>Critical</div>
+      <div class="filter-item" onclick="highlightRisk('high')">      <div class="f-dot" style="background:#ea580c"></div>High Risk</div>
+      <div class="filter-item" onclick="highlightRisk('medium')">    <div class="f-dot" style="background:#d97706"></div>Medium</div>
+      <div class="filter-item" onclick="highlightRisk('low')">       <div class="f-dot" style="background:#16a34a"></div>Low / Clean</div>
+      <div class="filter-item" onclick="highlightRisk(null)" style="margin-top:3px"><div class="f-dot" style="background:#475569"></div>Clear filter</div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-title">How to Use</div>
+      <div class="sb-note">Click a node to inspect risk profile &amp; connections.<br><br>Drag to reposition.<br><br>Scroll to zoom.<br><br>Click background to deselect.</div>
+    </div>
+  </div>
+
+  <!-- Graph -->
+  <div class="graph-wrap" id="gwrap">
+    <svg id="gsvg"></svg>
+    <div id="tip"></div>
+    <div class="graph-controls">
+      <button class="ctrl-btn" onclick="zIn()"    title="Zoom in">+</button>
+      <button class="ctrl-btn" onclick="zOut()"   title="Zoom out">−</button>
+      <button class="ctrl-btn" onclick="zReset()" title="Fit" style="font-size:11px">FIT</button>
+    </div>
+  </div>
+
+  <!-- Detail panel -->
+  <div class="detail" id="det">
+    <div class="det-empty" id="det-empty"><span class="ico">🔍</span>Click any node to explore its risk profile, connections, and intelligence signals.</div>
+    <div id="det-content" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ── Bottom bar ───────────────────────────────────────────────────────────── -->
+<div class="bottom-bar">
+  <span class="bb-lbl">Key Findings</span>
+  <div class="finding alert">🕸️ 1 Coordinated shell network — 3 enterprises, 1 shared director</div>
+  <div class="finding alert">📍 Address farm — 3 entities at single address</div>
+  <div class="finding alert">🚫 3 blacklisted CTA domains in active DLT templates</div>
+  <div class="finding warn">👤 Director Rajesh Kumar spans HIGH + CRITICAL entities</div>
+  <div class="finding warn">🏷️ YONO &amp; Lotus365 brand impersonation confirmed</div>
+  <div class="finding warn">📄 Template similarity across 3 nominally independent entities</div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────────────────────
+const NODES = [
+  // Enterprises
+  { id:"e1", name:"FinCo Services\nPvt Ltd",       type:"enterprise", risk:"low",         shell:15, trust:78, peId:"PE_1001",
+    desc:"Clean enterprise. All identity checks pass. Single director, unique address, clean header and complaint profile. No network connections to high-risk entities.",
+    conns:["d2","a2","h2","c2","tr2"] },
+
+  { id:"e2", name:"Digital Pay\nSolutions",         type:"enterprise", risk:"medium",      shell:42, trust:45, peId:"PE_2001",
+    desc:"Shares director Rajesh Kumar with HIGH and CRITICAL risk entities. Participates in address farm at Andheri East. Template content similarity with two high-risk entities detected.",
+    conns:["d1","d2","a1","p1","t1"] },
+
+  { id:"e3", name:"QuickCredit\nIndia Pvt Ltd",     type:"enterprise", risk:"high",        shell:68, trust:28, peId:"PE_3001",
+    desc:"Address farm participant. Shares PAN with Digital Pay Solutions. Template similarity across network. YONO/SBI brand impersonation embedded in DLT templates. Blacklisted CTA domain (yono8.com) found in active templates.",
+    conns:["d1","a1","p1","cta2","t1","b2"] },
+
+  { id:"e4", name:"MoneyGrow\nVentures",            type:"enterprise", risk:"critical",    shell:87, trust:12, peId:"PE_4001",
+    desc:"CRITICAL: Central node in fraud network. Address farm + shared PAN + shared director + blacklisted phishing CTA + 67% header blacklist rate + 18.2 complaints per header + zero DLT volume over 12 months. Linked to blacklisted entity via director Amit Verma.",
+    conns:["d1","d3","a1","p2","cta3","h1","c1","t1","tr1"] },
+
+  { id:"e5", name:"Lotus365\nGaming Ltd",           type:"enterprise", risk:"blacklisted", shell:95, trust:5,  peId:"PE_5001",
+    desc:"BLACKLISTED. Operates illegal gambling platform. Lotus365 brand impersonation confirmed. Blacklisted CTA (lotus365.cc) embedded in DLT templates. Shares director and PAN cluster with CRITICAL entity MoneyGrow Ventures.",
+    conns:["d3","p2","cta1","b1"] },
+
+  // Directors
+  { id:"d1", name:"Rajesh Kumar\nDIN: 08123456",    type:"director", risk:"flagged",
+    desc:"Director concentration risk. Appears as director in 3 enterprises: Digital Pay Solutions (MEDIUM), QuickCredit India (HIGH), MoneyGrow Ventures (CRITICAL). Any new entity with this director should be treated as elevated risk.",
+    conns:["e2","e3","e4"] },
+
+  { id:"d2", name:"Priya Sharma\nDIN: 07654321",    type:"director", risk:"clean",
+    desc:"Single primary enterprise director. Appears in FinCo Services (clean) and Digital Pay Solutions (medium — the shared director risk comes from the other director). No independent risk signals.",
+    conns:["e1","e2"] },
+
+  { id:"d3", name:"Amit Verma\nDIN: 09876543",      type:"director", risk:"flagged",
+    desc:"HIGH-RISK director. Appears as director in MoneyGrow Ventures (CRITICAL) and Lotus365 Gaming (BLACKLISTED). Any new entity registration by this director should be immediately escalated.",
+    conns:["e4","e5"] },
+
+  // Addresses
+  { id:"a1", name:"404, Business Hub\nAndheri East, Mumbai", type:"address", risk:"farm",  cluster:3,
+    desc:"ADDRESS FARM: 3 distinct DLT entities registered at this address — Digital Pay Solutions, QuickCredit India, and MoneyGrow Ventures. Classic shell company registration pattern. +5 risk points per F8 scoring.",
+    conns:["e2","e3","e4"] },
+
+  { id:"a2", name:"12, Corporate Park\nBKC, Mumbai",          type:"address", risk:"clean", cluster:1,
+    desc:"Unique address. Single entity registered here. No farm signal. Address verified against GST and MCA records.",
+    conns:["e1"] },
+
+  // PANs
+  { id:"p1", name:"PAN: AAACF1234M",  type:"pan", risk:"suspicious", entityCount:2,
+    desc:"2 DLT entities operating under this PAN: Digital Pay Solutions (MEDIUM) and QuickCredit India (HIGH). +5 risk points per F9 PAN clustering signal.",
+    conns:["e2","e3"] },
+
+  { id:"p2", name:"PAN: BBACG5678K",  type:"pan", risk:"suspicious", entityCount:2,
+    desc:"2 DLT entities: MoneyGrow Ventures (CRITICAL) and Lotus365 Gaming (BLACKLISTED). Maximum-risk PAN cluster — one entity is blacklisted. Any new registration under this PAN should be blocked.",
+    conns:["e4","e5"] },
+
+  // CTA Domains
+  { id:"cta1", name:"lotus365.cc\n[BLACKLISTED]",         type:"cta", risk:"blacklisted",
+    desc:"Blacklisted. Illegal online gambling platform. .cc TLD associated with high spam rates. Found embedded in Lotus365 Gaming Ltd active DLT templates. CTA engine arrested this domain.",
+    conns:["e5"] },
+
+  { id:"cta2", name:"yono8.com\n[BLACKLISTED]",           type:"cta", risk:"blacklisted",
+    desc:"Blacklisted. SBI YONO brand impersonation. Part of a 11-domain sequential generation campaign (yono8–yono10, yonorummy025–038). Found in QuickCredit India templates.",
+    conns:["e3"] },
+
+  { id:"cta3", name:"quickfinance.icu\n[BLACKLISTED]",    type:"cta", risk:"blacklisted",
+    desc:"Blacklisted. Phishing domain targeting loan applicants. .icu TLD — globally among the highest spam rates. Found in MoneyGrow Ventures active templates.",
+    conns:["e4"] },
+
+  // DLT Headers
+  { id:"h1", name:"Headers: 12 total\n8 blacklisted (67%)", type:"header", risk:"blacklisted",
+    desc:"CRITICAL: 67% header blacklist rate. 8 of 12 registered headers have been blacklisted by telecom operators for spam. Enterprise has no clean communication pathway remaining. F2 signal maxed.",
+    conns:["e4"] },
+
+  { id:"h2", name:"Headers: 45 total\n0 blacklisted",       type:"header", risk:"clean",
+    desc:"Clean header profile. All 45 registered headers are active and compliant. Zero blacklist rate. F2 signal clear.",
+    conns:["e1"] },
+
+  // Complaints
+  { id:"c1", name:"142 complaints\n18.2 per header",        type:"complaint", risk:"high",
+    desc:"HIGH: 142 total consumer complaints. 18.2 complaints per header — far above the 10/header elevated risk threshold. Systematic consumer harm pattern consistent with mass spam operations.",
+    conns:["e4"] },
+
+  { id:"c2", name:"3 complaints\n0.1 per header",            type:"complaint", risk:"clean",
+    desc:"Normal complaint rate. 3 complaints across 30 headers (0.1 per header). Well within acceptable range. F6 signal clear.",
+    conns:["e1"] },
+
+  // Templates
+  { id:"t1", name:"Similar Templates\n(3 entities)",         type:"template", risk:"suspicious",
+    desc:"SUSPICIOUS: Near-identical template content detected across Digital Pay Solutions, QuickCredit India, and MoneyGrow Ventures — three nominally independent enterprises. Indicates coordinated messaging campaign run through multiple entities to evade per-entity complaint thresholds.",
+    conns:["e2","e3","e4"] },
+
+  // Brands
+  { id:"b1", name:"LOTUS365\n[Impersonation]",               type:"brand", risk:"blacklisted",
+    desc:"Brand impersonation confirmed. Lotus365 is operating as an illegal gambling brand. Registered under Lotus365 Gaming Ltd on DLT. CTA domains (lotus365.cc, lotus365.club) confirmed blacklisted.",
+    conns:["e5"] },
+
+  { id:"b2", name:"YONO\n[SBI Brand Hijack]",                type:"brand", risk:"blacklisted",
+    desc:"SBI YONO brand hijacking. 11 confirmed impersonation domains arrested by CTA engine (yono8–yono10, yono-777.vip, yonorummy025–038 series). QuickCredit India using YONO-branded CTAs in templates to impersonate SBI.",
+    conns:["e3","cta2"] },
+
+  // DLT Traffic
+  { id:"tr1", name:"Volume: 0 msgs\n12-month zero",          type:"traffic", risk:"suspicious",
+    desc:"ANOMALY: Zero DLT message volume over 12 months despite having 12 registered headers (8 of which are now blacklisted). Dormant-registration shell indicator. F4 maximum risk signal triggered.",
+    conns:["e4"] },
+
+  { id:"tr2", name:"Volume: 2.3M/mo\nNormal pattern",        type:"traffic", risk:"clean",
+    desc:"Normal volume pattern. 2.3M messages/month. Operator distribution (Airtel 42%, Jio 38%, VIL 14%, BSNL 6%) consistent with declared business activity. F4 signal clear.",
+    conns:["e1"] },
+];
+
+const LINKS = [
+  // Enterprise → Director
+  { s:"e1", t:"d2", type:"director" },
+  { s:"e2", t:"d1", type:"director" }, { s:"e2", t:"d2", type:"director" },
+  { s:"e3", t:"d1", type:"director" },
+  { s:"e4", t:"d1", type:"director" }, { s:"e4", t:"d3", type:"director" },
+  { s:"e5", t:"d3", type:"director" },
+  // Enterprise → Address
+  { s:"e1", t:"a2", type:"address" },
+  { s:"e2", t:"a1", type:"address" }, { s:"e3", t:"a1", type:"address" }, { s:"e4", t:"a1", type:"address" },
+  // Enterprise → PAN
+  { s:"e2", t:"p1", type:"pan" }, { s:"e3", t:"p1", type:"pan" },
+  { s:"e4", t:"p2", type:"pan" }, { s:"e5", t:"p2", type:"pan" },
+  // Enterprise → CTA
+  { s:"e5", t:"cta1", type:"cta" }, { s:"e3", t:"cta2", type:"cta" }, { s:"e4", t:"cta3", type:"cta" },
+  // Enterprise → Header
+  { s:"e4", t:"h1", type:"header" }, { s:"e1", t:"h2", type:"header" },
+  // Enterprise → Complaints
+  { s:"e4", t:"c1", type:"complaint" }, { s:"e1", t:"c2", type:"complaint" },
+  // Enterprise → Template
+  { s:"e2", t:"t1", type:"template" }, { s:"e3", t:"t1", type:"template" }, { s:"e4", t:"t1", type:"template" },
+  // Enterprise → Brand
+  { s:"e5", t:"b1", type:"brand" }, { s:"e3", t:"b2", type:"brand" },
+  // Brand → CTA (impersonation link)
+  { s:"b2", t:"cta2", type:"brand" },
+  // Enterprise → Traffic
+  { s:"e4", t:"tr1", type:"traffic" }, { s:"e1", t:"tr2", type:"traffic" },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STYLE CONFIG
+// ─────────────────────────────────────────────────────────────────────────────
+const TYPE_CFG = {
+  enterprise: { color:"#3b82f6", icon:"🏢", label:"Enterprise",  r:27 },
+  director:   { color:"#f59e0b", icon:"👤", label:"Director",    r:20 },
+  address:    { color:"#10b981", icon:"📍", label:"Address",     r:20 },
+  pan:        { color:"#8b5cf6", icon:"🆔", label:"PAN",         r:20 },
+  cta:        { color:"#ef4444", icon:"🔗", label:"CTA Domain",  r:18 },
+  header:     { color:"#64748b", icon:"📡", label:"DLT Header",  r:18 },
+  template:   { color:"#06b6d4", icon:"📄", label:"Template",    r:18 },
+  brand:      { color:"#ec4899", icon:"🏷️", label:"Brand",       r:18 },
+  complaint:  { color:"#f97316", icon:"⚠️", label:"Complaints",  r:18 },
+  traffic:    { color:"#84cc16", icon:"📊", label:"DLT Traffic", r:18 },
+};
+
+const RISK_CFG = {
+  blacklisted:{ color:"#7c3aed", bg:"rgba(124,58,237,.15)",  label:"BLACKLISTED",  emoji:"🚫" },
+  critical:   { color:"#dc2626", bg:"rgba(220,38,38,.15)",   label:"CRITICAL",     emoji:"🔴" },
+  high:       { color:"#ea580c", bg:"rgba(234,88,12,.15)",   label:"HIGH RISK",    emoji:"🟠" },
+  medium:     { color:"#d97706", bg:"rgba(217,119,6,.15)",   label:"MEDIUM",       emoji:"🟡" },
+  low:        { color:"#16a34a", bg:"rgba(22,163,74,.15)",   label:"LOW",          emoji:"🟢" },
+  clean:      { color:"#2563eb", bg:"rgba(37,99,235,.15)",   label:"CLEAN",        emoji:"✅" },
+  suspicious: { color:"#d97706", bg:"rgba(217,119,6,.15)",   label:"SUSPICIOUS",   emoji:"⚠️" },
+  flagged:    { color:"#ea580c", bg:"rgba(234,88,12,.15)",   label:"FLAGGED",      emoji:"🚩" },
+  farm:       { color:"#dc2626", bg:"rgba(220,38,38,.15)",   label:"ADDRESS FARM", emoji:"🏭" },
+};
+
+const LINK_CFG = {
+  director: { color:"#f59e0b80", dash:null    },
+  address:  { color:"#10b98180", dash:null    },
+  pan:      { color:"#8b5cf680", dash:null    },
+  cta:      { color:"#ef444480", dash:"5,3"   },
+  header:   { color:"#64748b80", dash:"4,3"   },
+  template: { color:"#06b6d480", dash:"7,3"   },
+  brand:    { color:"#ec489980", dash:"5,3"   },
+  complaint:{ color:"#f9731680", dash:"4,3"   },
+  traffic:  { color:"#84cc1680", dash:"4,3"   },
+};
+
+function nColor(d) {
+  if (d.type === "enterprise") return (RISK_CFG[d.risk] || {}).color || "#3b82f6";
+  if (d.risk === "blacklisted")                                    return "#7c3aed";
+  if (["flagged","suspicious","farm"].includes(d.risk))            return "#ea580c";
+  return TYPE_CFG[d.type]?.color || "#94a3b8";
+}
+function nR(d) { return TYPE_CFG[d.type]?.r || 16; }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// D3 SETUP
+// ─────────────────────────────────────────────────────────────────────────────
+const wrap    = document.getElementById("gwrap");
+const svg     = d3.select("#gsvg");
+const tooltip = document.getElementById("tip");
+let W = wrap.clientWidth, H = wrap.clientHeight;
+
+// remap source/target to match d3 expectation
+const links = LINKS.map(l => ({ source:l.s, target:l.t, type:l.type }));
+const nodes = NODES.map(n => ({ ...n }));   // shallow copy so simulation can mutate
+
+const g = svg.append("g");
+
+// Zoom
+const zoom = d3.zoom().scaleExtent([.25, 4]).on("zoom", e => g.attr("transform", e.transform));
+svg.call(zoom);
+
+// Arrow markers
+const defs = svg.append("defs");
+Object.entries(LINK_CFG).forEach(([type, cfg]) => {
+  defs.append("marker")
+    .attr("id",         `arr-${type}`)
+    .attr("viewBox",    "0 -4 8 8")
+    .attr("refX",       8)
+    .attr("markerWidth",  5)
+    .attr("markerHeight", 5)
+    .attr("orient",     "auto")
+    .append("path")
+    .attr("d",    "M0,-4L8,0L0,4")
+    .attr("fill", cfg.color);
+});
+
+// Glow filters for critical/blacklisted
+["#dc2626","#7c3aed"].forEach((col, i) => {
+  const f = defs.append("filter").attr("id", `glow${i}`).attr("x","-50%").attr("y","-50%").attr("width","200%").attr("height","200%");
+  f.append("feGaussianBlur").attr("stdDeviation","4").attr("result","blur");
+  const fmerge = f.append("feMerge");
+  fmerge.append("feMergeNode").attr("in","blur");
+  fmerge.append("feMergeNode").attr("in","SourceGraphic");
+});
+
+// Simulation
+const sim = d3.forceSimulation(nodes)
+  .force("link",      d3.forceLink(links).id(d => d.id).distance(d => {
+    if (d.type === "director") return 150;
+    if (d.type === "address")  return 130;
+    return 110;
+  }).strength(.35))
+  .force("charge",    d3.forceManyBody().strength(-450))
+  .force("center",    d3.forceCenter(W/2, H/2))
+  .force("collision", d3.forceCollide().radius(d => nR(d) + 22))
+  .force("x",         d3.forceX(W/2).strength(.04))
+  .force("y",         d3.forceY(H/2).strength(.04));
+
+// ── Links ──────────────────────────────────────────────────────────────────
+const linkSel = g.append("g").selectAll("line")
+  .data(links).enter().append("line")
+  .attr("class", d => `lnk lnk-${d.type}`)
+  .attr("stroke",         d => LINK_CFG[d.type]?.color || "#44444880")
+  .attr("stroke-width",   1.6)
+  .attr("stroke-dasharray", d => LINK_CFG[d.type]?.dash || null)
+  .attr("marker-end",     d => `url(#arr-${d.type})`);
+
+// ── Pulse rings ────────────────────────────────────────────────────────────
+const pulseNodes = nodes.filter(d => ["blacklisted","critical"].includes(d.risk));
+const pulseRings = g.append("g").selectAll("circle.pr").data(pulseNodes).enter()
+  .append("circle").attr("class","pr")
+  .attr("r",    d => nR(d)+10)
+  .attr("fill", "none")
+  .attr("stroke", d => nColor(d))
+  .attr("stroke-width", 1.5)
+  .attr("stroke-opacity", .5);
+
+// ── Node groups ────────────────────────────────────────────────────────────
+const nodeSel = g.append("g").selectAll("g.nd")
+  .data(nodes).enter().append("g").attr("class","nd")
+  .attr("data-id", d => d.id)
+  .call(d3.drag()
+    .on("start", (e,d) => { if (!e.active) sim.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; })
+    .on("drag",  (e,d) => { d.fx=e.x; d.fy=e.y; })
+    .on("end",   (e,d) => { if (!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }))
+  .on("click",     nodeClick)
+  .on("mouseover", nodeOver)
+  .on("mouseout",  nodeOut)
+  .style("cursor","pointer");
+
+// outer ring
+nodeSel.append("circle").attr("class","nc")
+  .attr("r", d => nR(d))
+  .attr("fill",         d => nColor(d)).attr("fill-opacity",.18)
+  .attr("stroke",       d => nColor(d)).attr("stroke-width", 2)
+  .attr("filter",       d => ["blacklisted","critical"].includes(d.risk) ? `url(#glow${d.risk==="critical"?0:1})` : null);
+
+// inner fill
+nodeSel.append("circle").attr("r", d => nR(d)*.52)
+  .attr("fill", d => nColor(d)).attr("fill-opacity",.45);
+
+// icon
+nodeSel.append("text")
+  .attr("text-anchor","middle").attr("dominant-baseline","central")
+  .attr("font-size", d => nR(d)*.82)
+  .text(d => TYPE_CFG[d.type]?.icon || "●")
+  .style("pointer-events","none");
+
+// risk dot (enterprises only)
+nodeSel.filter(d => d.type==="enterprise").append("circle")
+  .attr("r",6).attr("cx", d => nR(d)*.72).attr("cy", d => -nR(d)*.72)
+  .attr("fill", d => (RISK_CFG[d.risk]||{}).color||"#fff")
+  .attr("stroke","#0a0e1a").attr("stroke-width",1.5);
+
+// labels
+nodeSel.append("text")
+  .attr("text-anchor","middle")
+  .attr("dy", d => nR(d)+13)
+  .attr("font-size","10px").attr("fill","#94a3b8")
+  .each(function(d) {
+    const lines = d.name.split("\n");
+    const el = d3.select(this);
+    lines.forEach((line, i) => {
+      el.append("tspan").attr("x",0).attr("dy", i===0 ? 0 : "1.15em").text(line);
+    });
+  });
+
+// ── Tick ──────────────────────────────────────────────────────────────────
+sim.on("tick", () => {
+  linkSel
+    .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+    .attr("x2", d => {
+      const dx=d.target.x-d.source.x, dy=d.target.y-d.source.y;
+      const dist=Math.sqrt(dx*dx+dy*dy)||1;
+      return d.target.x - (dx/dist)*(nR(d.target)+2);
+    })
+    .attr("y2", d => {
+      const dx=d.target.x-d.source.x, dy=d.target.y-d.source.y;
+      const dist=Math.sqrt(dx*dx+dy*dy)||1;
+      return d.target.y - (dy/dist)*(nR(d.target)+2);
+    });
+  nodeSel.attr("transform", d => `translate(${d.x},${d.y})`);
+  pulseRings.attr("cx", d => d.x).attr("cy", d => d.y);
+});
+
+// ── Pulse animation ────────────────────────────────────────────────────────
+(function animatePulse() {
+  pulseRings.transition().duration(1600)
+    .attr("r",             d => nR(d)+22)
+    .attr("stroke-opacity", 0)
+    .on("end", function(d) {
+      d3.select(this).attr("r", nR(d)+10).attr("stroke-opacity",.5);
+      setTimeout(animatePulse, 50);
+    });
+})();
+
+// ── Tooltip ────────────────────────────────────────────────────────────────
+function nodeOver(event, d) {
+  const r = RISK_CFG[d.risk] || {};
+  tooltip.innerHTML = `<strong>${d.name.replace(/\n/g," ")}</strong><br>
+    <span style="color:${r.color||'#94a3b8'}">${r.emoji||""} ${r.label||d.risk||""}</span><br>
+    <span style="color:#64748b;font-size:10px">${TYPE_CFG[d.type]?.label||d.type}</span>`;
+  tooltip.classList.add("on");
+  moveTip(event);
+}
+function nodeOut() { tooltip.classList.remove("on"); }
+function moveTip(e) {
+  const rect = wrap.getBoundingClientRect();
+  let x = e.clientX - rect.left + 12, y = e.clientY - rect.top - 8;
+  if (x+200 > W) x -= 215;
+  tooltip.style.left = x+"px"; tooltip.style.top = y+"px";
+}
+svg.on("mousemove", moveTip);
+
+// ── Click / select ─────────────────────────────────────────────────────────
+let selId = null;
+
+function nodeClick(event, d) {
+  event.stopPropagation();
+  selId = d.id;
+  const connSet = new Set([d.id, ...(d.conns||[])]);
+
+  nodeSel.selectAll("circle.nc")
+    .attr("stroke-opacity", n => connSet.has(n.id) ? 1    : .12)
+    .attr("fill-opacity",   n => connSet.has(n.id) ? .32  : .04);
+  nodeSel.selectAll("text").attr("opacity", n => connSet.has(n.id) ? 1 : .18);
+  linkSel
+    .attr("stroke-opacity", l => (l.source.id===d.id||l.target.id===d.id) ? .95 : .04)
+    .attr("stroke-width",   l => (l.source.id===d.id||l.target.id===d.id) ? 2.5 : 1.6);
+
+  showDetail(d);
+}
+
+svg.on("click", () => {
+  if (!selId) return;
+  selId = null;
+  nodeSel.selectAll("circle.nc").attr("stroke-opacity",1).attr("fill-opacity",.18);
+  nodeSel.selectAll("text").attr("opacity",1);
+  linkSel.attr("stroke-opacity",.45).attr("stroke-width",1.6);
+  document.getElementById("det-empty").style.display   = "block";
+  document.getElementById("det-content").style.display = "none";
+});
+
+function showDetail(d) {
+  document.getElementById("det-empty").style.display   = "none";
+  const content = document.getElementById("det-content");
+  content.style.display = "block";
+
+  const tc = TYPE_CFG[d.type]||{}, rc = RISK_CFG[d.risk]||{};
+  const connNodes = nodes.filter(n => (d.conns||[]).includes(n.id));
+
+  let h = `
+    <div class="det-hdr">
+      <div class="det-icon" style="background:${rc.bg||'rgba(59,130,246,.12)'}">${tc.icon||"●"}</div>
+      <div>
+        <div class="det-name">${d.name.replace(/\n/g,"<br>")}</div>
+        <div class="det-type">${tc.label||d.type}</div>
+        <div class="rbadge" style="background:${rc.bg};color:${rc.color}">${rc.emoji} ${rc.label||d.risk}</div>
+      </div>
+    </div>`;
+
+  if (d.type === "enterprise") {
+    const sc = d.shell>=75?"#dc2626":d.shell>=50?"#ea580c":d.shell>=30?"#d97706":"#16a34a";
+    const tc2 = d.trust>=70?"#16a34a":d.trust>=50?"#d97706":d.trust>=30?"#ea580c":"#dc2626";
+    const sTier = d.shell>=75?"CRITICAL — block & escalate":d.shell>=50?"HIGH — manual review":d.shell>=30?"MEDIUM — enhanced due diligence":"LOW — standard onboarding";
+    h += `
+      <div class="metric">
+        <div class="metric-lbl">Shell Risk Score</div>
+        <div class="metric-val" style="color:${sc}">${d.shell}<span style="font-size:12px;color:#64748b">/100</span></div>
+        <div class="bar"><div class="bar-fill" style="width:${d.shell}%;background:${sc}"></div></div>
+        <div class="metric-sub">${sTier}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-lbl">Enterprise Trust Score</div>
+        <div class="metric-val" style="color:${tc2}">${d.trust}<span style="font-size:12px;color:#64748b">/100</span></div>
+        <div class="bar"><div class="bar-fill" style="width:${d.trust}%;background:${tc2}"></div></div>
+        <div class="metric-sub">PE ID: ${d.peId}</div>
+      </div>`;
+  }
+
+  if (d.type === "address" && d.cluster) {
+    const ac = d.cluster>=10?"#dc2626":d.cluster>=5?"#ea580c":d.cluster>=3?"#d97706":"#16a34a";
+    const apt = d.cluster>=10?"+15 risk pts":d.cluster>=5?"+10 risk pts":d.cluster>=3?"+5 risk pts":"Clean";
+    h += `<div class="metric">
+      <div class="metric-lbl">Address Cluster Size</div>
+      <div class="metric-val" style="color:${ac}">${d.cluster}<span style="font-size:11px;color:#64748b"> entities</span></div>
+      <div class="metric-sub">${apt} (F8 signal)</div>
+    </div>`;
+  }
+
+  if (d.type === "pan" && d.entityCount) {
+    const pc = d.entityCount>=3?"#dc2626":"#d97706";
+    h += `<div class="metric">
+      <div class="metric-lbl">PAN Entity Count</div>
+      <div class="metric-val" style="color:${pc}">${d.entityCount}<span style="font-size:11px;color:#64748b"> entities</span></div>
+      <div class="metric-sub">${d.entityCount>=3?"+10 risk pts":"+5 risk pts"} (F9 signal)</div>
+    </div>`;
+  }
+
+  h += `<div class="slbl">Analysis</div>
+    <div class="analysis">${d.desc||"No details available."}</div>`;
+
+  if (connNodes.length) {
+    h += `<div class="slbl">Connected Nodes (${connNodes.length})</div>`;
+    connNodes.forEach(n => {
+      const nc2 = TYPE_CFG[n.type]||{}, nr = RISK_CFG[n.risk]||{};
+      h += `<div class="conn-item" onclick="selectById('${n.id}')">
+        <span>${nc2.icon||"●"}</span>
+        <span style="flex:1">${n.name.replace(/\n/g," ")}</span>
+        <span style="color:${nr.color||'#64748b'};font-size:10px;font-weight:600">${nr.label||n.risk||""}</span>
+      </div>`;
+    });
+  }
+
+  content.innerHTML = h;
+}
+
+function selectById(id) {
+  const d = nodes.find(n => n.id===id);
+  if (d) nodeClick({ stopPropagation:()=>{} }, d);
+}
+
+// ── Filters ────────────────────────────────────────────────────────────────
+const activeFilters = new Set(Object.keys(TYPE_CFG));
+
+function toggleFilter(el) {
+  const type = el.dataset.type;
+  el.classList.toggle("active");
+  activeFilters.has(type) ? activeFilters.delete(type) : activeFilters.add(type);
+  nodeSel.attr("opacity", d => activeFilters.has(d.type) ? 1 : 0).style("pointer-events", d => activeFilters.has(d.type) ? "all" : "none");
+  linkSel.attr("opacity", l => {
+    const si = typeof l.source === "object" ? l.source.id : l.source;
+    const ti = typeof l.target === "object" ? l.target.id : l.target;
+    const sn = nodes.find(n => n.id===si), tn = nodes.find(n => n.id===ti);
+    return (sn && tn && activeFilters.has(sn.type) && activeFilters.has(tn.type)) ? 1 : 0;
+  });
+}
+
+function highlightRisk(r) {
+  if (!r) {
+    nodeSel.selectAll("circle.nc").attr("stroke-opacity",1).attr("fill-opacity",.18);
+    nodeSel.selectAll("text").attr("opacity",1);
+    linkSel.attr("stroke-opacity",.45);
+    return;
+  }
+  nodeSel.selectAll("circle.nc")
+    .attr("stroke-opacity", n => n.risk===r ? 1 : .08)
+    .attr("fill-opacity",   n => n.risk===r ? .38: .02);
+  nodeSel.selectAll("text").attr("opacity", n => n.risk===r ? 1 : .12);
+}
+
+// ── Zoom controls ─────────────────────────────────────────────────────────
+function zIn()    { svg.transition().call(zoom.scaleBy, 1.35); }
+function zOut()   { svg.transition().call(zoom.scaleBy, 0.74); }
+function zReset() {
+  svg.transition().duration(600).call(
+    zoom.transform,
+    d3.zoomIdentity.translate(W/2, H/2).scale(.82).translate(-W/2, -H/2)
+  );
+}
+
+// ── Resize ─────────────────────────────────────────────────────────────────
+window.addEventListener("resize", () => {
+  W = wrap.clientWidth; H = wrap.clientHeight;
+  sim.force("center", d3.forceCenter(W/2, H/2))
+     .force("x", d3.forceX(W/2).strength(.04))
+     .force("y", d3.forceY(H/2).strength(.04))
+     .alpha(.1).restart();
+});
+
+// Initial fit after simulation settles
+setTimeout(zReset, 1200);
+</script>
+</body>
+</html>
