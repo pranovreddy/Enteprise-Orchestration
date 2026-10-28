@@ -116,7 +116,14 @@ button{cursor:pointer}
   padding:12px 12px 10px;
 }
 .fcard .row1{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.fcard h3{margin:8px 0 4px;font-size:15px;letter-spacing:-.02em;line-height:1.3}
+.fcard h3{margin:8px 0 4px;font-size:15px;letter-spacing:-.02em;line-height:1.3;text-transform:none;color:var(--ink)}
+.tilelab,.baylab{position:absolute;pointer-events:none;text-align:center;white-space:nowrap;text-shadow:0 1px 0 #fff,0 0 6px #fff,0 0 6px #fff}
+.tilelab{transform:translate(-50%,-60%);font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;font-weight:680;color:#172033}
+.tilelab.bad{color:#9f1239}
+.baylab{transform:translate(-50%,-130%);font-size:13px;font-weight:750;letter-spacing:-.02em}
+.maplab{position:absolute;transform:translate(-50%,-115%);pointer-events:none;max-width:148px;background:rgba(255,255,255,.94);border:1px solid #e6ebf2;border-radius:10px;padding:5px 8px;box-shadow:0 8px 20px rgba(23,32,51,.08);text-align:left}
+.maplab b{display:block;font-size:12.5px;letter-spacing:-.01em}
+.maplab small{display:block;margin-top:1px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#5c6b7c;font-weight:700}
 .fcard p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.4}
 .fcard .go{margin-top:10px;width:100%;height:32px;border:0;border-radius:9px;background:var(--ink);color:#fff;font-weight:650;font-size:12.5px}
 .x{border:0;background:transparent;color:var(--muted);font-size:16px;line-height:1;padding:2px 4px}
@@ -206,14 +213,16 @@ table.grid td{padding:5px 4px;border-top:1px solid #eef2f6}
 #viewtog{position:fixed;z-index:14;left:16px;bottom:40px;display:flex;background:#fff;border-radius:12px;padding:3px;box-shadow:0 4px 14px rgba(23,32,51,.06);border:1px solid var(--line)}
 #viewtog button{border:0;background:transparent;height:26px;padding:0 8px;border-radius:8px;font-size:12px;font-weight:700;color:var(--muted);box-shadow:none}
 #viewtog button.on{background:#172033;color:#fff}
-#statusline{position:fixed;z-index:12;left:16px;bottom:14px;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.08em;color:#6d7c8d}
+#statusline{position:fixed;z-index:12;left:16px;bottom:14px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.08em;color:#6d7c8d}
 #siblings{position:fixed;z-index:12;left:150px;right:calc(var(--ins) + 70px);bottom:16px;display:flex;justify-content:center;gap:6px;pointer-events:none;flex-wrap:wrap}
 .sib{pointer-events:auto;height:30px;padding:0 10px;border-radius:99px;font-size:12px;font-weight:680}
 .sib.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 #toast{
-  position:fixed;z-index:28;left:16px;right:calc(var(--ins) + 16px);bottom:62px;
+  position:fixed;z-index:28;left:16px;right:calc(var(--ins) + 16px);top:118px;
   display:flex;justify-content:center;pointer-events:none
 }
+body.has-card #toast{top:304px;left:16px;right:auto;width:300px;justify-content:flex-start}
+body.has-card #toast .box{max-width:300px}
 #toast .box{pointer-events:auto;background:#172033;color:#fff;border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;max-width:560px;box-shadow:0 12px 30px rgba(23,32,51,.25);font-size:13px}
 #toast button{border:0;background:#fff;color:#172033;border-radius:8px;height:28px;padding:0 8px;font-weight:750;font-size:12px}
 #tour{
@@ -234,13 +243,13 @@ body.ins-closed #collapse{left:-44px}
   #inspector{top:auto;left:0;right:0;bottom:0;width:100%;height:46vh;border-radius:16px 16px 0 0}
   body.ins-closed #inspector{transform:translateY(110%)}
   body.ins-closed{--ins:0px}
-  #tools{top:auto;bottom:calc(46vh + 58px);right:10px;transform:none;flex-direction:row}
-  #zoom{right:10px;bottom:calc(46vh + 104px)}
-  #siblings{left:8px;right:8px;bottom:calc(46vh + 10px)}
-  #statusline,#viewtog{bottom:calc(46vh + 8px)}
-  #viewtog{left:auto;right:120px}
-  #nav{max-width:70vw}
-  #toast,#tour{right:10px;bottom:calc(46vh + 52px)}
+  .fcard,.dlabel,.wlabel{display:none}
+  #viewtog,#statusline{display:none}
+  #tools{top:auto;bottom:calc(46vh + 14px);left:10px;right:auto;transform:none;flex-direction:row}
+  #zoom{right:10px;bottom:calc(46vh + 14px)}
+  #siblings{display:none}
+  #nav{max-width:92vw}
+  #toast,#tour{right:10px;left:10px;top:auto;bottom:calc(46vh + 64px)}
   .badge{display:none}
 }
 </style>
@@ -342,7 +351,7 @@ const IT={
   actions:[['release','Recommend release','Suggest the brand release the unused IDs.'],['justify','Ask the brand to justify','Request a business reason to keep them.'],['retire','Retire now','Remove the IDs from the active registry.']]},
  url:{cat:'url',label:'Unregistered links',title:n=>`${n} links use unregistered domains`,detail:()=>'Shorteners and domains in live templates are missing from the approved list.',
   actions:[['proof','Request whitelist proof','Brand shows ownership of each domain.'],['block','Block the unregistered domains','Stop messages that carry them.'],['notify','Notify the brand','Send the list of affected templates.']]},
- uc1:{cat:'tpl',label:'Content–LOB mismatch',title:()=>'Loan-offer templates mapped to Savings',detail:()=>'Authorised review confirmed personal-loan content on templates whose single mapped LOB is Savings (L-SAV). Scrub correctly checked Savings consent; those consents remain valid. Confirmed affected: T101, T204 (idle), T310. Cleared: T400, T405, T410. Observed exposure: 1,100 distinct recipients (T101∪T310).',
+ uc1:{cat:'tpl',label:'Content–LOB mismatch',title:()=>'Loan-offer templates mapped to Savings',detail:()=>'Authorised review confirmed personal-loan content on templates whose single mapped LOB is Savings (L-SAV). Scrub correctly checked Savings consent; those consents remain valid. Confirmed affected: T101, T204 (idle), T310. Cleared: T400, T405, T410. Observed exposure: 1,100 distinct recipients (T101 and T310, minus overlap).',
   actions:[['restrict','Restrict confirmed mismatched templates','Simulated template-control on T101, T204 and T310 only. No Savings-wide suspend. No remap.'],['evidence','Open affected-record review','Inspect confirmed, cleared and exposure tables.']]},
  uc2:{cat:'tpl',label:'Deceptive fixed claim',title:()=>'Deceptive “guaranteed approval” claim in loan templates',detail:()=>'Synthetic investigation evidence establishes the same deceptive claim in T501, T502 (idle) and T503. T504 is an ordinary loan offer without that claim and is cleared for this finding. Correct L-LOAN mapping does not make the claim legitimate.',
   actions:[['restrict2','Restrict templates with the confirmed claim','Simulated restriction of T501–T503. Preserve Loan consents.'],['evidence','Open claim excerpts','Review matched excerpts and cleared lookalike T504.']]},
@@ -684,6 +693,9 @@ function openConcerns(m,lobId){
   return m.issues.filter(i=>i.status!=='resolved' && (!lobId||i.lobId===lobId))
     .sort((a,b)=>(b.sev==='crit')-(a.sev==='crit')||b.n-a.n);
 }
+function roofIssues(m,lobId){
+  return openConcerns(m,lobId).filter(i=>i.execStatus!=='applied');
+}
 function counts(m){
   const open=m.issues.filter(i=>i.status==='open').length;
   const wait=m.issues.filter(i=>i.pendingApprove&&i.status==='open').length;
@@ -769,13 +781,13 @@ function buildScene(){
   const m=M(); ensureLayout(m);
   const layers=[[],[],[],[],[],[]];
   const texts=[]; const pins=[]; const labels=[]; const routes=[]; const nodes=[];
-  const motions=[];
+  const motions=[]; const unders=[];
   const dim=cat=>S.filter&&S.filter!==cat;
 
   if(S.level==='map'&&S.asset){
-    buildMap(m,layers,texts,labels,motions);
+    buildMap(m,layers,texts,labels,motions,unders);
   } else if(S.level==='ent'){
-    buildCampus(m,layers,texts,labels,pins,true);
+    drawCampus(m,layers,texts,labels,pins);
   } else if(S.level==='brand'){
     const d=m.layout.districts.find(d=>d.brand.id===S.brand)||m.layout.districts[0];
     drawDistrict(m,d,layers,texts,labels,pins,true);
@@ -789,6 +801,7 @@ function buildScene(){
   /* ground from boxes bounds — draw grid under first layer using campus or local pad */
   const ground=sceneGround();
   svg+=gridSVG(ground.x,ground.y,ground.w,ground.d,S.level==='ent'?2:1);
+  unders.forEach(u=>{svg+=u;});
   for(let L=0;L<layers.length;L++) sortLayer(layers[L]).forEach(b=>{svg+=drawBox(b);});
   routes.forEach(pts=>{
     const d=linePath(pts);
@@ -804,7 +817,7 @@ function buildScene(){
 }
 function sceneGround(){
   const m=M();
-  if(S.level==='map') return {x:-2,y:-2,w:18,d:16};
+  if(S.level==='map') return {x:-8,y:-5,w:20,d:18};
   if(S.level==='ent'){const L=m.layout; return {x:-2,y:-2,w:L.w+4,d:L.d+4};}
   if(S.level==='brand'){const d=m.layout.districts.find(d=>d.brand.id===S.brand)||m.layout.districts[0]; return {x:d.x-1.5,y:d.y-1.5,w:d.w+3,d:d.d+3};}
   const loc=findBuilding(m,S.lob);
@@ -850,7 +863,7 @@ function drawCampus(m,layers,texts,labels,pins){
 function drawDistrict(m,d,layers,texts,labels,pins,solo){
   const tint=mix(d.brand.color,0.9);
   pushBox(layers,1,{x:d.x,y:d.y,z:0,w:d.w,d:d.d,h:0.16,fill:[tint,'#eef3f8','#e3ebf3','#d5dee8'],hit:'brand:'+d.brand.id});
-  labels.push({x:d.x+d.w/2, y:d.y+d.d-0.8, z:0.4, cls:'dlabel', text:d.brand.name, sub:d.brand.code});
+  labels.push({x:d.x+d.w/2, y:d.y+d.d+0.15, z:0.35, cls:'dlabel', text:d.brand.name, sub:d.brand.code});
   d.buildings.forEach(b=>drawClosedBuilding(m,b,layers,texts,labels,pins));
 }
 function drawClosedBuilding(m,b,layers,texts,labels,pins){
@@ -871,11 +884,11 @@ function drawClosedBuilding(m,b,layers,texts,labels,pins){
       ]));
     });
   }
-  if(k<0.92 && (S.level==='lob'||S.level==='bay') && S.lob===lob.id) drawInterior(m,b,layers,texts,1-k);
-  const active=openConcerns(m,lob.id);
+  if(k<0.92 && (S.level==='lob'||S.level==='bay') && S.lob===lob.id) drawInterior(m,b,layers,texts,labels,1-k);
+  const active=roofIssues(m,lob.id);
   if(active.length && k>0.5){
-    const crit=active.some(i=>i.sev==='crit');
-    pins.push({lobId:lob.id, x:b.ax+b.w*0.62, y:b.ay+b.d*0.38, z:0.16+h+0.35, count:active.length, crit, on:S.concern&&active.some(i=>i.id===S.concern)});
+    const crit=active.some(i=>i.sev==='crit'&&i.status==='open')||active.some(i=>i.execStatus==='partial');
+    pins.push({lobId:lob.id, x:b.ax+b.w*0.55, y:b.ay+b.d*0.22, z:0.16+h+0.4, count:active.length, crit, on:S.concern&&active.some(i=>i.id===S.concern)});
   }
   if(k>0.7) labels.push({x:b.ax+b.w/2, y:b.ay+b.d-0.15, z:0.16+h+0.2, cls:'wlabel', text:lob.name, sub:lob.code});
 }
@@ -891,15 +904,15 @@ function drawOpenBuilding(m,loc,layers,texts,labels,pins){
       pushBox(layers,3,{x:bay.ax+0.18,y:bay.ay+0.18,z:0.08+h,w:bay.w-0.36,d:bay.d-0.36,h:0.05,fill:f,stroke:f[3],op:k,hit:'bay:'+lob.id+':'+bay.cat});
     });
   }
-  if(k<0.98) drawInterior(m,b,layers,texts,1-k);
-  const active=openConcerns(m,lob.id);
+  if(k<0.98) drawInterior(m,b,layers,texts,labels,1-k);
+  const active=roofIssues(m,lob.id);
   if(active.length){
     const focus=S.concern&&active.find(i=>i.id===S.concern);
     const bay=b.bays.find(bay=>bay.cat===(focus?focus.cat:active[0].cat))||b.bays[0];
-    pins.push({lobId:lob.id, x:bay.ax+bay.w/2, y:bay.ay+0.4, z:0.9, count:active.length, crit:active.some(i=>i.sev==='crit'), on:!!focus});
+    pins.push({lobId:lob.id, x:bay.ax+bay.w*0.82, y:bay.ay+0.35, z:0.95, count:active.length, crit:active.some(i=>i.sev==='crit'&&i.status==='open')||active.some(i=>i.execStatus==='partial'), on:!!focus});
   }
 }
-function drawInterior(m,b,layers,texts,op){
+function drawInterior(m,b,layers,texts,labels,op){
   if(op<0.04) return;
   const lob=b.lob;
   b.bays.forEach(bay=>{
@@ -908,9 +921,8 @@ function drawInterior(m,b,layers,texts,op){
     const tone=bayTone(m,lob,bay.cat);
     const f=FILL[tone]||FILL.ok;
     pushBox(layers,3,{x:bay.ax,y:bay.ay,z:0.28,w:bay.w,d:bay.d,h:0.12,fill:['#fbfcfe','#eef3f8','#e4ebf3', tone==='ok'?'#d5dee8':f[3]], hit:'bay:'+lob.id+':'+bay.cat, op:bayOp});
-    texts.push(planeLabel(bay.ax+0.2, bay.ay+0.18, 0.42, bay.w, [
-      {t:CATS.find(c=>c.id===bay.cat).s, y:0.55, size:0.46, fill:'#1c2838', w:750}
-    ]));
+    const quiet=S.level==='bay'&&S.cat&&bay.cat!==S.cat;
+    if(!quiet) labels.push({x:bay.ax+bay.w/2, y:bay.ay+0.55, z:0.7, cls:'baylab', text:CATS.find(c=>c.id===bay.cat).s});
     bay.tiles.forEach(t=>{
       const st=styleOf(t.asset,m);
       const sel=S.asset===t.asset.id;
@@ -919,12 +931,10 @@ function drawInterior(m,b,layers,texts,op){
       pushBox(layers,4,{x:t.ax,y:t.ay,z,w:t.w,d:t.d,h:sel?0.38:0.26,
         fill:ff, stroke:sel?'#2f6bff':ff[3], sw:sel?2.4:1.15,
         hit:'asset:'+t.asset.id, op:bayOp, hatch:st==='restricted', dash:st==='proposed'});
-      const tag=t.asset.name.length>10?t.asset.name.slice(0,9):t.asset.name;
-      const extra=st==='failed'?'FAIL':(t.asset.activity==='idle'?'IDLE':'');
-      texts.push(planeLabel(t.ax+0.08, t.ay+0.16, z+(sel?0.4:0.28), t.w, [
-        {t:tag, y:0.38, size:tag.length>6?0.2:0.26, fill:st==='crit'||st==='failed'?'#9f1239':'#172033'},
-        extra?{t:extra, y:0.68, size:0.16, fill:st==='failed'?'#c2410c':'#64748b', w:700}:null
-      ].filter(Boolean)));
+      const raw=t.asset.name;
+      const tag=raw.length>14?raw.slice(0,13)+'…':raw;
+      const extra=st==='failed'?'FAIL':st==='restricted'?'HELD':(t.asset.activity==='idle'?'IDLE':'');
+      if(!quiet) labels.push({x:t.ax+t.w/2, y:t.ay+t.d*0.42, z:z+0.5, cls:'tilelab'+(st==='failed'||st==='crit'?' bad':''), text:extra?tag+' · '+extra:tag});
     });
   });
 }
@@ -934,23 +944,25 @@ function addRoute(m,issue,routes,nodes){
   const {d,b}=loc;
   const bay=b.bays.find(x=>x.cat===issue.cat)||b.bays[0];
   const open=(S.level==='lob'||S.level==='bay')&&S.lob===issue.lobId;
-  const zR=open?0.78:b.h+0.42;
-  const gate={x:d.x+d.w/2, y:d.y+d.d-0.3, z:0.28};
-  const door={x:b.ax+b.w/2, y:b.ay+b.d+0.05, z:0.28};
-  const bayC={x:bay.ax+bay.w/2, y:bay.ay+bay.d*0.55, z:zR};
-  const pts=[gate];
-  if(Math.abs(gate.x-door.x)>0.3) pts.push({x:door.x,y:gate.y,z:0.28});
-  pts.push(door);
-  pts.push({x:door.x,y:Math.min(door.y, b.ay+b.d-0.2), z:zR});
-  if(Math.abs(door.x-bayC.x)>0.3) pts.push({x:bayC.x, y:b.ay+b.d-0.2, z:zR});
-  pts.push(bayC);
+  const zR=open?0.72:b.h+0.42;
+  const bayC={x:bay.ax+bay.w/2, y:bay.ay+bay.d*0.42, z:zR};
+  let pts;
+  if(open){
+    const lipY=bay.ay+bay.d+0.55;
+    pts=[{x:bay.ax-0.85, y:lipY, z:zR},{x:bay.ax+0.45, y:lipY, z:zR}];
+  } else {
+    const gate={x:d.x+Math.min(d.w*0.72, b.ax-d.x+b.w*0.5), y:d.y+d.d-0.35, z:0.28};
+    const door={x:b.ax+b.w/2, y:b.ay+b.d+0.05, z:0.28};
+    pts=[gate];
+    if(Math.abs(gate.x-door.x)>0.3) pts.push({x:door.x,y:gate.y,z:0.28});
+    pts.push(door);
+    pts.push({x:door.x,y:b.ay+b.d-0.15, z:zR});
+    if(Math.abs(door.x-bayC.x)>0.3) pts.push({x:bayC.x, y:b.ay+b.d-0.15, z:zR});
+    pts.push(bayC);
+  }
   const clean=[];
   pts.forEach(p=>{const l=clean[clean.length-1]; if(!l||Math.hypot(l.x-p.x,l.y-p.y,l.z-p.z)>0.08) clean.push(p);});
   routes.push(clean); clean.forEach(p=>nodes.push(p));
-  bay.tiles.filter(t=>(issue.execTargets?issue.execTargets[t.asset.id]:issue.assetIds.includes(t.asset.id)) && (issue.assetIds.includes(t.asset.id)||(issue.execTargets&&issue.execTargets[t.asset.id]))).forEach(t=>{
-    const p={x:t.ax+t.w/2,y:t.ay+t.d/2,z:zR+0.08};
-    routes.push([bayC,p]); nodes.push(p);
-  });
 }
 function cardAnchor(m,issue){
   const loc=findBuilding(m,issue.lobId); if(!loc) return null;
@@ -965,29 +977,20 @@ function popAnchor(m,id){
   return null;
 }
 
-function buildMap(m,layers,texts,labels,motions){
+function buildMap(m,layers,texts,labels,motions,unders){
   const a=assetBy(S.asset); if(!a) return;
   const panels=mapPanels(m,a);
-  pushBox(layers,0,{x:-3,y:-2,z:0,w:20,d:16,h:0.05,...white()});
+  pushBox(layers,0,{x:-7.2,y:-4.2,z:0,w:16.5,d:15.2,h:0.05,...white()});
+  const cut=(s,n)=>!s?'':(String(s).length>n?String(s).slice(0,n-1)+'…':String(s));
   panels.forEach((p,i)=>{
-    const h=p.self?3.15:2.55, w=p.self?3.3:2.9, dth=0.22;
+    const h=p.self?2.05:1.72, w=p.self?3.15:2.85, dth=0.18;
     pushBox(layers,3,{x:p.x,y:p.y,z:0,w,d:dth,h,fill:p.self?['#f8fbff','#e7eef8','#dbe6f4','#2f6bff']:['#ffffff','#eef3f8','#e4ebf3','#d5dee8'],
       hit:'panel:'+p.kind+':'+p.ref, sw:p.self?1.8:1.15});
-    if(!S.plan){
-      texts.push(frontLabel(p.x, p.y+dth, 0, h, [
-        {t:p.kicker, x:0.18,y:0.42,size:0.2,fill:'#5c6b7c',w:700},
-        {t:p.title, x:0.18,y:0.85,size:0.34,w:750},
-        {t:p.line1, x:0.18,y:1.3,size:0.2,fill:'#3d4c60',w:500},
-        {t:p.line2, x:0.18,y:1.65,size:0.18,fill:'#5c6b7c',w:500}
-      ]));
-    } else {
-      texts.push(planeLabel(p.x+0.1,p.y+0.02,0.08,w,[{t:p.title,y:0.18,size:0.16}]));
-    }
-    labels.push({x:p.x+w/2, y:p.y+dth, z:h+0.25, cls:'wlabel', text:p.title, sub:p.kicker});
+    labels.push({x:p.x+w/2, y:p.y, z:h+0.2, cls:'maplab', text:p.title, sub:p.kicker});
     if(!p.self){
-      const x1=panels[0].x+1.6, y1=panels[0].y+0.1, x2=p.x+w/2, y2=p.y+0.1;
+      const x1=panels[0].x+w*0.5, y1=panels[0].y, x2=p.x+w*0.5, y2=p.y;
       const path=linePath([{x:x1,y:y1,z:0.08},{x:x2,y:y1,z:0.08},{x:x2,y:y2,z:0.08}]);
-      motions.push(`<path class="link" d="${path}"/>`+(RM?'':`<circle class="mdot" r="4" fill="#f08a24"><animateMotion dur="${2.2+i*0.25}s" repeatCount="indefinite" path="${path}"/></circle>`));
+      motions.push(`<path class="link" d="${path}"/>`+(RM?'':`<circle class="mdot" r="4" fill="#f08a24"><animateMotion dur="${2.4+i*0.2}s" repeatCount="indefinite" path="${path}"/></circle>`));
     }
   });
 }
@@ -1001,7 +1004,7 @@ function mapPanels(m,a){
   const sib=lob.assets.filter(x=>x.cat===a.cat&&x.id!==a.id).slice(0,2);
   sib.forEach(s=>bits.push({kind:'asset',ref:s.id,kicker:'Same bay',title:s.name,line1:s.purpose||s.sub,line2:styleOf(s,m)}));
   if(a.cat==='tpl' && lob.id==='bank-sav') bits.push({kind:'asset',ref:'C-SAV-1',kicker:'Consent',title:'Savings consents',line1:'Preserved',line2:'Not invalidated by the mismatch'});
-  const pos=[[0,6.2],[4.2,3.4],[-3.6,3.4],[4.4,0.2],[-3.8,0.2],[0.4,-2.4],[4.6,-2.2]];
+  const pos=[[0,9.2],[5.1,5.2],[-5.1,5.2],[5.3,1.15],[-5.3,1.15],[0,-2.7],[5.2,-2.7]];
   return bits.slice(0,7).map((p,i)=>({...p,x:pos[i][0],y:pos[i][1]}));
 }
 function mix(hex,amt){
@@ -1011,24 +1014,27 @@ function mix(hex,amt){
 }
 
 /* ---------- camera ---------- */
+function cardOn(){
+  return !!(S.concern && (S.level==='ent'||S.level==='brand') && innerWidth>=1200);
+}
 function insets(){
   const ins=S.inspector&&innerWidth>860?400:0;
   const top=innerWidth>860?76:120;
   const bottom=innerWidth>860?78:(S.inspector?innerHeight*0.46+70:70);
-  return {left:28, right:ins+78, top, bottom};
+  return {left:cardOn()?336:28, right:ins+78, top, bottom};
 }
 function fitCurrent(animate){
   if(!SCENE) return;
   const b=SCENE.bounds, pad=insets();
   const vw=Math.max(120, innerWidth-pad.left-pad.right), vh=Math.max(120, innerHeight-pad.top-pad.bottom);
   let s=Math.min(vw/b.w, vh/b.h);
-  s=Math.max(0.18, Math.min(s, S.level==='bay'||S.level==='map'?4.2:2.8));
+  s=Math.max(0.18, Math.min(s, S.level==='map'?7:2.6));
   if(S.level==='bay'&&S.lob){
     const m=M(), loc=findBuilding(m,S.lob);
     const bay=loc&&loc.b.bays.find(x=>x.cat===S.cat);
     if(bay){
       const bb=boundsOf([{x:bay.ax-0.6,y:bay.ay-0.5,z:0,w:bay.w+1.4,d:bay.d+1.2,h:1.2}],[]);
-      s=Math.min(vw/bb.w, vh/bb.h); s=Math.max(0.3,Math.min(s,5));
+      s=Math.min(vw/bb.w, vh/bb.h); s=Math.max(0.35,Math.min(s,16));
       const tx=pad.left+(vw-bb.w*s)/2 - bb.x*s;
       const ty=pad.top+(vh-bb.h*s)/2 - bb.y*s;
       animateCam(tx,ty,s,animate); return;
@@ -1104,6 +1110,7 @@ function renderChrome(){
   const pe=m.ent.peId||m.ent.name.toUpperCase();
   $id('statusline').textContent=`${pe} · ${m.brands.length} BRANDS · ${m.lobs.length} LOBS · ${m.assets.length} ASSETS · ${c.open} OPEN`;
   document.body.classList.toggle('ins-closed',!S.inspector);
+  document.body.classList.toggle('has-card', cardOn());
   const tour=$id('tour');
   if(S.tour!=null){
     const step=TOUR[S.tour];
@@ -1115,8 +1122,12 @@ let ovSig='';
 function overlayPieces(){
   const pieces=[];
   SCENE.labels.forEach(l=>{
-    if(S.level==='ent' && l.cls==='wlabel' && cam.s<0.55) return;
-    pieces.push({x:l.x,y:l.y,z:l.z,kind:'label',html:`<div class="ov ${l.cls||'wlabel'}" data-wx="${l.x}" data-wy="${l.y}" data-wz="${l.z}">${l.sub?`<small>${esc(l.sub)}</small>`:''}${esc(l.text)}</div>`});
+    if(l.cls==='tilelab' && cam.s<2.4) return;
+    if((S.level==='ent'||S.level==='brand') && l.cls==='wlabel' && cam.s<0.5) return;
+    const inner=l.cls==='maplab'
+      ? `<small>${esc(l.sub||'')}</small><b>${esc(l.text)}</b>`
+      : `${l.sub?`<small>${esc(l.sub)}</small>`:''}${esc(l.text)}`;
+    pieces.push({x:l.x,y:l.y,z:l.z,kind:'label',html:`<div class="ov ${l.cls||'wlabel'}" data-wx="${l.x}" data-wy="${l.y}" data-wz="${l.z}">${inner}</div>`});
   });
   SCENE.pins.forEach(p=>{
     pieces.push({x:p.x,y:p.y,z:p.z,kind:'pin',html:`<button class="ov pin ${p.crit?'crit':''} ${p.on?'on':''}" data-wx="${p.x}" data-wy="${p.y}" data-wz="${p.z}" data-act="pin:${p.lobId}" aria-label="${p.count} open concerns">${p.count}</button>`});
@@ -1138,19 +1149,16 @@ function overlayPieces(){
 function placeOv(el,x,y,z){
   const [sx,sy]=screen(x,y,z);
   if(el.classList.contains('fcard')){
-    let left=sx+18, top=sy-24;
-    const reserve=S.inspector&&innerWidth>860?420:16;
-    if(left>innerWidth-reserve-310) left=sx-318;
-    if(left<12) left=12;
-    if(top<70) top=74;
-    if(top>innerHeight-200) top=Math.max(74, innerHeight-210);
-    el.style.left=left+'px'; el.style.top=top+'px'; return;
+    if(!cardOn()){el.style.display='none';return;}
+    el.style.display='';
+    el.style.left='16px'; el.style.top='118px'; return;
   }
   if(el.classList.contains('pop')){el.style.left=(sx+14)+'px'; el.style.top=(sy-10)+'px'; return;}
   el.style.left=sx+'px'; el.style.top=sy+'px';
 }
 function positionOverlay(){
   if(!SCENE) return;
+  document.body.classList.toggle('has-card', cardOn());
   const root=$id('overlay');
   const issue=S.concern&&issueBy(S.concern);
   const pieces=overlayPieces();
@@ -1160,6 +1168,41 @@ function positionOverlay(){
   if(sig!==ovSig){ovSig=sig; root.innerHTML=pieces.map(p=>p.html).join('');}
   const els=root.querySelectorAll('.ov');
   pieces.forEach((p,i)=>{if(els[i]) placeOv(els[i],p.x,p.y,p.z);});
+  separateLabels();
+}
+function separateLabels(){
+  if(S.level!=='ent'&&S.level!=='brand') return;
+  const root=$id('overlay');
+  const labs=[...root.querySelectorAll('.dlabel,.wlabel')];
+  const pins=[...root.querySelectorAll('.pin')];
+  if(!labs.length) return;
+  const box=el=>{const r=el.getBoundingClientRect();return {l:r.left,t:r.top,r:r.right,b:r.bottom,w:r.width};};
+  const hit=(a,b)=>a.l<b.r-2 && a.r>b.l+2 && a.t<b.b+4 && a.b>b.t-4;
+  const minL=cardOn()?332:12;
+  const maxR=innerWidth-(S.inspector&&innerWidth>860?424:16);
+  labs.forEach(el=>{
+    const w=el.offsetWidth||box(el).w;
+    let cx=parseFloat(el.style.left);
+    if(cx-w/2<minL) cx=minL+w/2;
+    if(cx+w/2>maxR) cx=maxR-w/2;
+    el.style.left=cx+'px';
+    el.dataset.nudge='0';
+  });
+  for(let n=0;n<12;n++){
+    let moved=false;
+    const pb=pins.map(box);
+    for(const el of labs){
+      if(+el.dataset.nudge>=8) continue;
+      const a=box(el);
+      const onPin=pb.some(b=>hit(a,b));
+      const onW=el.classList.contains('dlabel') && labs.some(o=>o!==el && o.classList.contains('wlabel') && hit(a,box(o)));
+      if(!onPin && !onW) continue;
+      el.style.top=(parseFloat(el.style.top)+6)+'px';
+      el.dataset.nudge=+el.dataset.nudge+1;
+      moved=true;
+    }
+    if(!moved) break;
+  }
 }
 function floatingCard(issue,x,y){
   const T=IT[issue.type];
