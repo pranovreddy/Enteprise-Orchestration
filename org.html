@@ -42,7 +42,7 @@ button{cursor:pointer}
 .chip{margin-top:6px;height:36px;padding:0 12px;border-radius:18px;border:1px solid var(--gold-dim);background:var(--glass);backdrop-filter:blur(12px);display:flex;align-items:center;gap:8px;white-space:nowrap}
 .chip small{font:500 10px var(--mono);color:var(--gold);letter-spacing:.08em}
 .ask{position:relative;width:min(320px,32vw);margin-top:2px}
-.ask input{width:100%;height:42px;border-radius:21px;border:1px solid var(--gold-dim);background:var(--glass);backdrop-filter:blur(12px);padding:0 46px 0 16px}
+.ask input{width:100%;height:42px;border-radius:21px;border:1px solid var(--gold-dim);background:var(--glass);backdrop-filter:blur(12px);padding:0 46px 0 14px}
 .ask input::placeholder{color:var(--muted)}
 .ask button{position:absolute;right:4px;top:4px;width:34px;height:34px;border:0;border-radius:50%;background:var(--blue);color:#fff}
 .modes{position:absolute;left:18px;top:96px;width:210px;display:flex;flex-direction:column;gap:2px}
@@ -52,7 +52,8 @@ button{cursor:pointer}
 .mode.on{border-left-color:var(--gold);background:linear-gradient(90deg,rgba(228,184,106,.14),transparent)}
 .legend{margin:14px 0 0 12px;display:grid;gap:5px;color:var(--muted);font:11px var(--mono)}
 .legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
-.side{position:absolute;right:18px;top:96px;bottom:108px;width:344px;overflow:auto;padding-right:4px}
+.open-loop{margin:12px 0 0 12px;pointer-events:auto}
+.side{position:absolute;right:18px;top:96px;bottom:16px;width:344px;overflow:auto;padding-right:4px}
 .side::-webkit-scrollbar{width:8px}.side::-webkit-scrollbar-thumb{background:rgba(228,184,106,.28);border-radius:8px}
 .card{background:var(--glass);border:1px solid var(--gold-dim);border-radius:16px;backdrop-filter:blur(18px) saturate(1.15);box-shadow:0 18px 50px rgba(0,0,0,.28);padding:14px 14px 12px;margin-bottom:10px}
 .eyebrow{font:500 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
@@ -78,9 +79,9 @@ button{cursor:pointer}
 .next{font-size:12.5px;color:var(--muted);margin-top:6px}
 .next b{color:var(--text);font-weight:600}
 .foot{margin-top:8px;color:var(--muted);font-size:11px}
-.caption{position:absolute;left:22px;bottom:112px;width:min(460px, calc(100% - 400px));color:var(--muted);font-size:13px}
+.caption{position:absolute;left:22px;bottom:96px;width:min(520px, calc(100vw - 430px));color:var(--muted);font-size:13px}
 .caption b{color:var(--text);font-weight:600}
-.time{position:absolute;left:18px;right:18px;bottom:12px;height:86px;display:flex;flex-direction:column;gap:6px;padding:8px 12px 8px;border-radius:14px;background:var(--glass);border:1px solid var(--gold-dim);backdrop-filter:blur(16px)}
+.time{position:absolute;left:18px;right:380px;bottom:12px;display:flex;flex-direction:column;gap:6px;padding:8px 12px 8px;border-radius:14px;background:var(--glass);border:1px solid var(--gold-dim);backdrop-filter:blur(16px)}
 .time-top{display:flex;align-items:center;gap:10px;min-width:0}
 #when{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
 .evs{display:flex;gap:6px;overflow:auto;min-width:0}
@@ -90,6 +91,9 @@ button{cursor:pointer}
 .months button{background:none;border:0;border-left:1px solid rgba(207,224,236,.22);color:var(--muted);text-align:left;padding:3px 0 0 5px;font-size:10px;letter-spacing:.06em;text-transform:uppercase}
 .months button small{display:block;font:9px var(--mono);letter-spacing:0;text-transform:none;opacity:.6}
 .months button.on{color:#fff;font-weight:700;box-shadow:inset 0 3px 0 var(--blue)}
+.months .dot{display:block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin:0 0 3px 2px}
+.quiet{color:var(--muted);font-size:12px;white-space:nowrap}
+.sub{font:600 11px var(--ui);fill:#3d2912}
 .node{cursor:pointer}
 .label{font:500 13px var(--ui);fill:#e8f2f6}
 .label.core{font-family:var(--serif);font-size:26px;font-weight:500}
@@ -104,15 +108,21 @@ button{cursor:pointer}
 @keyframes drift{to{stroke-dashoffset:-240}}
 .boom{position:absolute;z-index:9;left:12px;top:12px;right:12px;background:#3a1016;color:#ffd0d6;padding:12px;border-radius:8px;white-space:pre-wrap}
 @media (max-width:860px){
-  .modes{left:10px;right:10px;top:78px;width:auto;flex-direction:row;overflow:auto}
-  .mode{min-width:148px;border-left:0;border-bottom:2px solid transparent;border-radius:8px}
+  .top{padding:10px 10px 0;gap:8px}
+  .word em{display:none}
+  .word strong{font-size:26px}
+  .modes{left:8px;right:8px;top:50px;width:auto;flex-direction:row;overflow:auto;gap:0;z-index:5;background:rgba(7,20,28,.92);border:1px solid var(--gold-dim);border-radius:12px;padding:4px}
+  .mode{display:flex;align-items:center;flex:none;width:max-content;padding:6px 10px;border-left:0;border-bottom:2px solid transparent;border-radius:8px}
+  .mode span{font-size:12px;white-space:nowrap}
+  .mode b{display:none}
   .mode.on{border-bottom-color:var(--gold)}
-  .legend,.caption{display:none}
-  .side{left:10px;right:10px;top:auto;width:auto;height:42vh;bottom:78px}
-  .time{height:70px}
+  .legend,.caption,.open-loop{display:none}
+  .side{left:8px;right:8px;top:auto;width:auto;height:34vh;bottom:8px}
+  .time{left:8px;right:8px;bottom:calc(34vh + 12px)}
   .ask{width:42px}.ask input{padding:0;color:transparent}.ask input::placeholder{color:transparent}
   .crumb{display:none}
-  .card h2{font-size:24px}
+  .chip small{display:none}
+  .card h2{font-size:22px}
 }
 @media (prefers-reduced-motion:reduce){
   .orbit{animation:none}
@@ -138,7 +148,7 @@ button{cursor:pointer}
   </defs>
   <g id="world">
     <circle id="orbit" class="orbit" r="148"/>
-    <g id="loopyTag" class="tag" role="button" tabindex="0" aria-label="Open Loopy">
+    <g id="loopyTag" class="tag" role="button" tabindex="0" aria-label="Open Loopy" style="display:none">
       <rect x="-58" y="-13" width="116" height="26" rx="13"/>
       <text y="4">Loopy governs</text>
     </g>
@@ -155,7 +165,7 @@ button{cursor:pointer}
     <nav class="crumb" id="crumb" aria-label="Org path"></nav>
     <button class="chip" type="button" id="agentChip" data-act="cycle" aria-label="Cycle Loopy agent"></button>
     <form class="ask" id="askForm">
-      <input id="askIn" type="text" placeholder="Ask about a fingerprint, a director, a brand…" aria-label="Ask the org" autocomplete="off">
+      <input id="askIn" type="text" placeholder="Ask the org" aria-label="Ask the org" autocomplete="off">
       <button type="submit" aria-label="Ask">↵</button>
     </form>
   </header>
@@ -173,6 +183,7 @@ button{cursor:pointer}
       <div><i style="background:#ff6fae"></i>Brand</div>
       <div><i style="background:#f0b429"></i>Identity, channel, signal</div>
     </div>
+    <button class="btn open-loop" type="button" data-go="loopy" data-dive="1">Open the Loopy ring</button>
   </nav>
   <aside class="side" id="side" aria-live="polite">
     <section class="card" id="metrics"></section>
@@ -197,7 +208,7 @@ const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 const polar = (cx,cy,r,deg) => { const a = deg*Math.PI/180; return [cx+Math.cos(a)*r, cy+Math.sin(a)*r]; };
 const norm = d => ((d % 360) + 360) % 360;
 
-const KIND = {core:'#e4b86a', content:'#3ec8db', enterprise:'#4c8dff', brand:'#ff6fae', identity:'#f0b429', channel:'#7dcea0', signal:'#ff8a3d', enforcement:'#ff5d73', agent:'#c4b5fd', loopy:'#c4b5fd', case:'#b7c6d2'};
+const KIND = {core:'#e4b86a', content:'#3ec8db', enterprise:'#4c8dff', brand:'#ff6fae', identity:'#f0b429', channel:'#7dcea0', signal:'#ff8a3d', enforcement:'#e5484d', agent:'#c4b5fd', loopy:'#c4b5fd', case:'#b7c6d2'};
 const RISK = {ok:'#3ddc97', watch:'#ffb020', high:'#ff8a3d', crit:'#ff4d5e', block:'#c3b2ff'};
 const RISK_LABEL = {ok:'Clear', watch:'Watch', high:'High', crit:'Critical', block:'Blocked', core:'Primacy', agent:'On the ring'};
 const PRIMARY = new Set(['content','enterprise','brand']);
@@ -267,7 +278,7 @@ const RAW = [
 ['fp5b','FP-5B90','content','high',11,70,'KYC expiry notice. Blocked 12 Oct 2026. Born at Halcyon Bank, seen again at Meridian.'],
 ['cta-lotus','lotus365.cc','content','block',8,94,'Blacklisted gambling domain inside Lotus365 templates.'],
 ['cta-yono','yono8.com','content','block',9,92,'Blacklisted. One of a sequential YONO series, found in QuickCredit templates.'],
-['cta-qf','quickfinance.icu','content','block',8,88,'Blacklisted phishing domain on a high-spam TLD, inside MoneyGrow templates.'],
+['cta-qf','quickfinance','content','block',8,88,'Blacklisted phishing domain quickfinance.icu, on a high-spam TLD, inside MoneyGrow templates.'],
 ['tpl-sim','Similar text','content','high',8,79,'Near-identical template copy across Digital Pay, QuickCredit, and MoneyGrow.'],
 ['rajesh','Rajesh Kumar','identity','high',8,84,'DIN 08123456. Director at Digital Pay, QuickCredit, and MoneyGrow. A new firm with this director is not a fresh start.'],
 ['amit','Amit Verma','identity','crit',8,90,'DIN 09876543. Director at MoneyGrow and at blacklisted Lotus365. Orion fails new registrations closed.'],
@@ -318,9 +329,10 @@ const RAW = [
 ];
 
 const N = {};
+const MARK = {consent:'', loopy:'Lp', content:'Ct', enterprise:'En', brand:'Br', identity:'Id', channel:'Ch', signal:'Sg', enforcement:'Ef', nova:'Nv', atlas:'As', vega:'Vg', echo:'Ec', orion:'Or', 'b-hbank':'Bk', 'b-hmob':'Mo', 'b-hretail':'Rt', 'b-hinsure':'In', 'b-htravel':'Tr', 'lob-prepaid':'Pr', 'iss-scam':'Lk', 'iss-headers':'Hd', 'fp7-var':'Nm'};
 RAW.forEach(r => {
   const [id,name,kind,risk,since,heat,summary] = r;
-  const mark = name.replace(/[^A-Za-z0-9]/g,'').slice(0,2).toUpperCase();
+  const mark = MARK[id] || name.replace(/[^A-Za-z0-9]/g,'').slice(0,2).toUpperCase();
   N[id] = {id,name,kind,risk,since,heat,summary,mark,links:[],action:''};
 });
 
@@ -349,7 +361,7 @@ const LINK = {
   monarch:[['fp19','Origin of the draw'],['fp7','Re-filed the alert']],
   lumen:[['fpc8','Near match of the loan']],
   'b-hbank':[['fp5b','Origin'],['halcyon','Enterprise']],
-  'b-hmob':[['fp7','Near match'],['iss-scam','Look-alike links'],['halcyon','Enterprise']],
+  'b-hmob':[['fp7','Near match'],['iss-scam','Reported sign-in copies'],['halcyon','Enterprise']],
   'b-yono':[['cta-yono','Domain series'],['qcredit','Filed by']],
   'b-lotus':[['cta-lotus','Domain'],['lotus','Enterprise']],
   'b-vwallet':[['fp7','Origin brand'],['vantage','Enterprise']],
@@ -458,6 +470,7 @@ function metricsFor(n){
   ];
 }
 function actionFor(n){
+  if (NOTES[n.id] && NOTES[n.id].vega) return NOTES[n.id].vega;
   if (n.risk==='block' || n.risk==='crit') return 'Block the shared text network-wide and trace the sender. Orion can pause the firm if it keeps sending.';
   if (n.risk==='high') return 'Ask the brand to explain, and hold the affected templates until the answer arrives.';
   if (n.risk==='watch') return 'Leave it on Nova’s watch. Do not pause. Echo writes the pattern down.';
@@ -598,17 +611,14 @@ function addGhosts(items){
   if (!S.sel || !N[S.sel]) return;
   const extras = [];
   const push = id => {
-    if (!id || !N[id] || placed.has(id) || extras.includes(id) || extras.length>=7) return;
+    if (!id || !N[id] || placed.has(id) || extras.includes(id) || extras.length>=5) return;
     extras.push(id);
   };
   (N[S.sel].links||[]).forEach(l => push(l.to));
-  if (S.mode==='diag' || S.mode==='follow'){
-    Object.values(N).forEach(n => (n.links||[]).forEach(l => { if (l.to===S.sel) push(n.id); }));
-  }
   if (!extras.length) return;
   const spots = ghostAngles(items, extras.length);
   const maxR = items.reduce((m,i) => Math.max(m, Math.hypot(i.x,i.y)), 0);
-  const gr = maxR + 96;
+  const gr = maxR + 132;
   extras.forEach((id,i) => {
     const deg = spots[i];
     const [x,y] = polar(0,0,gr,deg);
@@ -679,6 +689,7 @@ function makeNode(id){
   g.appendChild(svgEl('circle', {class:'body'}));
   g.appendChild(svgEl('circle', {class:'pip', r:4.5, stroke:'#07141c', 'stroke-width':1.4}));
   g.appendChild(svgEl('text', {class:'mark', 'text-anchor':'middle'}));
+  g.appendChild(svgEl('text', {class:'sub', 'text-anchor':'middle'}));
   const label = svgEl('text', {class:'label', 'text-anchor':'middle'});
   g.appendChild(label);
   g.addEventListener('pointerdown', ev => ev.stopPropagation());
@@ -717,14 +728,14 @@ function syncEdges(list){
   }
 }
 function pads(){
-  if (innerWidth < 860) return {l:24, r:24, t:132, b:Math.round(innerHeight*0.50)+8};
-  return {l:236, r:390, t:104, b:128};
+  if (innerWidth < 860) return {l:28, r:28, t:148, b:Math.round(innerHeight*0.42)+96};
+  return {l:248, r:390, t:108, b:132};
 }
 function fit(items, immediate){
   if (userMoved && booted) return;
   let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
   items.forEach(it => {
-    const r = it.r + 52;
+    const r = it.r + 78;
     minX=Math.min(minX,it.x-r); maxX=Math.max(maxX,it.x+r);
     minY=Math.min(minY,it.y-r); maxY=Math.max(maxY,it.y+r);
   });
@@ -780,26 +791,35 @@ function applyNode(id){
   g.querySelector('.hit').setAttribute('r', Math.max(p.r+8, 20).toFixed(1));
   const mark = g.querySelector('.mark');
   const label = g.querySelector('.label');
+  const sub = g.querySelector('.sub');
   if (id==='consent'){
     mark.textContent = '';
     label.setAttribute('class','label core');
-    label.setAttribute('x','0'); label.setAttribute('y','8');
+    label.setAttribute('x','0'); label.setAttribute('y','2');
     label.textContent = 'Consent';
+    sub.textContent = 'Loopy governs';
+    sub.setAttribute('x','0'); sub.setAttribute('y','24');
+    sub.style.display = '';
   } else if (p.role==='center'){
-    label.setAttribute('class','label');
+    sub.style.display = 'none';
     mark.setAttribute('y','4');
     mark.textContent = n.mark;
-    label.setAttribute('x','0');
-    label.setAttribute('y', (p.r+22).toFixed(1));
-    setLabel(label, n.name, p.share);
+    label.textContent = '';
+    label.dataset.key = '';
   } else {
+    sub.style.display = 'none';
     label.setAttribute('class','label');
     mark.setAttribute('y','4');
     mark.textContent = p.r>=16 ? n.mark : '';
     const a = (p.deg||0) * Math.PI/180;
-    const dist = p.r + 18;
-    label.setAttribute('x', (Math.cos(a)*dist).toFixed(1));
-    label.setAttribute('y', (Math.sin(a)*dist + 4).toFixed(1));
+    const c = Math.cos(a), s = Math.sin(a);
+    const dist = p.r + 22;
+    let x = c * dist, y = s * dist;
+    if (c > 0.45){ label.setAttribute('text-anchor','start'); y += 4; }
+    else if (c < -0.45){ label.setAttribute('text-anchor','end'); y += 4; }
+    else { label.setAttribute('text-anchor','middle'); y += s < 0 ? -6 : 14; }
+    label.setAttribute('x', x.toFixed(1));
+    label.setAttribute('y', y.toFixed(1));
     setLabel(label, n.name, p.share);
   }
 }
@@ -899,13 +919,17 @@ function paintModes(){
   document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('on', b.dataset.mode===S.mode));
   const mode = MODES.find(m => m.id===S.mode);
   const extra = S.month<11 ? ` Known by ${FULL[S.month]}.` : '';
-  $('#caption').innerHTML = `<b>${esc(mode && mode.id==='depth' ? 'Sub-levels' : '')}</b> ${esc((mode?mode.line:'')+extra)} Click a body. Double-click to go deeper. Esc steps back.`;
+  const title = {event:'Event insights', heat:'Network heatmap', diag:'Zoomed diagnostics', depth:'Sub-levels', follow:'Follow a change'}[S.mode] || '';
+  $('#caption').innerHTML = `<b>${esc(title)}.</b> ${esc((mode?mode.line:'')+extra)} Click a body. Double-click to go deeper. Esc steps back.`;
 }
 function paintTime(){
   $('#when').textContent = FULL[S.month];
   $('#months').setAttribute('aria-valuenow', String(S.month));
   document.querySelectorAll('#months button').forEach((b,i) => b.classList.toggle('on', i===S.month));
-  document.querySelectorAll('#evs button').forEach(b => b.classList.toggle('on', S.mode==='follow' && b.dataset.ev===S.follow));
+  const list = EVENTS.filter(e => e.m===S.month);
+  $('#evs').innerHTML = list.length
+    ? list.map(ev => `<button type="button" data-ev="${ev.id}" class="${S.mode==='follow' && S.follow===ev.id ? 'on' : ''}">${esc(ev.name)}</button>`).join('')
+    : '<span class="quiet">Nothing new discovered this month</span>';
 }
 function paintChip(){
   const id = voiceAgent();
@@ -942,7 +966,7 @@ function paint(){
     const cons = connections(S.sel);
     const where = placeOf(S.sel);
     const buttons = [];
-    if (kidsOf(S.sel).length) buttons.push(`<button class="btn pri" type="button" data-act="dive">Open sub-level</button>`);
+    if (kidsOf(S.sel).length && where!=='center') buttons.push(`<button class="btn pri" type="button" data-act="dive">Open sub-level</button>`);
     if (where==='ghost') buttons.push(`<button class="btn" type="button" data-act="place">Place in its domain</button>`);
     if (S.stack.length>1 || S.sel!==S.stack[S.stack.length-1]) buttons.push(`<button class="btn" type="button" data-act="back">Back</button>`);
     $('#detail').innerHTML = `
@@ -961,7 +985,7 @@ function paint(){
       ${['auto','nova','atlas','vega','echo','orion'].map(id => `<button type="button" data-agent="${id}" class="${S.agent===id?'on':''}">${id==='auto'?'Auto':AGENT_META[id][0]}</button>`).join('')}
     </div>
     <p class="quote">${esc(speak(subject, agent))}</p>
-    <p class="next"><b>Next step.</b> ${esc(actionFor(subject))}</p>
+    ${speak(subject, agent)===actionFor(subject) ? '' : `<p class="next"><b>Next step.</b> ${esc(actionFor(subject))}</p>`}
     <p class="next"><b>Speaking as ${esc(an)}</b> about ${esc(subject.name)}. Sample data, not a live order.</p>
     ${S.miss ? '<p class="next">Try a fingerprint, YONO, Rajesh Kumar, the address farm, or MoneyGrow.</p>' : ''}
     <p class="foot">Illustrative sample from the enterprise trust map and the ConsentOS graph. Nothing here sends, blocks, or pauses for real.</p>`;
@@ -1161,8 +1185,10 @@ window.addEventListener('keydown', ev => {
 window.addEventListener('resize', () => { if (!userMoved){ booted = true; fit(layoutItems(), false); kick(); } else applyCam(); drawStars(); });
 
 const months = $('#months');
-months.innerHTML = MONTHS.map((m,i) => `<button type="button" data-month="${i}"><b>${m}</b><small>${YEARS[i]}</small></button>`).join('');
-$('#evs').innerHTML = EVENTS.map(ev => `<button type="button" data-ev="${ev.id}">${esc(ev.name)}</button>`).join('');
+months.innerHTML = MONTHS.map((m,i) => {
+  const dot = EVENTS.some(e => e.m===i) ? '<i class="dot"></i>' : '<i class="dot" style="opacity:0"></i>';
+  return `<button type="button" data-month="${i}">${dot}<b>${m}</b><small>${YEARS[i]}</small></button>`;
+}).join('');
 months.addEventListener('pointerdown', ev => { scrub = true; });
 window.addEventListener('pointermove', ev => {
   if (!scrub) return;
