@@ -1,0 +1,1344 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Enterprise Control Centre · DigiConsent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: full-bleed abstract God's-Eye constellation. Insights/ask share a fixed right dock. Briefing shrinks the stage into a card beside a paper pane. */
+:root{
+ --ink:#06101b;--glass:rgba(14,30,46,.66);--glass-hi:rgba(11,24,38,.92);--hair:rgba(196,222,240,.18);
+ --text:#e9f2f8;--muted:#93abbd;--brand:#1f6bff;--brand-deep:#164fc4;
+ --ok:#3ddc97;--warn:#ffb020;--crit:#ff4d5e;--prog:#9b8cff;
+ --paper:#f5f8f6;--paper-ink:#0d1f2b;--paper-muted:#566a76;--paper-hair:#d9e3df;
+ --tl-ink:#cfe0ec;--tl-dim:rgba(207,224,236,.45);
+ --ui:'Schibsted Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
+ --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+ --ease:cubic-bezier(.65,0,.2,1);color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--ink);color:var(--text);font:14px/1.4 var(--ui);overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #9cc0ff;outline-offset:2px}
+.app{position:relative;height:100%;width:100%;overflow:hidden;background:var(--ink);transition:background .7s var(--ease)}
+.app.profile{background:var(--paper);--tl-ink:#0d1f2b;--tl-dim:rgba(13,31,43,.4)}
+/* stage */
+.stage{position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;background:var(--ink);touch-action:none;cursor:grab;transition:left .95s var(--ease),top .95s var(--ease),right .95s var(--ease),bottom .95s var(--ease),border-radius .95s var(--ease),box-shadow .95s}
+.stage.drag{cursor:grabbing}
+.app.profile .stage{left:30px;top:30px;right:calc(50% + 15px);bottom:104px;border-radius:16px;box-shadow:0 24px 60px rgba(8,30,40,.35)}
+.sky{position:absolute;inset:0;background:radial-gradient(72% 48% at 50% 56%,rgba(56,124,204,.32),transparent 68%),radial-gradient(42% 30% at 24% 68%,rgba(32,86,160,.22),transparent 72%),radial-gradient(38% 26% at 80% 62%,rgba(40,96,170,.18),transparent 74%),radial-gradient(120% 70% at 50% 108%,#2b5fb8 0%,rgba(43,95,184,0) 62%),radial-gradient(60% 40% at 80% 6%,rgba(94,129,200,.26),transparent 70%),linear-gradient(180deg,#050d18 0%,#0b1c30 38%,#12325e 74%,#1a4478 100%)}
+.fog{position:absolute;width:60%;height:34%;border-radius:50%;background:radial-gradient(closest-side,rgba(150,200,215,.16),transparent);filter:blur(20px);animation:drift 40s ease-in-out infinite alternate;pointer-events:none}
+.fog.a{left:-10%;top:42%}.fog.b{right:-15%;top:18%;animation-duration:55s;animation-direction:alternate-reverse}.fog.c{left:12%;top:54%;width:76%;height:30%;animation-duration:48s;opacity:.8}
+@keyframes drift{to{transform:translateX(18%)}}
+#scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+.vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(86% 70% at 50% 46%,transparent 34%,rgba(3,8,14,.18) 72%,rgba(3,8,14,.55) 100%)}
+#scene .bld{cursor:pointer}#scene .tile{cursor:pointer}
+.ring{transform-box:fill-box;transform-origin:center;animation:ping 2.2s ease-out infinite}
+.ring.s{animation-duration:3.4s;animation-delay:.6s}
+@keyframes ping{0%{transform:scale(.3);opacity:.9}100%{transform:scale(2.6);opacity:0}}
+.feed{animation:dash 3s linear infinite}@keyframes dash{to{stroke-dashoffset:-40}}
+/* hotspots */
+.hots{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hot{position:absolute;left:0;top:0;will-change:transform}
+.hot .in{position:relative;opacity:0;transform:scale(.8);transition:opacity .5s,transform .5s var(--ease);pointer-events:none}
+.hot.on .in{opacity:1;transform:none;pointer-events:auto}
+.hot .plus{position:absolute;left:-17px;top:-17px;width:34px;height:34px;border-radius:3px;background:#fff;color:#0d2a38;display:grid;place-items:center;font-size:22px;font-weight:300;line-height:1;border:0;box-shadow:0 0 0 5px rgba(255,255,255,.16),0 0 0 6px rgba(255,255,255,.55);cursor:pointer;transition:transform .25s}
+.hot .plus:hover{transform:scale(1.12)}
+.hot .tag{position:absolute;left:30px;top:-14px;white-space:nowrap;display:flex;align-items:center;gap:8px;height:28px;padding:0 11px;border-radius:3px;background:var(--glass-hi);border:1px solid var(--hair);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;backdrop-filter:blur(10px);cursor:pointer}
+.hot .tag em{font:400 11px var(--mono);letter-spacing:0;color:var(--muted);text-transform:none;font-style:normal}
+.hot.flip .tag,.hot.edge .tag{left:auto;right:30px}
+.hot.unflip .tag{left:30px;right:auto}
+.hot.left .tag{left:auto;right:30px;flex-direction:row-reverse}
+.hot.left .plus{display:none}
+.hot.floor .tag{right:12px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+.dot.warn{background:var(--warn)}.dot.crit{background:var(--crit);box-shadow:0 0 0 0 rgba(255,77,94,.7);animation:pulse 1.8s infinite}.dot.prog{background:var(--prog)}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(255,77,94,0)}100%{box-shadow:0 0 0 0 rgba(255,77,94,0)}}
+.tip{position:absolute;z-index:5;pointer-events:none;min-width:190px;padding:10px 12px;border-radius:8px;background:var(--glass-hi);border:1px solid var(--hair);backdrop-filter:blur(10px);font-size:12px}
+.tip b{display:block;font-size:13px;margin-bottom:2px}.tip span{color:var(--muted);font-family:var(--mono);font-size:11px}
+.steps{position:absolute;left:10px;right:10px;bottom:10px;display:flex;gap:6px;opacity:0;transform:translateY(14px);pointer-events:none;transition:.6s var(--ease)}
+.app.profile .steps{opacity:1;transform:none;pointer-events:auto;transition-delay:.5s}
+.steps button{flex:1;display:flex;justify-content:space-between;gap:6px;min-width:0;padding:10px 12px;border-radius:6px;border:0;background:rgba(12,26,40,.7);backdrop-filter:blur(8px);font-size:12px;color:var(--muted)}
+.steps button.on{background:#fff;color:#0d1f2b;font-weight:600}
+.steps button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* top bar */
+.top{position:absolute;left:0;right:0;top:0;height:100px;z-index:20;pointer-events:none;display:flex;align-items:flex-start;gap:14px;padding:0 30px 0 30px}
+.top>*{pointer-events:auto}
+.logo{cursor:pointer;font:inherit;color:inherit;width:78px;height:78px;margin-left:0;background:#0b2233;border:1px solid var(--hair);border-top:0;display:grid;place-content:center;gap:6px;justify-items:start;padding:0 16px}
+.logo i{display:block;height:5px;border-radius:2px;background:#fff}.logo i:nth-child(1){width:34px}.logo i:nth-child(2){width:24px;background:var(--brand)}.logo i:nth-child(3){width:30px}
+.logo small{font:500 8px var(--mono);letter-spacing:.14em;color:var(--muted)}
+.crumbs{flex:1;display:flex;align-items:center;gap:12px;margin-top:26px;min-width:0;transition:opacity .4s}
+.app.profile .crumbs,.app.profile .ask-launch,.app.profile .rail,.app.profile .dock{opacity:0;pointer-events:none}
+.back{display:flex;align-items:center;gap:12px;height:44px;padding:0 22px;border-radius:4px;border:0;background:var(--brand);color:#fff;font-weight:500;white-space:nowrap}
+.back[hidden]{display:none}
+.trail{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.trail button{background:none;border:0;padding:4px 2px;color:var(--text)}.trail button:last-child{font-weight:600}
+.ask-launch{margin-top:26px;position:relative;width:min(280px,30vw);flex:none;display:flex;align-items:center;height:44px;padding:0 46px 0 16px;border-radius:22px;border:1px solid var(--hair);background:var(--glass-hi);backdrop-filter:blur(10px);color:var(--muted);text-align:left;font:inherit;transition:opacity .4s,border-color .3s,color .3s}
+.ask-launch #askLaunchLabel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ask-launch .go{position:absolute;right:5px;top:5px;width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center}
+.app[data-dock=ask] .ask-launch{color:var(--text);border-color:rgba(156,192,255,.75)}
+.menu-btn{margin-top:26px;width:54px;height:44px;border-radius:4px;border:0;background:var(--brand);display:grid;place-content:center;gap:5px}
+.menu-btn i{display:block;width:22px;height:2px;background:#fff}
+.menu{position:absolute;right:30px;top:76px;width:270px;background:var(--brand);color:#fff;border-radius:4px;padding:14px 18px;z-index:30;box-shadow:0 14px 40px rgba(0,0,0,.35)}
+.menu button{display:block;width:100%;text-align:left;background:none;border:0;padding:9px 0;font-size:14px;color:#fff}
+.menu p{margin:8px 0 0;font-size:12px;opacity:.85;border-top:1px solid rgba(255,255,255,.3);padding-top:10px}
+/* rail */
+.rail{position:absolute;right:442px;top:112px;z-index:12;display:flex;flex-direction:column;gap:6px;width:62px;transition:opacity .4s}
+.rail button{display:grid;justify-items:center;gap:3px;padding:9px 0 7px;border-radius:8px;border:1px solid var(--hair);background:var(--glass);backdrop-filter:blur(10px);font-size:10px;color:var(--muted);letter-spacing:.03em}
+.rail button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.rail button.on{background:#fff;color:#0d1f2b;border-color:#fff}
+.legend{margin-top:6px;font-size:10px;line-height:1.35;color:var(--muted);text-align:center}
+.legend i{display:block;height:5px;border-radius:3px;margin:5px 0 3px;background:linear-gradient(90deg,#36587a,#d69632,#de4654)}
+/* right dock: insights and ask share one fixed frame */
+.dock{position:absolute;right:30px;top:112px;bottom:104px;width:400px;z-index:11;display:flex;flex-direction:column;border-radius:14px;background:var(--glass);backdrop-filter:blur(18px) saturate(1.2);border:1px solid var(--hair);overflow:hidden;transition:opacity .45s}
+.dock-switch{position:relative;display:grid;grid-template-columns:1fr 1fr;margin:12px 14px 0;padding:3px;border-radius:10px;background:rgba(6,16,28,.45);border:1px solid var(--hair);flex:none}
+.dock-switch .thumb{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:8px;background:#fff;transition:transform .45s var(--ease);pointer-events:none}
+.dock[data-face=ask] .thumb{transform:translateX(100%)}
+.dock-switch button{position:relative;z-index:1;height:32px;border:0;background:none;color:var(--muted);font-size:13px;font-weight:600;border-radius:8px;transition:color .35s}
+.dock-switch button.on{color:#0d1f2b}
+.dock-stage{position:relative;flex:1;min-height:0;overflow:hidden}
+.dock-view{position:absolute;inset:0;display:flex;flex-direction:column;transform:translateX(100%);pointer-events:none;transition:transform .48s var(--ease)}
+.dock-view.on{transform:none;pointer-events:auto}
+.dock[data-face=ask] .panel{transform:translateX(-100%)}
+.dock .panel{background:transparent;border:0;box-shadow:none}
+.p-body{overflow:auto;padding:16px 22px 20px;flex:1;min-height:0;animation:swap .5s var(--ease)}
+@keyframes swap{from{opacity:0;transform:translateY(10px)}}
+.eyebrow{font:500 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.p-body h2{margin:4px 0 4px;font-size:26px;line-height:1.1;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+.p-body h3{margin:22px 0 8px;font:500 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sub{color:var(--muted);margin:0}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:16px;background:var(--hair);border:1px solid var(--hair);border-radius:8px;overflow:hidden}
+.kpis div{background:rgba(10,22,34,.7);padding:10px 12px}
+.kpis label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.kpis b{font:500 19px var(--mono);font-variant-numeric:tabular-nums}.kpis small{font:11px var(--mono);color:var(--muted);margin-left:4px}
+.rows{list-style:none;margin:0;padding:0}
+.rows li{border-top:1px solid var(--hair)}.rows li:first-child{border-top:0}
+.row{display:flex;gap:12px;align-items:flex-start;width:100%;padding:11px 0;background:none;border:0;text-align:left}
+.row .sq{flex:none;width:26px;height:26px;border-radius:4px;display:grid;place-items:center;font-size:13px;font-weight:700;background:rgba(61,220,151,.2);color:var(--ok)}
+.sq.warn{background:rgba(255,176,32,.2);color:var(--warn)}.sq.crit{background:rgba(255,77,94,.22);color:var(--crit)}.sq.prog{background:rgba(155,140,255,.2);color:var(--prog)}
+.row b{display:block;font-weight:500;font-size:13.5px}.row span{font-size:12px;color:var(--muted)}
+.row:hover b{text-decoration:underline}
+.chip{display:inline-block;padding:2px 8px;border-radius:10px;font:500 10px var(--mono);letter-spacing:.05em;text-transform:uppercase;background:rgba(61,220,151,.16);color:var(--ok)}
+.chip.warn{background:rgba(255,176,32,.16);color:var(--warn)}.chip.crit{background:rgba(255,77,94,.18);color:var(--crit)}.chip.prog{background:rgba(155,140,255,.16);color:var(--prog)}
+.issue{padding:14px 0;border-top:1px solid var(--hair)}.issue:first-of-type{border-top:0}
+.issue h4{margin:6px 0 4px;font-size:14.5px;font-weight:600;line-height:1.3}.issue p{margin:0 0 10px;font-size:12.5px;color:var(--muted)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{height:34px;padding:0 14px;border-radius:4px;border:1px solid var(--hair);background:rgba(255,255,255,.06);font-size:12.5px;font-weight:500}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}.btn:hover{filter:brightness(1.15)}
+.floorlist button{display:flex;width:100%;justify-content:space-between;align-items:center;padding:9px 0;background:none;border:0;border-top:1px solid var(--hair);font-size:13px}
+.floorlist button span{font:11px var(--mono);color:var(--muted)}
+.opt{display:flex;gap:10px;padding:10px 12px;border:1px solid var(--hair);border-radius:8px;margin-bottom:8px;cursor:pointer}
+.opt:has(input:checked){border-color:#9cc0ff;background:rgba(31,107,255,.14)}
+.opt input{margin-top:3px;accent-color:var(--brand)}.opt b{display:block;font-size:13px}.opt span{font-size:12px;color:var(--muted)}
+textarea,select{width:100%;margin-top:6px;border-radius:6px;border:1px solid var(--hair);background:rgba(8,18,28,.6);color:var(--text);font:inherit;padding:8px 10px}
+label.f{display:block;margin-top:12px;font-size:12px;color:var(--muted)}
+.sum{background:rgba(255,255,255,.05);border-radius:8px;padding:12px;font-size:13px;margin:12px 0}.sum dt{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:8px}.sum dd{margin:2px 0 0}
+.ring-score{display:flex;align-items:center;gap:14px;margin-top:16px}
+/* hud: one bar — walkthrough plus every figure, instead of four separate cards */
+.hud{position:absolute;left:30px;right:516px;bottom:98px;z-index:9;height:auto;min-height:64px;display:flex;align-items:stretch;border-radius:10px;overflow:hidden;background:var(--glass);border:1px solid var(--hair);backdrop-filter:blur(16px);transition:transform .7s var(--ease),opacity .5s}
+.brief{flex:none;width:auto;min-height:0;display:flex;align-items:center;border:0;border-radius:0;background:var(--brand);color:#fff;text-align:left;transition:filter .2s}
+.brief:hover{filter:brightness(1.08)}
+.brief .plus{width:48px;align-self:stretch;border-right:1px solid rgba(255,255,255,.35);display:grid;place-items:center;font-size:26px;font-weight:200}
+.brief .txt{padding:0 14px;font-size:14px;font-weight:500;line-height:1.2;white-space:nowrap}
+.brief small{display:block;margin-top:2px;font:400 10px var(--mono);opacity:.8}
+.metrics{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:stretch;gap:1px;background:var(--hair)}
+.mg{flex:1 1 max-content;display:flex;flex-direction:column;justify-content:center;gap:3px;padding:8px 12px;background:rgba(8,20,34,.78)}
+.mg .hd{padding:0;border:0;font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.stats{display:flex;gap:12px}
+.stats div{flex:0 0 auto}
+.stats label{display:block;font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.stats b{font:500 14px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.stats b.crit{color:var(--crit)}.stats b.warn{color:var(--warn)}
+[data-lvl=lob] .metrics,[data-lvl=asset] .metrics{display:none}
+[data-lvl=lob] .hud,[data-lvl=asset] .hud{right:auto;width:auto;background:transparent;border-color:transparent;backdrop-filter:none}
+[data-lvl=lob] .brief,[data-lvl=asset] .brief{border-radius:8px}
+.app.profile .hud{opacity:0;transform:translateY(40px);pointer-events:none}
+/* ask face, inside the dock */
+.dock-ask{display:flex;gap:8px;padding:12px 14px 0;flex:none}
+.dock-ask input{flex:1;min-width:0;height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--hair);background:rgba(8,18,28,.55);color:var(--text);font:inherit}
+.dock-ask input::placeholder{color:var(--muted)}
+.dock-ask button{width:40px;height:40px;border-radius:50%;border:0;background:var(--brand);color:#fff;flex:none}
+.msgs{overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+.msg{max-width:92%;font-size:13.5px;line-height:1.45}
+.msg.u{align-self:flex-end;background:rgba(31,107,255,.28);padding:8px 12px;border-radius:12px 12px 2px 12px}
+.msg.a .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.msg b{font-weight:600}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:4px 14px 14px;flex:none}
+.chips button{border:1px solid var(--hair);background:rgba(255,255,255,.05);border-radius:14px;padding:6px 11px;font-size:12px}
+.chips button:hover{background:rgba(255,255,255,.12)}
+@media (prefers-reduced-motion:reduce){.dock-view,.dock-switch .thumb{transition:none}}
+/* profile */
+.pane{position:absolute;left:calc(50% + 15px);right:30px;top:30px;bottom:104px;z-index:6;display:flex;flex-direction:column;color:var(--paper-ink);opacity:0;transform:translateX(40px);pointer-events:none;transition:opacity .6s,transform .8s var(--ease)}
+.app.profile .pane{opacity:1;transform:none;pointer-events:auto;transition-delay:.35s}
+.pr-top{height:54px;display:flex;align-items:center}
+.pr-top .back{height:54px;width:min(270px,60%);justify-content:center}
+.pr-meta{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:13px;color:var(--paper-muted)}.pr-meta b{color:var(--paper-ink);font-weight:500}
+.pr-main{flex:1;overflow:auto;padding:22px 4px 10px 0;display:flex;flex-direction:column;gap:20px;min-height:0}
+.pr-main .big{margin:auto 0 0;font-size:clamp(20px,2.1vw,29px);line-height:1.28;font-weight:500;letter-spacing:-.01em;text-wrap:pretty;animation:swap .6s var(--ease)}
+.pr-main .st{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--paper-hair);border:1px solid var(--paper-hair);border-radius:6px;overflow:hidden}
+.pr-main .st div{background:#fff;padding:12px 14px}.pr-main .st label{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--paper-muted)}.pr-main .st b{font:500 22px var(--mono)}
+.pr-main .pl{border-top:1px solid var(--paper-hair)}
+.pr-main .pl div{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--paper-hair);font-size:13.5px}.pr-main .pl div span{flex:1;min-width:0}.pr-main .pl small{display:block;color:var(--paper-muted);font-size:12px}
+.pr-main .btn{border-color:var(--paper-hair);background:#fff;color:var(--paper-ink)}.pr-main .btn.pri{background:var(--brand);color:#fff;border-color:var(--brand)}
+.pr-ctl{display:flex;align-items:center;gap:14px;padding-top:12px}
+.play{width:54px;height:54px;border:0;border-radius:4px;background:var(--brand);color:#fff;font-size:16px}
+.pr-ctl small{font:11px var(--mono);color:var(--paper-muted)}
+/* timeline */
+.tl{position:absolute;left:30px;right:30px;bottom:12px;height:78px;z-index:12;color:var(--tl-ink);transition:color .6s}
+.spark{position:absolute;left:0;right:0;top:0;height:26px}.spark svg{width:100%;height:100%;display:block;overflow:visible}
+.months{position:absolute;left:0;right:0;bottom:0;height:46px;display:grid;grid-template-columns:repeat(12,1fr);cursor:ew-resize;touch-action:none}
+.mo{position:relative;border-left:1px solid var(--tl-dim);padding:5px 0 0 6px;font:500 10px var(--ui);letter-spacing:.06em;text-transform:uppercase;user-select:none;background:repeating-linear-gradient(90deg,transparent 0 calc(12.5% - 1px),var(--tl-dim) calc(12.5% - 1px) 12.5%) bottom/100% 8px no-repeat}
+.mo.on::before{content:"";position:absolute;left:0;right:6px;top:-3px;height:5px;border-radius:3px;background:var(--brand)}
+.mo.on{font-weight:700}.mo small{display:block;font:9px var(--mono);opacity:.55;text-transform:none;letter-spacing:0}
+.toast{position:absolute;left:50%;top:88px;transform:translate(-50%,-20px);opacity:0;z-index:40;padding:11px 18px;border-radius:6px;background:var(--brand);color:#fff;font-weight:500;box-shadow:0 12px 30px rgba(0,0,0,.35);pointer-events:none;transition:.5s var(--ease);max-width:90%}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (max-width:900px){
+ .rail .legend{display:none}
+ .ask-launch{width:44px;height:44px;padding:0;border-radius:8px;justify-content:center}
+ .ask-launch #askLaunchLabel{display:none}
+ .ask-launch .go{position:static;width:44px;height:44px;border-radius:8px}
+ .dock{left:12px;right:12px;top:auto;width:auto;height:min(42vh,420px);bottom:96px}
+ .hud{left:12px;right:auto;bottom:calc(96px + min(42vh,420px) + 8px);min-height:0;background:transparent;border-color:transparent;backdrop-filter:none}
+ .metrics{display:none}
+ .brief{min-height:48px;border-radius:8px}
+ .rail{top:78px;right:12px;width:50px}.rail button span{display:none}
+ .top{padding:0 12px;gap:8px}.logo{width:56px;height:64px;padding:0 8px}
+ .crumbs{margin-top:14px;min-width:0;overflow:hidden}.back{height:40px;padding:0 12px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+ .ask-launch,.menu-btn{margin-top:14px}.trail{display:none}
+ .chips{flex-wrap:nowrap;overflow-x:auto}
+ .chips button{flex:none}
+ .app.profile .stage{right:12px;bottom:auto;height:36%}
+ .pane{left:12px;right:12px;top:calc(36% + 40px);bottom:96px}.tl{left:12px;right:12px}.steps button span{display:none}
+}
+/* registry */
+.dir{position:absolute;inset:0;z-index:50;overflow:auto;background:#eef3fb;color:#0a1f44;transition:opacity .8s var(--ease),transform 1s var(--ease)}
+.app.in-map .dir{opacity:0;transform:scale(1.035);pointer-events:none;visibility:hidden;transition:opacity .8s var(--ease),transform 1s var(--ease),visibility 0s 1s}
+.dir button,.dir select,.dir input{font:inherit}
+.dir .wrap{max-width:1240px;margin:0 auto}
+.dir-hd{background:radial-gradient(70% 160% at 88% 0%,rgba(31,107,255,.6),transparent 62%),linear-gradient(180deg,#051532,#0a2757);color:#fff;padding:0 max(16px,env(safe-area-inset-right,0px)) 44px max(16px,env(safe-area-inset-left,0px))}
+.dir-hd .wrap{display:flex;gap:28px;align-items:flex-start}
+.dir-hd .logo{flex:none;border-color:rgba(255,255,255,.2);background:#06183a}
+.dir-hd h1{margin:30px 0 6px;font-size:clamp(28px,4vw,42px);line-height:1.05;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+.dir-hd p{margin:0;max-width:54ch;color:#b9cdf0;font-size:15px}
+.dir-hd .eyebrow{display:block;margin-top:30px;color:#8fb4ff}
+.dir-tools{position:sticky;top:0;z-index:5;background:rgba(238,243,251,.94);backdrop-filter:blur(12px);border-bottom:1px solid #d6e0f0;padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px))}
+.dir-tools .wrap{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{flex:1 1 320px;min-width:0;position:relative}
+.search svg{position:absolute;left:14px;top:50%;width:18px;height:18px;margin-top:-9px;fill:none;stroke:#5b6f8f;stroke-width:1.8;stroke-linecap:round}
+.search input{width:100%;height:46px;padding:0 14px 0 42px;border-radius:10px;border:1px solid #c5d3ea;background:#fff;color:#0a1f44}
+.search input:focus-visible,.dir select:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.seg{display:flex;border:1px solid #c5d3ea;border-radius:10px;background:#fff;overflow:hidden}
+.seg button{height:44px;padding:0 14px;border:0;background:none;color:#40557a;font-size:13px;font-weight:500;white-space:nowrap}
+.seg button+button{border-left:1px solid #e0e8f5}.seg button.on{background:var(--brand);color:#fff}
+.dir select{height:46px;margin:0;width:auto;padding:0 12px;border-radius:10px;border:1px solid #c5d3ea;background:#fff;color:#0a1f44}
+.dir-body{padding:24px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
+.dstats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#d6e0f0;border:1px solid #d6e0f0;border-radius:12px;overflow:hidden;margin-bottom:20px}
+.dstats div{background:#fff;padding:14px 18px}.dstats label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#5b6f8f}
+.dstats b{font:500 26px var(--mono);font-variant-numeric:tabular-nums}.dstats b.c{color:#d6334a}.dstats b.w{color:#b87400}
+.dcount{margin:0 0 14px;font-size:13px;color:#5b6f8f}
+.egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.ecard{display:flex;flex-direction:column;text-align:left;padding:0;border:1px solid #d6e0f0;border-radius:14px;background:#fff;overflow:hidden;color:#0a1f44;cursor:pointer;animation:rise .55s var(--ease) both;transition:transform .35s var(--ease),box-shadow .35s,border-color .2s}
+.ecard:hover,.ecard:focus-visible{transform:translateY(-4px);box-shadow:0 18px 40px rgba(10,40,100,.15);border-color:#8fb0f5}
+.ecard.opening{transform:scale(1.03);box-shadow:0 24px 60px rgba(10,40,100,.3)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+.skyl{height:88px;background:radial-gradient(90% 120% at 50% 120%,#2a63d4,transparent 70%),linear-gradient(180deg,#07204c,#0f3578)}
+.skyl svg{display:block;width:100%;height:100%}
+.ebody{padding:16px 18px 16px;display:flex;flex-direction:column;gap:14px}
+.ehd{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.ehd h3{margin:0;font-size:18px;line-height:1.2;font-weight:600;letter-spacing:-.01em}.ehd p{margin:3px 0 0;font-size:12.5px;color:#5b6f8f}
+.score{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--c) calc(var(--v)*1%),#e1e9f6 0)}
+.score span{width:42px;height:42px;border-radius:50%;background:#fff;display:grid;place-items:center;font:500 16px var(--mono)}
+.s-ok{--c:#2bb673}.s-warn{--c:#f0a30a}.s-crit{--c:#e04858}
+.est{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.est label,.erow label{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#5b6f8f}
+.est b{font:500 16px var(--mono)}
+.erow{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.erow b{font:500 18px var(--mono)}.erow small{font:11px var(--mono);margin-left:6px}
+.erow svg{width:120px;height:34px;overflow:visible}
+.efoot{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding-top:12px;border-top:1px solid #e3eaf6}
+.efoot .go{margin-left:auto;font-size:13px;font-weight:600;color:var(--brand)}
+.dir .chip{background:#e3f6ec;color:#1b8a55}.dir .chip.warn{background:#fff1d1;color:#9a6200}.dir .chip.crit{background:#ffe1e5;color:#c0283c}
+.etable{width:100%;border-collapse:collapse;background:#fff;border:1px solid #d6e0f0;border-radius:12px;overflow:hidden;font-size:13.5px}
+.tw{overflow-x:auto;border-radius:12px}
+.etable th{padding:11px 14px;text-align:left;font:500 10.5px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:#5b6f8f;background:#f6f9fe;border-bottom:1px solid #d6e0f0;white-space:nowrap}
+.etable td{padding:12px 14px;border-bottom:1px solid #e8eef8;white-space:nowrap;font-variant-numeric:tabular-nums}
+.etable tr{cursor:pointer}.etable tbody tr:hover{background:#f3f7ff}.etable tr:last-child td{border-bottom:0}
+.etable td:first-child b{display:block;font-weight:600}.etable td:first-child small{color:#5b6f8f}
+.empty{padding:60px 20px;text-align:center;color:#5b6f8f;background:#fff;border:1px dashed #c5d3ea;border-radius:14px}
+.dir-foot{margin-top:28px;font-size:12px;color:#5b6f8f}.dir-foot a{color:#1f6bff;font-weight:600}
+@media (max-width:720px){.dstats{grid-template-columns:1fr 1fr}.dir-hd .wrap{flex-direction:column;gap:0}.dir-hd .eyebrow{margin-top:16px}.dir-hd h1{margin-top:8px}.dir-tools .seg,.dir-tools select{flex:1 1 auto}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+.chip.blk{background:rgba(160,150,200,.22);color:#cfc8ee}.sq.blk{background:rgba(190,180,230,.18);color:#d6cff2}
+.thr{margin:10px 0 4px;padding:10px 12px 4px;border:1px solid var(--hair);border-left:3px solid var(--c);border-radius:6px;background:rgba(255,255,255,.03)}
+.thr blockquote{margin:6px 0;font:12px/1.5 var(--mono);color:var(--text)}.thr .sub{margin:0 0 4px}
+.thr-list .row.here{opacity:.5;pointer-events:none}
+.hot.portal .plus{color:var(--c);font-size:18px;font-weight:700}.hot.portal .tag{border-color:var(--c)}
+.arcf{stroke-dasharray:4 8;animation:dash2 1.6s linear infinite}@keyframes dash2{to{stroke-dashoffset:-36}}
+.dir .chip.blk{background:#ece6ff;color:#5b3fc4}
+.dstats{grid-template-columns:repeat(5,1fr)}.dstats b.p{color:#6a46d9}
+.twatch{margin-bottom:24px}.twatch h2{margin:0 0 2px;font-size:19px;font-weight:600;letter-spacing:-.01em}.tw-h p{margin:0 0 12px;font-size:13px;color:#5b6f8f;max-width:70ch}
+.tw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.tree-node{pointer-events:all}
+.tcard{text-align:left;border:1px solid #d6e0f0;border-left:4px solid var(--c);border-radius:12px;background:#fff;padding:14px 16px;color:#0a1f44;cursor:pointer;display:flex;flex-direction:column;gap:7px;transition:transform .3s var(--ease),box-shadow .3s}
+.tcard:hover,.tcard:focus-visible{transform:translateY(-3px);box-shadow:0 14px 32px rgba(10,40,100,.14)}.tcard.opening{transform:scale(1.03)}
+.tcard .tk{font:500 10.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:#5b6f8f}.tcard b{font-size:15px}
+.tcard q{font-size:12.5px;color:#41567a;quotes:none;line-height:1.4}
+.chain{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:11px}.chain span{padding:2px 8px;border-radius:10px;background:#eef3fb;color:#274470}.chain span.o{background:#ece6ff;color:#5b3fc4;font-weight:600}.chain em{color:#8aa0c4;font-style:normal}
+.tcard small{color:#5b6f8f;font-size:12px}
+@media (max-width:720px){.dstats{grid-template-columns:1fr 1fr}}
+
+.role-switch{margin-top:26px;display:flex;padding:3px;border-radius:8px;border:1px solid var(--hair);background:var(--glass-hi);backdrop-filter:blur(10px);flex:none}
+.role-switch button{height:38px;padding:0 14px;border:0;border-radius:6px;background:transparent;color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.role-switch button.on{background:#fff;color:#0d1f2b}
+.sim-badge{margin-top:30px;font:500 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--warn);padding:6px 10px;border:1px solid rgba(255,176,32,.35);border-radius:4px;background:rgba(255,176,32,.08);white-space:nowrap}
+.app.profile .role-switch,.app.profile .sim-badge{opacity:0;pointer-events:none}
+</style>
+<div class="app" id="app" data-lvl="ent" data-dock="insights">
+ <main class="stage" id="stage" aria-label="Abstract enterprise constellation map">
+  <div class="sky"><i class="fog a"></i><i class="fog b"></i><i class="fog c"></i></div>
+  <svg id="scene" role="img" aria-label="God's-eye constellation of the selected enterprise"></svg>
+  <div class="vig"></div>
+  <div class="hots" id="hots"></div>
+  <div class="tip" id="tip" hidden></div>
+  <div class="steps" id="steps"></div>
+ </main>
+ <header class="top">
+  <button class="logo" data-act="registry" aria-label="All enterprises"><i></i><i></i><i></i><small>CONTROL CENTRE</small></button>
+  <div class="crumbs"><button class="back" id="backBtn" data-act="back" hidden>Back</button><div class="trail" id="trail"></div></div>
+  <button type="button" class="ask-launch" id="askLaunch" data-act="ask-view" aria-controls="dock"><span id="askLaunchLabel">Ask about this enterprise…</span><span class="go" aria-hidden="true">↵</span></button>
+  <div class="role-switch" id="roleSwitch" role="group" aria-label="Operator role">
+   <button type="button" class="on" data-role="investigator" aria-pressed="true">Investigator</button>
+   <button type="button" data-role="approver" aria-pressed="false">Approver</button>
+  </div>
+  <div class="sim-badge" title="Prototype only">Sample · simulated enforcement</div>
+  <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false"><i></i><i></i><i></i></button>
+  <div class="menu" id="menu" hidden>
+   <button data-act="registry">All enterprises</button><button data-act="profile">Enterprise briefing</button><button data-act="tour">Guided tour</button><button data-act="reset">Reset sample actions</button>
+   <p><span id="aboutEnt">This enterprise</span> is a fictional enterprise. All figures are illustrative and every action is simulated.</p>
+  </div>
+ </header>
+ <nav class="rail" id="rail" aria-label="Map lens"></nav>
+ <aside class="dock" id="dock" data-face="insights" aria-label="Insights and ask" inert>
+  <div class="dock-switch" role="tablist" aria-label="Choose a view">
+   <i class="thumb" aria-hidden="true"></i>
+   <button type="button" role="tab" class="on" id="tabInsights" data-act="dock:insights" aria-selected="true" aria-controls="panel">Insights</button>
+   <button type="button" role="tab" id="tabAsk" data-act="dock:ask" aria-selected="false" aria-controls="chat">Ask</button>
+  </div>
+  <div class="dock-stage">
+   <section class="dock-view panel on" id="panel" aria-label="Insights"><div class="p-body" id="pBody"></div></section>
+   <section class="dock-view chat" id="chat" aria-label="Ask about the enterprise" aria-hidden="true" inert>
+    <form class="dock-ask" id="askForm" autocomplete="off"><input id="askIn" type="text" placeholder="Ask about this enterprise…" aria-label="Ask about the enterprise"><button type="submit" aria-label="Ask">↵</button></form>
+    <div class="msgs" id="msgs" aria-live="polite"></div>
+    <div class="chips" id="chips"></div>
+   </section>
+  </div>
+ </aside>
+ <section class="hud" id="hud">
+  <button class="brief" data-act="profile" aria-label="We will walk you through the whole enterprise. 4 steps, sample data."><span class="plus" aria-hidden="true">+</span><span class="txt">Walk through<small>4 steps · sample data</small></span></button>
+  <div class="metrics" id="metrics">
+   <div class="mg"><div class="hd" id="h1"></div><div class="stats"><div title="Total complaints"><label>Total</label><b data-n="comp">0</b></div><div title="Change versus last month"><label>vs last mo.</label><b data-n="delta">0</b></div><div title="Scam reports"><label>Scam reports</label><b data-n="scam">0</b></div><div title="Spam and DND"><label>Spam / DND</label><b data-n="spam">0</b></div></div></div>
+   <div class="mg"><div class="hd" id="h2"></div><div class="stats"><div title="Consent coverage"><label>Consent</label><b data-n="cons">0</b></div><div title="Critical concerns"><label>Critical</label><b data-n="crit">0</b></div><div title="Concerns needing attention"><label>Attention</label><b data-n="warn">0</b></div><div title="Actions in progress"><label>In progress</label><b data-n="prog">0</b></div></div></div>
+   <div class="mg"><div class="hd" id="h3"></div><div class="stats"><div title="Sender IDs"><label>Sender IDs</label><b data-n="hdr">0</b></div><div title="Templates"><label>Templates</label><b data-n="tpl">0</b></div><div title="Voice numbers"><label>Voice nos.</label><b data-n="voice">0</b></div><div title="Sender IDs expiring within 14 days"><label>Expiring 14d</label><b data-n="exp">0</b></div></div></div>
+  </div>
+ </section>
+ <section class="pane" id="profile" aria-label="Enterprise briefing">
+  <div class="pr-top"><button class="back" data-act="profile-close">⟵&nbsp; Return to the main screen</button></div>
+  <div class="pr-meta"><span>Enterprise: <b id="prEnt"></b></span><span>Period: <b id="prPeriod"></b></span></div>
+  <div class="pr-main" id="prMain"></div>
+  <div class="pr-ctl"><button class="play" id="playBtn" data-act="play" aria-label="Play tour">▶</button><small id="prStep"></small></div>
+ </section>
+ <footer class="tl" id="tl"><div class="spark" id="spark"></div><div class="months" id="months"></div></footer>
+ <div class="toast" id="toast" role="status"></div>
+<div class="dir" id="dir">
+ <header class="dir-hd"><div class="wrap"><div class="logo" style="cursor:default"><i></i><i></i><i></i><small>CONTROL CENTRE</small></div><div><span class="eyebrow">DigiConsent · telco operator · sample data</span><h1>Enterprise Control Centre</h1><p>Choose an enterprise to open its map of brands, lines of business, consents, assets and investigations.</p></div></div></header>
+ <div class="dir-tools"><div class="wrap">
+  <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="dirSearch" type="search" placeholder="Search by enterprise, brand, sector or city  ( / )" autocomplete="off" aria-label="Search enterprises"></label>
+  <div class="seg" id="dirStatus" role="group" aria-label="Status"><button data-v="all">All</button><button data-v="crit">Critical</button><button data-v="warn">Attention</button><button data-v="ok">Healthy</button></div>
+  <select id="dirSector" aria-label="Sector"></select>
+  <select id="dirSort" aria-label="Sort"><option value="attention">Needs attention first</option><option value="score">Most open concerns</option><option value="complaints">Most complaints</option><option value="name">Name</option></select>
+  <div class="seg" id="dirView" role="group" aria-label="View"><button data-v="cards">Cards</button><button data-v="list">List</button></div>
+ </div></div>
+ <div class="dir-body"><div class="wrap"><div class="dstats" id="dirStats"></div><section class="twatch" id="dirThr"></section><p class="dcount" id="dirCount"></p><div id="dirList"></div><p class="dir-foot">All enterprises, figures and actions in this prototype are fictional. Enforcement is simulated. <a href="Enterprise_Trust_Map_4.html">Open Trust Map visual reference</a></p></div></div>
+</div>
+
+</div>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s);
+const NS='http://www.w3.org/2000/svg';
+const el=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;};
+const lerp=(a,b,t)=>a+(b-a)*t,clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt=n=>Math.round(n).toLocaleString('en-IN');
+let seed=11;const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};
+const rndInt=(a,b)=>a+Math.floor(rnd()*(b-a+1));
+
+/* ---------- data (illustrative) ---------- */
+const MONTHS=['Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'];
+const YEARS=[2025,2025,2026,2026,2026,2026,2026,2026,2026,2026,2026,2026];
+const MFULL=['November 2025','December 2025','January 2026','February 2026','March 2026','April 2026','May 2026','June 2026','July 2026','August 2026','September 2026','October 2026'];
+const CATS=[{id:'cns',name:'Consent records',s:'Consent'},{id:'voice',name:'Voice numbers',s:'Voice'},{id:'url',name:'Links & URLs',s:'Links'},{id:'tpl',name:'Message templates',s:'Templates'},{id:'hdr',name:'Sender IDs',s:'Sender IDs'}];
+const IT={
+ reuse:{cat:'tpl',label:'Blocked template reused elsewhere',title:n=>`This blocked template is being reused by other brands`,detail:()=>`The text of this template was blocked, and the same message, or a close variant, has since been filed elsewhere. Blocking it in one place does not stop the reuse.`,
+  actions:[['netblock','Block this fingerprint network-wide','Reject the text and its near matches across every enterprise and brand.'],['probe','Investigate the common source','Trace the shared vendor, agent or sender behind the reuse.'],['notify','Warn the affected brands','Tell each brand that this text is blocked and why.']]},
+ clone:{cat:'tpl',label:'Reused blocked template',title:n=>`A template blocked elsewhere is being used here`,detail:(n,l)=>`${l.brand.name} filed text that matches a template already blocked for another brand. The match is on the message fingerprint, so renaming the template does not hide it.`,
+  actions:[['netblock','Block this fingerprint network-wide','Reject the text and its near matches across every enterprise and brand.'],['suspend','Suspend this template','Stop delivery from this template while the brand responds.'],['notice','Issue a show-cause notice','Ask why a blocked text was filed again.'],['probe','Open an investigation','Trace who supplied the text and who else is using it.']]},
+ scam:{cat:'url',label:'Scam & phishing',title:n=>`${n} look-alike links are circulating in brand messages`,detail:(n,l)=>`Recipients reported ${n} short links that mimic ${l.brand.name} sign-in pages. They arrive from sender IDs that resemble the registered headers.`,
+  actions:[['block','Block the look-alike links','Add the domains to the group blocklist and alert carriers.'],['notify','Alert the brand security lead','Send a priority notice with the reported links attached.'],['escalate','Escalate to the enforcement desk','Open a case for takedown and sender tracing.']]},
+ spam:{cat:'tpl',label:'Spam & DND',title:n=>`${n} promotional templates reached DND-registered numbers`,detail:()=>`Complaints cite unsolicited offers after opt-out. No retrievable consent trail for these sends.`,
+  actions:[['suspend','Suspend the promotional templates','Stop delivery until a DND scrub is shown.'],['notice','Issue a show-cause notice','Ask the brand to explain within the response window.'],['scrub','Ask for DND scrub proof','Request the last three scrub reports.']]},
+ consent:{cat:'cns',label:'Consent gap',title:n=>`Consent proof is missing on ${n} campaigns`,detail:n=>`Coverage fell below 85%. ${n} live campaigns have no retrievable opt-in record.`,
+  actions:[['audit','Request a consent audit','Brand shares opt-in samples within the response window.'],['pause','Pause the affected campaigns','Hold delivery for campaigns without proof.'],['dpo','Notify the data protection officer','Copy the brand DPO on the finding.']]},
+ expiry:{cat:'hdr',label:'Expiring assets',title:n=>`${n} sender ID${n>1?'s':''} expire within 14 days`,detail:()=>`Lapsed headers stop delivering and invite look-alike registrations.`,
+  actions:[['remind','Send a renewal reminder','Notify the brand owner with the renewal link.'],['extend','Extend by 14 days','Grant a grace period while renewal completes.'],['review','Flag for review','Add to the weekly asset review.']]},
+ tpl:{cat:'tpl',label:'Template mismatch',title:n=>`${n} templates need re-verification`,detail:()=>`Content on the wire no longer matches the registered template text.`,
+  actions:[['reverify','Send for re-verification','Brand re-submits the templates for approval.'],['suspend','Suspend until verified','Hold the templates until they pass.'],['edit','Request a content edit','Ask the brand to correct the template text.']]},
+ idle:{cat:'hdr',label:'Idle assets',title:n=>`${n} sender IDs unused for 90+ days`,detail:()=>`Idle headers are a common source of misuse and add registry clutter.`,
+  actions:[['release','Recommend release','Suggest the brand release the unused IDs.'],['justify','Ask the brand to justify','Request a business reason to keep them.'],['retire','Retire now','Remove the IDs from the active registry.']]},
+ url:{cat:'url',label:'Unregistered links',title:n=>`${n} links use unregistered domains`,detail:()=>`Shorteners and domains in live templates are missing from the approved list.`,
+  actions:[['proof','Request whitelist proof','Brand shows ownership of each domain.'],['block','Block the unregistered domains','Stop messages that carry them.'],['notify','Notify the brand','Send the list of affected templates.']]},
+ uc1:{cat:'tpl',label:'Content–LOB mismatch',title:n=>`Loan-offer templates mapped to Savings`,detail:()=>`Authorised review confirmed personal-loan content on templates whose single mapped LOB is Savings (L-SAV). Scrub correctly checked Savings consent; those consents remain valid. Confirmed affected: T101, T204 (idle), T310. Cleared: T400, T405, T410. Observed exposure: 1,100 distinct recipients (T101∪T310).`,
+  actions:[['restrict','Restrict confirmed mismatched templates','Simulated template-control on T101, T204 and T310 only. No Savings-wide suspend. No remap.'],['evidence','Open affected-record review','Inspect confirmed, cleared and exposure tables.']]},
+ uc2:{cat:'tpl',label:'Deceptive fixed claim',title:n=>`Deceptive “guaranteed approval” claim in loan templates`,detail:()=>`Synthetic investigation evidence establishes the same deceptive claim in T501, T502 (idle) and T503. T504 is an ordinary loan offer without that claim and is cleared for this finding. Correct L-LOAN mapping does not make the claim legitimate.`,
+  actions:[['restrict2','Restrict templates with the confirmed claim','Simulated restriction of T501–T503. Preserve Loan consents.'],['evidence','Open claim excerpts','Review matched excerpts and cleared lookalike T504.']]},
+ uc3:{cat:'cns',label:'Disputed consent',title:n=>`User disputes Loans consent with matching template`,detail:()=>`Template and LOB match. Signup evidence is missing in connected records. Outcome: request original consent evidence. Do not blacklist correctly mapped template content or invent batch fraud.`,
+  actions:[['request','Request consent evidence','Ask the enterprise for acquisition proof for the disputed record.'],['hold','Restrict reliance on exact disputed records','Administrative restriction under approved policy — not a user revocation.']]},
+ uc4:{cat:'cns',label:'Post-revocation purpose',title:n=>`Contact after Personal Loans revocation via Financial Offers`,detail:()=>`User R200 revoked Personal Loans. A later personal-loan offer used T620 mapped solely to Financial Offers. Default demo state: message fits a separately active Financial Offers consent — Policy clarification required. No automatic cross-LOB revocation.`,
+  actions:[['policy','Flag policy clarification required','Escalate revocation-precedence question. Do not auto-revoke Financial Offers consent.'],['uc1route','Route as content–LOB mismatch','Use if reviewer finds content outside Financial Offers (alternate evidence state).']]},
+ uc6:{cat:'url',label:'Harmful populated variable',title:n=>`Populated variables changed purpose or introduced harm`,detail:()=>`Approved template structure maps to one LOB; harmful or wrong-purpose content arrived via variable values. Where the value is a URL, continue under UC9. Idle URL placeholders alone are not confirmed affected.`,
+  actions:[['linkuc9','Open URL / CTA investigation','Continue with submitted URL evidence and CTA inventory review.'],['evidence','Review variable values','Inspect observed populated values for this template.']]},
+ uc9:{cat:'url',label:'Malicious submitted URL',title:n=>`Harmful URLs supplied at submission`,detail:()=>`T601 uses {URL}. S601/S602 resolve to https://loan-check.example/verify (fictional harmfulness finding). S603 uses a safe URL and is outside confirmed uses. CTA inventory: CTA-A/B match short URLs; CTA-C unused but independently harmful; CTA-D no issue in checks; CTA-E unreachable/unverified.`,
+  actions:[['restricturl','Restrict confirmed harmful URL uses','Simulated control on submitted short URLs. Destination-only match without alias support is incomplete coverage.'],['ctareview','Review registered CTA inventory','Independent results per CTA — do not mark whole inventory affected.']]},
+};
+const BCOL=['#4c8dff','#9b7bff','#ff6fae','#3dd6e8','#c9d3e6','#ff9f6b'];
+const SECT={'Banking & lending':['Retail Lending','Cards','Wealth','Collections','Payments','SME Loans','Home Loans','Forex','Treasury','Customer Care'],
+ 'Communications':['Prepaid','Postpaid','Enterprise Sales','Broadband','Roaming','IoT Services','Device Sales','Wholesale','Customer Care','Recharge Partners'],
+ 'Retail & e-commerce':['Online Store','Loyalty Club','Marketplace','Stores & Offers','Delivery','Returns','Gift Cards','Subscriptions','Seller Support','Customer Care'],
+ 'Insurance':['Motor','Health','Claims','Life','Travel Cover','Home Cover','Renewals','Agents','Group Plans','Customer Care'],
+ 'Travel & hospitality':['Flights','Hotels','Holidays','Loyalty','Cargo','Visa Services','Airport Services','Cab Transfers','Corporate Travel','Customer Care'],
+ 'Healthcare':['Hospitals','Diagnostics','Pharmacy','Telehealth','Appointments','Insurance Desk','Home Care','Wellness','Blood Bank','Customer Care'],
+ 'Energy & utilities':['Billing','Field Services','Solar','Support','Prepaid Meters','Outage Alerts','New Connections','Industrial Sales','EV Charging','Customer Care'],
+ 'Fintech':['Wallet','Lending','Merchant','Investments','Remittance','Credit Score','Bill Pay','Rewards','Payouts','Customer Care'],
+ 'Media & streaming':['Streaming','News','Advertising','Subscriptions','Events','Podcasts','Gaming','Merch','Partnerships','Customer Care']};
+function gridFor(n){const t=n+1,cols=Math.ceil(Math.sqrt(t)),rows=Math.ceil(t/cols),hq=[Math.floor(cols/2),Math.floor(rows/2)],slots=[];
+ for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)if(!(c===hq[0]&&r===hq[1]))slots.push([c,r]);return{cols,rows,hq,slots:slots.slice(0,n)};}
+const ENTERPRISES=[
+ {id:'aster',name:'Aster Finance',city:'Mumbai',since:2019,seed:11,risk:.72,sector:'Financial services',audit:'20 Oct 2026',peId:'PE-ASTER',
+  brands:[['Aster Bank','B','Banking & lending','ASTBNK','bank'],['Aster Finance Offers','F','Fintech','ASTOFF','off'],['Aster Verify','V','Fintech','ASTVRF','vrf']],
+  lobs:[['bank','sav','Savings',8.5],['bank','loan','Loans',9.2],['bank','card','Cards',5.4],['off','finoff','Financial Offers',4.8],['vrf','kyc','Verification',3.6]],
+  issues:{'bank-sav':[['uc1','crit',3,8]],'bank-loan':[['uc2','crit',3,9],['uc3','warn',1,10]],'off-finoff':[['uc4','warn',1,10]],'vrf-kyc':[['uc9','crit',2,10],['uc6','warn',1,10]]}},
+ {id:'northstar',name:'Northstar Messaging',city:'Bengaluru',since:2016,seed:23,risk:0.18,sector:'Communications',audit:'03 Oct 2026',
+  brands:[['Northstar Relay','N','Communications',null,null,3],['Northstar Direct','D','Communications',null,null,2]]},
+ {id:'orbit',name:'Orbit Connect',city:'Hyderabad',since:2018,seed:41,risk:0.22,sector:'Communications',audit:'11 Oct 2026',
+  brands:[['Orbit SMS','O','Communications',null,null,4],['Orbit Voice','V','Communications',null,null,2]]}
+];
+const TYPES=['scam','spam','consent','expiry','tpl','idle','url','uc1','uc2','uc3','uc4','uc6','uc9'];
+function genIssues(ent,L){const def={};
+ L.forEach(l=>{if(rnd()<.25+ent.risk*.65){const t1=TYPES[Math.floor(rnd()*7)],arr=[[t1,rnd()<ent.risk*.55?'crit':'warn',rndInt(1,6),rndInt(4,11)]];
+  if(rnd()<ent.risk*.5){let t2;do{t2=TYPES[Math.floor(rnd()*7)];}while(t2===t1);arr.push([t2,'warn',rndInt(1,4),rndInt(5,11)]);}def[l.id]=arr;}});
+ return def;}
+const TPLN=['OTP verification','Payment reminder','Statement ready','Offer announcement','Account alert','Renewal notice','Delivery update','Welcome message'];
+const CNSN=['App sign-up','Branch form','Web checkout','IVR opt-in','Partner referral'];
+const HSUF=['','-S','-P','-T','-O','-A','-X','-N'];
+let BRANDS,BR,lobs,LB,issues,assets,ENT;
+function build(ent){
+ seed=ent.seed;const sl=gridFor(ent.brands.length).slots;
+ const BRANDS=ent.brands.map((b,i)=>({id:b[4]||'b'+i,name:b[0],mono:b[1],sector:b[2],code:b[3]||b[0].replace(/[^A-Za-z]/g,'').toUpperCase().slice(0,6),color:BCOL[i],slot:sl[i],lobN:b[5]}));
+ const BR={};BRANDS.forEach(b=>BR[b.id]=b);
+ const lobs=[],LB={};
+ const defs=ent.lobs||BRANDS.flatMap(b=>{const pool=SECT[b.sector].slice(),n=Math.min(pool.length,b.lobN||rndInt(3,4)),out=[];for(let i=0;i<n;i++){const k=Math.floor(rnd()*pool.length);out.push([b.id,pool[k].toLowerCase().replace(/[^a-z]+/g,''),pool[k],+(3+rnd()*11).toFixed(1)]);pool.splice(k,1);}return out;});
+ defs.forEach(([b,k,name,vol])=>{const l={id:b+'-'+k,key:k,brand:BR[b],name,vol,issues:[],assets:[]};lobs.push(l);LB[l.id]=l;});
+ const idef=ent.issues||genIssues(ent,lobs),issues=[];let ic=0,ac=0;const assets=[];
+ for(const id in idef)idef[id].forEach(([type,sev,n,since])=>{const i={id:ent.id+'-i'+(++ic),lob:LB[id],type,sev,n,since,status:'open',action:null,assets:[]};LB[id].issues.push(i);issues.push(i);});
+ lobs.forEach(l=>{
+  const need={};l.issues.forEach(i=>{const c=IT[i.type].cat;need[c]=(need[c]||0)+i.n;});
+  const cnt={hdr:Math.min(8,Math.max(rndInt(3,5),(need.hdr||0)+1)),tpl:Math.min(8,Math.max(rndInt(6,8),(need.tpl||0)+1)),voice:rndInt(2,4),url:Math.min(8,Math.max(rndInt(4,6),(need.url||0)+1)),cns:Math.min(8,Math.max(rndInt(3,5),(need.cns||0)+1))};
+  l.cnt=cnt;
+  CATS.forEach(c=>{for(let j=0;j<cnt[c.id];j++){
+   const a={id:'a'+(++ac),lob:l,cat:c.id,idx:j,vol:rndInt(40,2400),audit:rndInt(3,120),issue:null};
+   const r4=Math.floor(rnd()*46656).toString(36).padStart(3,'0');
+   if(c.id==='hdr'){a.name=l.brand.code+HSUF[j];a.sub='Registered sender ID';}
+   else if(c.id==='tpl'){a.name=TPLN[j%8];a.sub='TPL-'+l.key.slice(0,3).toUpperCase()+'-'+(100+j*7);}
+   else if(c.id==='voice'){a.name='1600-'+rndInt(200,899)+'-'+rndInt(1000,9999);a.sub='Outbound voice line';}
+   else if(c.id==='url'){a.name='go.'+l.brand.code.toLowerCase()+'.example/'+r4;a.sub='Short link';}
+   else{a.name=CNSN[j%5];a.sub='Opt-in source';}
+   l.assets.push(a);assets.push(a);}});
+  l.issues.forEach(i=>{const cat=IT[i.type].cat;let n=0;l.assets.forEach(a=>{if(a.cat===cat&&!a.issue&&n<i.n){a.issue=i;i.assets.push(a);n++;}});});
+  l.b={scam:[],spam:[],other:[],cons:[]};const bc=rndInt(90,97);
+  for(let m=0;m<12;m++){l.b.scam.push(l.vol*1.4*(.8+.4*rnd()));l.b.spam.push(l.vol*5*(.8+.4*rnd()));l.b.other.push(l.vol*22*(.85+.3*rnd()));l.b.cons.push(bc-1.5*rnd());}
+  l.issues.forEach(i=>{i.c=[];for(let m=0;m<12;m++){const r=m>=i.since?Math.min(1,(m-i.since+1)/3):0,o={scam:0,spam:0,other:0,cons:0},cr=i.sev==='crit';
+   if(i.type==='scam')o.scam=l.vol*(cr?22:6)*r;if(i.type==='spam')o.spam=l.vol*(cr?30:9)*r;if(i.type==='consent')o.cons=(cr?20:11)*r;
+   if(i.type==='tpl'||i.type==='uc1'||i.type==='uc2')o.other=l.vol*(cr?10:4)*r;if(i.type==='url'||i.type==='uc9'||i.type==='uc6')o.scam=l.vol*2*r;if(i.type==='uc3'||i.type==='uc4')o.cons=(cr?12:6)*r;i.c.push(o);}});
+ });
+ return{ent,BRANDS,BR,lobs,LB,issues,assets};
+}
+
+/* ---------- ECC Aster enrichment & simulation ---------- */
+const ECC={
+ role:'investigator',
+ awaitingApproval:0,
+ incompleteActions:0,
+ actions:{},
+ fixtures:{
+  uc1:{confirmed:['T101','T204','T310'],cleared:['T400','T405','T410'],exposure:1100,t204Recipients:0,complainants:54,cohort:900,consentsPreserved:true},
+  uc2:{confirmed:['T501','T502','T503'],cleared:['T504']},
+  uc9:{harmfulSubs:['S601','S602'],safeSubs:['S603'],ctas:[
+    {id:'CTA-A',state:'observed_harmful'},{id:'CTA-B',state:'observed_harmful'},{id:'CTA-C',state:'unused_confirmed_harmful'},
+    {id:'CTA-D',state:'no_issue_in_checks'},{id:'CTA-E',state:'unreachable_unverified'}]}
+ }
+};
+function enrichAster(m){
+ if(!m||m.ent.id!=='aster'||m._ecc)return m;m._ecc=true;
+ const byId=id=>m.LB[id];
+ const sav=byId('bank-sav'),loan=byId('bank-loan'),fin=byId('off-finoff'),kyc=byId('vrf-kyc');
+ const nameTpl=(lob,specs)=>{
+  const tpls=lob.assets.filter(a=>a.cat==='tpl');
+  specs.forEach((sp,i)=>{const a=tpls[i];if(!a)return;Object.assign(a,{name:sp.id,sub:sp.sub,tplId:sp.id,mappedLobId:sp.lob,purpose:sp.purpose,activity:sp.activity,recipients:sp.recipients||0,assessment:sp.assessment,ecc:true});});
+ };
+ if(sav)nameTpl(sav,[
+  {id:'T101',lob:'L-SAV',purpose:'Personal loan offer',activity:'active',recipients:900,assessment:'confirmed',sub:'Mapped LOB L-SAV · loan content · 900 recipients'},
+  {id:'T204',lob:'L-SAV',purpose:'Personal loan offer',activity:'idle',recipients:0,assessment:'confirmed',sub:'Mapped LOB L-SAV · idle · 0 observed recipients'},
+  {id:'T310',lob:'L-SAV',purpose:'Personal loan offer',activity:'active',recipients:300,assessment:'confirmed',sub:'Mapped LOB L-SAV · loan content · 300 recipients'},
+  {id:'T400',lob:'L-SAV',purpose:'Savings update',activity:'active',recipients:0,assessment:'cleared',sub:'Mapped LOB L-SAV · content fits Savings · cleared UC1'},
+  {id:'T405',lob:'L-SAV',purpose:'Savings-specific offer',activity:'idle',recipients:0,assessment:'cleared',sub:'Mapped LOB L-SAV · idle · cleared UC1'},
+ ]);
+ if(loan)nameTpl(loan,[
+  {id:'T410',lob:'L-LOAN',purpose:'Loan offer',activity:'active',recipients:0,assessment:'cleared_uc1',sub:'Mapped LOB L-LOAN · correctly mapped · cleared UC1'},
+  {id:'T501',lob:'L-LOAN',purpose:'Guaranteed approval claim',activity:'active',recipients:0,assessment:'confirmed_uc2',sub:'L-LOAN · deceptive claim confirmed'},
+  {id:'T502',lob:'L-LOAN',purpose:'Guaranteed approval claim',activity:'idle',recipients:0,assessment:'confirmed_uc2',sub:'L-LOAN · idle · same claim'},
+  {id:'T503',lob:'L-LOAN',purpose:'Guaranteed approval claim',activity:'active',recipients:0,assessment:'confirmed_uc2',sub:'L-LOAN · paraphrase of same claim'},
+  {id:'T504',lob:'L-LOAN',purpose:'Ordinary loan offer',activity:'active',recipients:0,assessment:'cleared_uc2',sub:'L-LOAN · no deceptive claim · cleared UC2'},
+ ]);
+ if(fin){const t=fin.assets.find(a=>a.cat==='tpl');if(t)Object.assign(t,{name:'T620',tplId:'T620',mappedLobId:'L-FINOFF',purpose:'Personal loan offer',sub:'Mapped LOB L-FINOFF · UC4 overlap path',assessment:'policy_clarification'});}
+ if(kyc){const t=kyc.assets.find(a=>a.cat==='tpl');if(t)Object.assign(t,{name:'T601',tplId:'T601',mappedLobId:'L-KYC',purpose:'Verification with {URL}',sub:'URL placeholder · UC9 submissions',assessment:'url_variable'});
+  const urls=kyc.assets.filter(a=>a.cat==='url');
+  [['CTA-A','https://short.example/a'],['CTA-B','https://short.example/b'],['CTA-C','unused registered'],['CTA-D','checks clear'],['CTA-E','unreachable']].forEach((x,i)=>{if(urls[i])Object.assign(urls[i],{name:x[0],sub:x[1],ctaId:x[0]});});}
+ // Link UC1 issue assets to T101/T204/T310
+ const uc1=m.issues.find(i=>i.type==='uc1');
+ if(uc1&&sav){uc1.assets=sav.assets.filter(a=>['T101','T204','T310'].includes(a.tplId));uc1.assets.forEach(a=>a.issue=uc1);uc1.n=3;
+  sav.assets.filter(a=>['T400','T405'].includes(a.tplId)).forEach(a=>{a.issue=null;});}
+ const uc2=m.issues.find(i=>i.type==='uc2');
+ if(uc2&&loan){uc2.assets=loan.assets.filter(a=>['T501','T502','T503'].includes(a.tplId));uc2.assets.forEach(a=>a.issue=uc2);uc2.n=3;
+  const t504=loan.assets.find(a=>a.tplId==='T504');if(t504)t504.issue=null;}
+ return m;
+}
+const models={};const getModel=e=>{if(models[e.id])return models[e.id];const m=build(e);if(e.id==='aster')enrichAster(m);return models[e.id]=m;};
+/* ---------- shared-template abuse ---------- */
+const THR_DEF=[]; // ECC demo: shared-fingerprint threats deferred; UC2 carries deceptive-claim finding
+
+const TSTATE={live:{l:'Sending the blocked text',sev:'crit',match:100},variant:{l:'Reworded to evade the block',sev:'crit',match:94},resub:{l:'Re-filed under a new name',sev:'warn',match:100}};
+const THREATS=[];let THR_DONE=false;
+function applyThreats(){
+ if(THR_DONE)return;THR_DONE=true;
+ THR_DEF.forEach((d,ti)=>{
+  const thr={id:d.id,name:d.name,fp:d.fp,kind:d.kind,text:d.text,blocked:d.blocked,col:d.col,nodes:[]};
+  [['origin',d.origin],...d.clones.map(c=>['clone',c])].forEach(([role,r],k)=>{
+   const ent=ENTERPRISES.find(e=>e.id===r[0]),m=getModel(ent),br=m.BRANDS[Math.min(r[1],m.BRANDS.length-1)],L=m.lobs.filter(l=>l.brand===br),lob=L[Math.min(r[2],L.length-1)];
+   const a=lob.assets.find(x=>x.cat==='tpl'&&!x.issue&&!x.threat);if(!a)return;
+   const o=role==='origin',st=o?null:TSTATE[r[4]],since=o?8:9+(k%3),sev=o?'warn':st.sev;
+   const node={thr,ent,model:m,brand:br,lob,asset:a,role,attempts:r[3],state:o?'blocked':r[4],match:o?100:st.match};
+   a.name=d.name+(r[4]==='variant'?' (v2)':r[4]==='resub'?' · re-filed':'');a.sub=o?'Blocked · '+d.fp:(r[4]==='variant'?'Near match of ':'Exact match of ')+d.fp;a.threat=thr;a.role=role;
+   const i={id:ent.id+'-t'+ti+'-'+k,lob,type:o?'reuse':'clone',sev,n:1,since,status:'open',action:null,assets:[a],thr,node,c:[]};
+   for(let mo=0;mo<12;mo++){const rr=mo>=since?Math.min(1,(mo-since+1)/3):0,cr=sev==='crit',z={scam:0,spam:0,other:0,cons:0};
+    if(o)z.other=lob.vol*2*rr;else if(d.kind==='scam')z.scam=lob.vol*(cr?16:5)*rr;else z.spam=lob.vol*(cr?24:8)*rr;i.c.push(z);}
+   a.issue=i;lob.issues.push(i);m.issues.push(i);node.issue=i;thr.nodes.push(node);});
+  THREATS.push(thr);});
+}
+function useModel(m){ENT=m.ent;BRANDS=m.BRANDS;BR=m.BR;lobs=m.lobs;LB=m.LB;issues=m.issues;assets=m.assets;}
+const LAST=11;
+function lobAt(l,m){
+ let scam=l.b.scam[m],spam=l.b.spam[m],other=l.b.other[m],cons=l.b.cons[m];
+ l.issues.forEach(i=>{const f=m===LAST?(i.status==='open'?1:i.status==='prog'?.7:.3):1,c=i.c[m];scam+=c.scam*f;spam+=c.spam*f;other+=c.other*f;cons-=c.cons*f;});
+ const vis=l.issues.filter(i=>i.since<=m&&i.status!=='resolved'),open=vis.filter(i=>i.status==='open'),prog=vis.length-open.length,crit=open.filter(i=>i.sev==='crit').length,warn=open.length-crit;
+ return{comp:scam+spam+other,scam,spam,cons,crit,warn,prog,open,vis,
+  score:clamp(100-crit*24-warn*9-prog*3-Math.round((100-cons)*.2),8,100),sev:crit?'crit':warn?'warn':'ok',
+  exp:vis.filter(i=>i.type==='expiry').reduce((s,i)=>s+i.n,0),atRisk:vis.reduce((s,i)=>s+i.n,0)};
+}
+function agg(list,m){
+ const r={comp:0,scam:0,spam:0,vol:0,cons:0,score:0,crit:0,warn:0,prog:0,exp:0,hdr:0,tpl:0,voice:0,flagged:0,critLobs:0,min:100};
+ list.forEach(l=>{const x=lobAt(l,m);r.comp+=x.comp;r.scam+=x.scam;r.spam+=x.spam;r.vol+=l.vol;r.cons+=x.cons*l.vol;r.score+=x.score*l.vol;r.min=Math.min(r.min,x.score);r.crit+=x.crit;r.warn+=x.warn;r.prog+=x.prog;r.exp+=x.exp;
+  r.hdr+=l.cnt.hdr;r.tpl+=l.cnt.tpl;r.voice+=l.cnt.voice;if(x.sev!=='ok')r.flagged++;if(x.sev==='crit')r.critLobs++;});
+ r.cons/=r.vol;r.score=r.score/r.vol*.65+r.min*.35;return r;
+}
+const statusOf=(a,m)=>{const i=a.issue;if(!i||i.since>m)return'ok';if(a.role==='origin'&&i.status==='open')return'blk';return i.status==='open'?i.sev:i.status==='prog'?'prog':'ok';};
+const allIssuesOpen=m=>issues.filter(i=>i.since<=m&&i.status==='open');
+const sevRank=i=>(i.sev==='crit'?100:0)+i.n*3+(i.since)/2;
+const topIssues=m=>allIssuesOpen(m).sort((a,b)=>sevRank(b)-sevRank(a));
+const S={active:false,m:LAST,lens:'risk',focus:{lvl:'ent'},panelOpen:true,entPanel:false,profile:false,sheet:null,sel:null,autofit:true,step:0,log:[],dock:'insights',role:'investigator',eccView:null,tree:{brands:new Set(),lobs:new Set()}};
+function resetState(){Object.assign(S,{m:LAST,lens:'risk',focus:{lvl:'ent'},panelOpen:true,entPanel:false,profile:false,sheet:null,sel:null,autofit:true,step:0,log:[],dock:'insights',role:'investigator',eccView:null,tree:{brands:new Set(),lobs:new Set()}});ECC.awaitingApproval=0;ECC.incompleteActions=0;ECC.actions={};document.querySelectorAll('#roleSwitch button').forEach(b=>{const on=b.dataset.role==='investigator';b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on));});}
+let dockHolds=0;
+const holdingDock=fn=>{dockHolds++;try{return fn();}finally{dockHolds--;}};
+const LENS={risk:{name:'Risk',val:(l,x)=>100-x.score,leg:'Tree drill-down<br>Ring = open concerns'},comp:{name:'Complaints',val:(l,x)=>x.comp/l.vol,leg:'Emphasis by complaints'},
+ scam:{name:'Scams',val:(l,x)=>x.scam,leg:'Emphasis by scam reports'},cons:{name:'Consent',val:(l,x)=>100-x.cons,leg:'Emphasis by consent gap'},
+ assets:{name:'Assets',val:(l,x)=>x.atRisk,leg:'Expand LOBs to see assets'},
+ reuse:{name:'Shared',val:(l,x)=>l.issues.filter(i=>i.thr&&i.since<=S.m&&i.status!=='resolved').reduce((s,i)=>s+Math.log(2+i.node.attempts),0),leg:'Shared finding paths'}};
+
+
+
+/* ---------- scene: collapsible enterprise tree ---------- */
+const A=29,B=14.5,Z0=7,PD=7.4,MG=2,EXP_STEP=58,EXP_EFF=6;
+let PW=11.8,GX=13.4,GY=9.4,BASEX=2*GX+PW+MG,BASEY=GY+PD+MG,HQSLOT=[1,1];
+const perRow=L=>L<=5?L:Math.ceil(L/2);
+function layoutFor(m){const g=gridFor(m.BRANDS.length),per=Math.max(...m.BRANDS.map(b=>perRow(m.lobs.filter(l=>l.brand===b).length)));
+ PW=Math.max(8.6,1.7+per*2.5-.4+.5);GX=PW+1.6;GY=PD+2;BASEX=(g.cols-1)*GX+PW+MG;BASEY=(g.rows-1)*GY+PD+MG;HQSLOT=g.hq;}
+const iso=(x,y,z=0)=>[(x-y)*A,(x+y)*B-z];
+const pts=a=>a.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+const rgb=(c,f=1)=>`rgb(${Math.round(clamp(c[0]*f,0,255))},${Math.round(clamp(c[1]*f,0,255))},${Math.round(clamp(c[2]*f,0,255))})`;
+const mix=(a,b,t)=>[lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t)];
+const svg=$('#scene'),stage=$('#stage'),app=$('#app');
+let defs,world,gUnder,gPlate,gFeed,gGround,gCity,gScr,gridMaskRect,gridSig,fades,items,bld,dots,signs;const H={};const SIGN_H=118;
+const WALL=[38,62,86],COOL=[54,86,112],WARM=[218,152,50],HOT=[226,72,86];
+const LIT={ok:[165,225,255],warn:[255,198,92],crit:[255,112,124]};
+const TILEC={ok:[[130,204,218],[80,152,170],[54,110,128]],warn:[[255,194,74],[216,152,42],[162,110,30]],crit:[[255,96,110],[216,64,78],[152,42,56]],prog:[[176,156,255],[132,110,232],[94,78,172]],blk:[[120,128,158],[78,86,114],[52,58,82]]};
+function approach(s,t,dt,rate){let ch=false;for(const k in t){const d=t[k]-s[k];if(Math.abs(d)>.002){s[k]+=d*(1-Math.exp(-dt*rate));ch=true;}else if(d!==0){s[k]=t[k];ch=true;}}return ch;}
+function mkFade(g,key){const f={g,key,s:{v:1},t:{v:1}};fades.push(f);return f;}
+
+const TREE={
+ y:{ent:0,brand:86,lob:172,asset:248},
+ gap:{brand:28,lob:18,asset:10},
+ w:{ent:168,brand:132,lob:112,asset:78},
+ h:{ent:44,brand:38,lob:34,asset:28}
+};
+const GX2={bbox:null,gEdges:null,gNodes:null,gLabs:null};
+
+function lobAssets(l){
+ const primary=l.assets.filter(a=>a.tplId||a.cat==='tpl');
+ return primary.length?primary.slice(0,8):l.assets.slice(0,6);
+}
+function measureLob(l){
+ if(!S.tree.lobs.has(l.id)) return TREE.w.lob;
+ const n=Math.max(lobAssets(l).length,1);
+ return Math.max(TREE.w.lob, n*TREE.w.asset+(n-1)*TREE.gap.asset);
+}
+function measureBrand(br){
+ const Ls=lobs.filter(l=>l.brand===br);
+ if(!S.tree.brands.has(br.id)||!Ls.length) return TREE.w.brand;
+ let w=0; Ls.forEach((l,i)=>{w+=measureLob(l)+(i?TREE.gap.lob:0);});
+ return Math.max(TREE.w.brand,w);
+}
+function stubB3(l,ax,ay){
+ const x=(ax!=null?ax:(l._p&&l._p.x)||0), y=(ay!=null?ay:(l._p&&l._p.y)||0);
+ l.b3={lob:l,x,y,w:40,d:40,anchor:[x,y-TREE.h.lob/2-4],zTop:[0,0,0,0,0],dirty:false,
+  s:{h:1,gap:0,fade:1,hv:0,r:40,g:70,b:110,lr:165,lg:225,lb:255},t:{h:1,gap:0,fade:1,hv:0,r:40,g:70,b:110,lr:165,lg:225,lb:255},
+  setBeacon:function(){},draw:function(){},buildTiles:function(){},killTiles:function(){},tiles:null,g:null};
+}
+function layoutTree(){
+ /* Tidy vertical tree: Enterprise → Brands → LOBs → Assets. Only expanded branches take width. */
+ const brandWs=BRANDS.map(measureBrand);
+ let total=brandWs.reduce((s,w,i)=>s+w+(i?TREE.gap.brand:0),0);
+ let x0=-total/2;
+ BRANDS.forEach((br,i)=>{
+  const bw=brandWs[i];
+  const bx=x0+bw/2;
+  br._p={x:bx,y:TREE.y.brand}; br._w=bw;
+  br.signTop=[bx, TREE.y.brand-TREE.h.brand/2-8];
+  const Ls=lobs.filter(l=>l.brand===br);
+  if(S.tree.brands.has(br.id)){
+   const lws=Ls.map(measureLob);
+   let lwSum=lws.reduce((s,w,j)=>s+w+(j?TREE.gap.lob:0),0);
+   let lx=bx-lwSum/2;
+   Ls.forEach((l,j)=>{
+    const lw=lws[j]; const cx=lx+lw/2;
+    l._p={x:cx,y:TREE.y.lob}; l._w=lw;
+    const pool=lobAssets(l);
+    if(S.tree.lobs.has(l.id)){
+     const aw=pool.length*TREE.w.asset+(Math.max(pool.length,1)-1)*TREE.gap.asset;
+     let ax=cx-aw/2;
+     pool.forEach(a=>{
+      a._p={x:ax+TREE.w.asset/2,y:TREE.y.asset}; a._w=TREE.w.asset;
+      ax+=TREE.w.asset+TREE.gap.asset;
+     });
+    } else pool.forEach(a=>{a._p=null;});
+    stubB3(l); lx+=lw+TREE.gap.lob;
+   });
+  } else {
+   Ls.forEach(l=>{lobAssets(l).forEach(a=>{a._p=null;}); stubB3(l,bx,TREE.y.brand); l._p=null; l.b3.anchor=[bx,TREE.y.brand];});
+  }
+  x0+=bw+TREE.gap.brand;
+ });
+ const ent={x:0,y:TREE.y.ent,w:TREE.w.ent,h:TREE.h.ent};
+ H.hqAnchor=[0,-TREE.h.ent/2-10]; H.hqBase=[0,0];
+ const maxY=S.tree.lobs.size?TREE.y.asset+TREE.h.asset/2+24:S.tree.brands.size?TREE.y.lob+TREE.h.lob/2+24:TREE.y.brand+TREE.h.brand/2+24;
+ GX2.bbox={minX:-Math.max(total/2,TREE.w.ent/2)-40,maxX:Math.max(total/2,TREE.w.ent/2)+40,minY:-TREE.h.ent/2-36,maxY:maxY};
+ GX2._ent=ent;
+}
+function nodeSevColor(sev){return sev==='crit'?'#ff4d5e':sev==='warn'?'#ffb020':sev==='prog'?'#9b8cff':'#5ec8a0';}
+function elbow(x1,y1,x2,y2){
+ const mid=(y1+y2)/2;
+ return 'M'+x1.toFixed(1)+','+y1.toFixed(1)+' V'+mid.toFixed(1)+' H'+x2.toFixed(1)+' V'+y2.toFixed(1);
+}
+function card(g,x,y,w,h,opt){
+ const r=el('rect',{x:(x-w/2).toFixed(1),y:(y-h/2).toFixed(1),width:w,height:h,rx:8,fill:opt.fill||'rgba(12,28,46,.94)',stroke:opt.stroke||'rgba(160,200,230,.35)','stroke-width':opt.sw||1.4,filter:opt.glow?'url(#glow2)':'none',class:'tree-node'},g);
+ return r;
+}
+function label(g,x,y,text,opt){
+ const t=el('text',{x:x,y:y,'text-anchor':opt.anchor||'middle',fill:opt.fill||'#e9f2f8','font-size':opt.size||11,'font-weight':opt.weight||600,'font-family':'Schibsted Grotesk,system-ui,sans-serif'},g);
+ t.textContent=text; return t;
+}
+function plusBadge(g,x,y,n,open){
+ if(!n)return;
+ el('circle',{cx:x,cy:y,r:9,fill:open?'#1f6bff':'rgba(20,40,60,.95)',stroke:'rgba(200,220,240,.5)','stroke-width':1},g);
+ const t=el('text',{x:x,y:y+3.5,'text-anchor':'middle',fill:'#fff','font-size':9,'font-weight':700,'font-family':'JetBrains Mono,monospace'},g);
+ t.textContent=open?'−':String(n);
+}
+
+function syncTreeToFocus(){
+ const f=S.focus; if(!f)return;
+ if(f.lvl==='brand'&&f.brand) S.tree.brands.add(f.brand.id);
+ if((f.lvl==='lob'||f.lvl==='asset')&&f.lob){S.tree.brands.add(f.lob.brand.id);S.tree.lobs.add(f.lob.id);}
+}
+
+function toggleBrand(br){
+ if(S.tree.brands.has(br.id)){S.tree.brands.delete(br.id);lobs.filter(l=>l.brand===br).forEach(l=>S.tree.lobs.delete(l.id));}
+ else S.tree.brands.add(br.id);
+ rebuildTree();goto({lvl:'brand',brand:br},{instant:true,keepTree:true});
+}
+function toggleLob(l){
+ if(S.tree.lobs.has(l.id)) S.tree.lobs.delete(l.id); else {S.tree.brands.add(l.brand.id);S.tree.lobs.add(l.id);}
+ rebuildTree();goto({lvl:'lob',lob:l},{instant:true,keepTree:true});
+}
+function rebuildTree(){
+ if(!S.active)return;
+ buildScene();buildFeeds();buildHots();buildLinks();applyLens();
+ fly(currentFit(),true);renderAll();
+}
+
+function buildScene(){
+ svg.innerHTML='';fades=[];items=[];bld=[];dots={};signs={};
+ defs=el('defs',null,svg);
+ const gf=el('filter',{id:'glow',x:'-60%',y:'-60%',width:'220%',height:'220%'},defs);el('feGaussianBlur',{stdDeviation:8},gf);
+ const gf2=el('filter',{id:'glow2',x:'-40%',y:'-40%',width:'180%',height:'180%'},defs);el('feGaussianBlur',{stdDeviation:3.5},gf2);
+ world=el('g',null,svg);
+ gUnder=el('g',null,world);gPlate=el('g',null,world);gFeed=el('g',null,world);gGround=el('g',null,world);gCity=el('g',null,world);
+ GX2.gEdges=el('g',null,gFeed);GX2.gNodes=el('g',null,gCity);GX2.gLabs=el('g',{'pointer-events':'none'},gCity);
+ gScr=el('g',{'pointer-events':'none'});svg.insertBefore(gScr,world);gridSig='';gridMaskRect=null;
+ syncTreeToFocus();
+ layoutTree();
+ const bb=GX2.bbox;
+ el('ellipse',{cx:0,cy:(bb.minY+bb.maxY)/2,rx:(bb.maxX-bb.minX)/2+30,ry:(bb.maxY-bb.minY)/2+40,fill:'url(#fieldGrad)'},gUnder);
+ {const rg=el('radialGradient',{id:'fieldGrad',cx:'50%',cy:'20%',r:'75%'},defs);
+  el('stop',{offset:'0%','stop-color':'#1a4a7a','stop-opacity':'.28'},rg);
+  el('stop',{offset:'100%','stop-color':'#06101b','stop-opacity':'0'},rg);}
+
+ // level captions (clean IA)
+ [['Enterprise',TREE.y.ent],['Brands',TREE.y.brand],['Lines of business',TREE.y.lob],['Assets',TREE.y.asset]].forEach(([lab,yy],i)=>{
+  if(i===2&&!S.tree.brands.size)return; if(i===3&&!S.tree.lobs.size)return;
+  const t=el('text',{x:bb.minX+8,y:yy+4,fill:'rgba(147,171,189,.55)','font-size':9,'font-family':'JetBrains Mono,monospace','letter-spacing':'.08em'},GX2.gLabs);
+  t.textContent=lab.toUpperCase();
+ });
+
+ // Enterprise root
+ {const e=GX2._ent, eg=el('g',{class:'node hub',style:'cursor:pointer'},GX2.gNodes);
+  card(eg,e.x,e.y,e.w,e.h,{fill:'#12325e',stroke:'#6aa4ff',sw:1.8,glow:true});
+  label(eg,e.x,e.y-4,(ENT.name||'Enterprise'),{size:13,weight:700});
+  label(eg,e.x,e.y+12,(ENT.peId||'Principal entity')+' · '+BRANDS.length+' brands',{size:9,fill:'#93abbd',weight:500});
+  eg.addEventListener('click',()=>{S.tree.brands.clear();S.tree.lobs.clear();rebuildTree();H.hqClick&&H.hqClick();});
+ }
+
+ // Brands + descendants
+ BRANDS.forEach(br=>{
+  const open=S.tree.brands.has(br.id), Ls=lobs.filter(l=>l.brand===br);
+  const sev=sevOfBrand(br,S.m), col=nodeSevColor(sev);
+  // edge enterprise → brand
+  el('path',{d:elbow(0,TREE.h.ent/2,br._p.x,br._p.y-TREE.h.brand/2),fill:'none',stroke:'rgba(140,190,255,.35)','stroke-width':1.5},GX2.gEdges);
+  const bg=el('g',{class:'node brand',style:'cursor:pointer'},GX2.gNodes); bg.dataset.brand=br.id;
+  card(bg,br._p.x,br._p.y,TREE.w.brand,TREE.h.brand,{fill:'rgba(11,34,51,.96)',stroke:col,sw:sev==='ok'?1.3:2.2,glow:sev!=='ok'});
+  el('circle',{cx:br._p.x-TREE.w.brand/2+14,cy:br._p.y,r:6,fill:br.color},bg);
+  label(bg,br._p.x+4,br._p.y+4,br.name.replace(/^Aster /,''),{size:11});
+  plusBadge(bg,br._p.x+TREE.w.brand/2-2,br._p.y-TREE.h.brand/2+2,Ls.length,open);
+  bg.addEventListener('click',e=>{e.stopPropagation(); if(e.metaKey||e.altKey){H.brandClick&&H.brandClick(br);return;} toggleBrand(br);});
+  bg.addEventListener('pointerenter',e=>{const a=agg(Ls,S.m);showTip('<b>'+br.name+'</b><span>'+Ls.length+' LOBs · '+(a.crit+a.warn)+' open · click to '+(open?'collapse':'expand')+'</span>',e);});
+  bg.addEventListener('pointerleave',()=>hideTip());
+
+  if(!open) return;
+  Ls.forEach(l=>{
+   if(!l._p)return;
+   const x=lobAt(l,S.m), lsev=x.sev, lcol=nodeSevColor(lsev);
+   const lopen=S.tree.lobs.has(l.id), pool=lobAssets(l);
+   el('path',{d:elbow(br._p.x,br._p.y+TREE.h.brand/2,l._p.x,l._p.y-TREE.h.lob/2),fill:'none',stroke:'rgba(160,200,230,.3)','stroke-width':1.3},GX2.gEdges);
+   const lg=el('g',{class:'node lob',style:'cursor:pointer'},GX2.gNodes); lg.dataset.lob=l.id; lg.dataset.brand=br.id;
+   card(lg,l._p.x,l._p.y,TREE.w.lob,TREE.h.lob,{fill:'rgba(12,28,46,.96)',stroke:lcol,sw:lsev==='ok'?1.2:2,glow:lsev!=='ok'});
+   label(lg,l._p.x,l._p.y+4,l.name,{size:10});
+   plusBadge(lg,l._p.x+TREE.w.lob/2-2,l._p.y-TREE.h.lob/2+2,pool.length,lopen);
+   lg.addEventListener('click',e=>{e.stopPropagation(); toggleLob(l);});
+   lg.addEventListener('pointerenter',e=>{showTip('<b>'+br.name+' › '+l.name+'</b><span>'+pool.length+' assets · '+(x.crit+x.warn)+' open · click to '+(lopen?'collapse':'expand')+'</span>',e);});
+   lg.addEventListener('pointerleave',()=>hideTip());
+   bld.push(l.b3);
+
+   if(!lopen) return;
+   pool.forEach(a=>{
+    if(!a._p)return;
+    el('path',{d:elbow(l._p.x,l._p.y+TREE.h.lob/2,a._p.x,a._p.y-TREE.h.asset/2),fill:'none',stroke:'rgba(160,200,230,.22)','stroke-width':1,class:'edge asset'},GX2.gEdges).setAttribute('data-lob',l.id);
+    const st=statusOf(a,S.m);
+    const ac=a.assessment==='confirmed'||st==='crit'?nodeSevColor('crit'):(String(a.assessment||'').includes('cleared')?'#6a8a9a':nodeSevColor(st==='ok'?'ok':st));
+    const ag=el('g',{class:'node asset',style:'cursor:pointer'},GX2.gNodes); ag.dataset.lob=l.id; ag.dataset.asset=a.id;
+    const idle=a.activity==='idle';
+    card(ag,a._p.x,a._p.y,TREE.w.asset,TREE.h.asset,{fill:idle?'rgba(12,28,46,.7)':'rgba(12,28,46,.95)',stroke:a.restricted?'#9b8cff':ac,sw:a.assessment==='confirmed'?2:1.2});
+    label(ag,a._p.x,a._p.y+3.5,a.tplId||a.name||a.cat,{size:9,fill:idle?'#93abbd':'#e9f2f8'});
+    ag.addEventListener('click',e=>{e.stopPropagation();H.tileClick?H.tileClick(a):goto({lvl:'asset',lob:l,asset:a},{keepTree:true});});
+    ag.addEventListener('pointerenter',e=>{const bits=[a.sub||a.cat];if(a.mappedLobId)bits.push(a.mappedLobId);if(a.recipients!=null)bits.push(a.recipients+' recipients');if(idle)bits.push('idle');showTip('<b>'+esc(a.tplId||a.name||'Asset')+'</b><span>'+bits.join(' · ')+'</span>',e);});
+    ag.addEventListener('pointerleave',()=>hideTip());
+   });
+  });
+ });
+
+ // Aster exposure hint when Savings LOB visible
+ if(ENT.id==='aster'){
+  const sav=lobs.find(l=>l.id==='bank-sav');
+  if(sav&&sav._p&&S.tree.brands.has(sav.brand.id)){
+   const ex=el('g',{class:'node exposure',style:'cursor:pointer'},GX2.gNodes);
+   const exx=sav._p.x+TREE.w.lob/2+56, exy=sav._p.y;
+   el('rect',{x:exx-48,y:exy-11,width:96,height:22,rx:4,fill:'rgba(40,16,24,.92)',stroke:'rgba(255,77,94,.45)','stroke-width':1},ex);
+   label(ex,exx,exy+4,'1,100 exposed',{size:9,fill:'#ffb0b8',weight:500});
+   el('path',{d:elbow(sav._p.x+TREE.w.lob/2,sav._p.y,exx-48,exy),fill:'none',stroke:'rgba(255,77,94,.35)','stroke-width':1},GX2.gEdges);
+   ex.addEventListener('click',()=>{S.tree.lobs.add(sav.id);rebuildTree();goto({lvl:'lob',lob:sav},{keepTree:true});});
+  }
+ }
+}
+
+function sevOfBrand(br,m){const a=agg(lobs.filter(l=>l.brand===br),m);return a.crit?'crit':a.warn?'warn':'ok';}
+function syncAbstractFocus(){
+ /* Tree visibility is driven by S.tree expand sets; highlight focus path. */
+ if(!GX2.gNodes)return;
+ const f=S.focus;
+ const brandId=f.lvl==='brand'?f.brand.id:(f.lvl==='lob'||f.lvl==='asset')?f.lob.brand.id:null;
+ const lobId=(f.lvl==='lob'||f.lvl==='asset')?f.lob.id:null;
+ const assetId=f.lvl==='asset'?f.asset.id:null;
+ GX2.gNodes.querySelectorAll('.node.brand').forEach(n=>{
+  n.style.opacity=!brandId||n.dataset.brand===brandId?1:0.35;
+ });
+ GX2.gNodes.querySelectorAll('.node.lob').forEach(n=>{
+  n.style.opacity=!lobId||n.dataset.lob===lobId?1:(n.dataset.brand===brandId?0.55:0.25);
+ });
+ GX2.gNodes.querySelectorAll('.node.asset').forEach(n=>{
+  n.style.opacity=!assetId||n.dataset.asset===assetId?1:(n.dataset.lob===lobId?0.7:0.25);
+ });
+}
+let feeds,gLink=null,links=[],portalBox=null;
+function buildFeeds(){feeds={};BRANDS.forEach(br=>{feeds[br.id]={setAttribute(){}};});}
+function buildLinks(){gLink=null;links=[];portalBox=null;}
+
+
+/* ---------- camera ---------- */
+const cam={x:0,y:0,k:.5};let camAnim=null;
+const margins=()=>{if(S.profile)return{l:24,r:24,t:60,b:76};if(innerWidth<=900){const dockH=Math.min(Math.round(innerHeight*.42),420);return{l:28,r:76,t:78,b:dockH+148};}const deep=S.focus.lvl==='lob'||S.focus.lvl==='asset';return{l:36,r:520,t:84,b:deep?168:220};};
+const panelShown=()=>S.focus.lvl!=='ent'||S.entPanel;
+function boundsFor(f){
+ if(GX2.bbox&&f.lvl==='ent') return Object.assign({},GX2.bbox);
+ if(f.lvl==='brand'){const p=f.brand._p||{x:0,y:0}; const open=S.tree.brands.has(f.brand.id); return{minX:p.x-(f.brand._w||TREE.w.brand)/2-20,maxX:p.x+(f.brand._w||TREE.w.brand)/2+20,minY:TREE.y.brand-40,maxY:open?(S.tree.lobs.size?TREE.y.asset:TREE.y.lob)+40:TREE.y.brand+40};}
+ if(f.lvl==='lob'||f.lvl==='asset'){const p=f.lob._p||{x:0,y:0}; return{minX:p.x-90,maxX:p.x+90,minY:TREE.y.lob-36,maxY:(S.tree.lobs.has(f.lob.id)?TREE.y.asset:TREE.y.lob)+40};}
+ return GX2.bbox||{minX:-220,maxX:220,minY:-50,maxY:200};
+}
+function fitB(bx){const W=stage.clientWidth,Hh=stage.clientHeight,m=margins(),aw=Math.max(80,W-m.l-m.r),ah=Math.max(80,Hh-m.t-m.b);
+ const k=clamp(Math.min(aw/(bx.maxX-bx.minX),ah/(bx.maxY-bx.minY))*0.92,innerWidth<=900?.35:.55,2.8),cx=(bx.minX+bx.maxX)/2,cy=(bx.minY+bx.maxY)/2;
+ return{x:cx-(m.l+aw/2-W/2)/k,y:cy-(m.t+ah/2-Hh/2)/k,k};}
+const currentFit=()=>fitB(boundsFor(S.focus));
+function fly(t,instant){
+ S.autofit=true;
+ if(instant||RM){Object.assign(cam,t);camAnim=null;return;}
+ const dist=Math.hypot(t.x-cam.x,t.y-cam.y)*Math.min(cam.k,t.k)+Math.abs(Math.log(t.k/cam.k))*500;
+ camAnim={f:{x:cam.x,y:cam.y,k:cam.k},t,t0:performance.now(),dur:clamp(.95+dist/1700,1.05,2.1)*1000,dip:Math.min(.22,dist/3800)};
+}
+const refit=()=>{const t=currentFit();if(camAnim)camAnim.t=t;else if(S.autofit)Object.assign(cam,t);};
+new ResizeObserver(refit).observe(stage);
+/* ---------- hotspots ---------- */
+const hotsEl=$('#hots'),hots=[];
+function mkHot(o){const e=document.createElement('div');e.className='hot '+(o.cls||'');e.innerHTML=`<div class="in"><button class="plus" tabindex="-1" aria-label="${o.label||'Open'}">+</button><div class="tag" role="button" tabindex="0"></div></div>`;
+ const h={e,anchor:o.anchor,html:o.html,tag:e.querySelector('.tag')};
+ e.querySelector('.plus').addEventListener('click',o.click);h.tag.addEventListener('click',o.click);h.tag.addEventListener('keydown',ev=>{if(ev.key==='Enter')o.click();});
+ h.refresh=()=>{h.tag.innerHTML=h.html();};h.refresh();h.on=false;h.set=v=>{h.on=v;e.classList.toggle('on',v);};
+ hotsEl.appendChild(e);hots.push(h);return h;}
+const dotHtml=sev=>`<i class="dot ${sev==='ok'?'':sev}"></i>`;
+let brandHots,lobHots,hqHot,floorHots=[];
+function buildHots(){hotsEl.innerHTML='';hots.length=0;floorHots=[];brandHots={};lobHots={};
+ hqHot=mkHot({cls:'flip',label:'Enterprise',anchor:()=>H.hqAnchor,click:()=>{S.tree.brands.clear();S.tree.lobs.clear();rebuildTree();goto({lvl:'ent'});},html:()=>'<i class="dot"></i><b>'+esc(ENT.name)+'</b><em>collapse tree</em>'});
+ BRANDS.forEach(br=>{brandHots[br.id]=mkHot({label:br.name,anchor:()=>br.signTop||[br._p.x,br._p.y-24],click:()=>toggleBrand(br),html:()=>{const a=agg(lobs.filter(l=>l.brand===br),S.m),sev=a.crit?'crit':a.warn?'warn':'ok';const open=S.tree.brands.has(br.id);return dotHtml(sev)+'<b>'+br.name.replace(/^Aster /,'')+'</b><em>'+(open?'collapse':'expand')+'</em>';}});});
+ lobs.forEach(l=>{lobHots[l.id]=mkHot({label:l.name,anchor:()=>l._p?[l._p.x,l._p.y-TREE.h.lob/2-6]:[0,0],click:()=>toggleLob(l),html:()=>{if(!l._p)return '';const x=lobAt(l,S.m);const open=S.tree.lobs.has(l.id);return dotHtml(x.sev)+'<b>'+l.name+'</b><em>'+(open?'assets':'expand')+'</em>';}});});
+}
+function syncHots(){
+ const f=S.focus;syncAbstractFocus();
+ hqHot&&hqHot.set(true);
+ BRANDS.forEach(br=>brandHots[br.id]&&brandHots[br.id].set(f.lvl==='ent'||(f.lvl==='brand'&&f.brand===br)));
+ lobs.forEach(l=>lobHots[l.id]&&lobHots[l.id].set(!!l._p&&S.tree.brands.has(l.brand.id)&&(f.lvl==='brand'||f.lvl==='lob'||f.lvl==='asset')));
+ floorHots.forEach(h=>{h.e.remove();hots.splice(hots.indexOf(h),1);});floorHots=[];
+}
+
+function refreshHots(){hots.forEach(h=>h.refresh());}
+/* ---------- lens ---------- */
+const flags={};
+function applyLens(){
+ const m=S.m,L=LENS[S.lens];
+ BRANDS.forEach(br=>{const ls=lobs.filter(l=>l.brand===br),op=ls.flatMap(l=>lobAt(l,m).open);
+  flags[br.id]={scam:op.some(i=>['scam','uc9'].includes(i.type)),spam:op.some(i=>i.type==='spam')};});
+ const lg=$('#legend');if(lg)lg.innerHTML=L.leg+(S.lens==='risk'?'':'<i></i>cool → hot');
+ syncAbstractFocus();refreshHots();
+}
+/* ---------- shared-template links (deferred in abstract map) ---------- */
+const entThreats=()=>THREATS.filter(t=>t.nodes.some(n=>n.ent===ENT));
+function mkArc(){return null;}
+function updArc(){}
+function linkTarget(L){const f=S.focus;if(S.lens==='reuse'&&f.lvl==='ent')return 1;if((f.lvl==='lob'||f.lvl==='asset')&&L.lobs.has(f.lob))return 1;return 0;}
+function updateLinks(now,dt){links.forEach(L=>{L.tt.v=linkTarget(L);const ch=approach(L.s,L.tt,dt,4);if(ch||L.s.v>.005){L.g.setAttribute('opacity',L.s.v.toFixed(2));if(L.s.v>.01)L.arcs.forEach(a=>updArc(a,now));}L.hots.forEach(h=>h.set(L.s.v>.6&&S.focus.lvl==='ent'));});}
+/* ---------- screen-locked ground grid ---------- */
+function drawScrGrid(W,Hh){
+ if(!gScr)return;
+ const sig=cam.x.toFixed(1)+'|'+cam.y.toFixed(1)+'|'+cam.k.toFixed(3)+'|'+W+'|'+Hh;
+ if(sig===gridSig)return;gridSig=sig;
+ gScr.textContent='';
+ // soft screen-space starfield / measure grid (not buildings)
+ for(let i=0;i<36;i++){
+  const x=(i*97+41)%W, y=(i*53+29)%Hh;
+  el('circle',{cx:x,cy:y,r:i%5===0?1.2:.6,fill:'rgba(180,210,235,'+(i%5===0?'.22':'.1')+')'},gScr);
+ }
+}
+/* ---------- tick ---------- */
+let last=performance.now();
+function tick(now){
+ if(!S.active){last=now;requestAnimationFrame(tick);return;}
+ const dt=Math.min(.05,(now-last)/1000);last=now;
+ if(camAnim){const a=camAnim,p=clamp((now-a.t0)/a.dur,0,1),e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+  cam.x=lerp(a.f.x,a.t.x,e);cam.y=lerp(a.f.y,a.t.y,e);cam.k=lerp(a.f.k,a.t.k,e)*(1-a.dip*Math.sin(Math.PI*e));if(p>=1){Object.assign(cam,a.t);camAnim=null;}}
+ const W=stage.clientWidth,Hh=stage.clientHeight;
+ if(!world){requestAnimationFrame(tick);return;}
+ world.setAttribute('transform',`translate(${W/2},${Hh/2}) scale(${cam.k}) translate(${-cam.x},${-cam.y})`);
+ drawScrGrid(W,Hh);
+ fades.forEach(f=>{if(approach(f.s,f.t,dt,5))f.g.style.opacity=f.s.v;});updateLinks(now,dt);
+ for(const h of hots){const p=h.anchor();if(!p||p[0]==null||p[1]==null)continue;const x=(p[0]-cam.x)*cam.k+W/2,y=(p[1]-cam.y)*cam.k+Hh/2;
+  h.e.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+  if(!h.e.classList.contains('floor')){const tw=h.tag?h.tag.offsetWidth:140,limit=S.profile?W-16:(innerWidth<=900?W-72:W-438);
+   const rightOverflow=Math.max(0,(x+34+tw)-limit),leftOverflow=Math.max(0,8-(x-34-tw));
+   const goLeft=h.e.classList.contains('flip')?leftOverflow<=rightOverflow:rightOverflow>0&&leftOverflow<rightOverflow;
+   h.e.classList.toggle('edge',goLeft&&!h.e.classList.contains('flip'));
+   h.e.classList.toggle('unflip',!goLeft&&h.e.classList.contains('flip'));}}
+ requestAnimationFrame(tick);
+}
+/* ---------- focus controller ---------- */
+function goto(f,opt={}){
+ S.focus=f;S.sel=f.lvl==='asset'?f.asset:null;if(!opt.keepSheet)S.sheet=null;app.dataset.lvl=f.lvl;
+ if(!opt.keepTree){
+  syncTreeToFocus();
+  // rebuild layout when expand path changes
+  if(S.active&&GX2.gNodes){buildScene();buildHots();}
+ }
+ bld.forEach(b=>{if(!b)return; b.t.fade=1;b.t.gap=0;b.dirty=true;});
+ syncHots();renderAll();fly(currentFit(),opt.instant);
+ if(!dockHolds&&!opt.keepDock)setDock('insights');
+}
+const parentOf=f=>f.lvl==='asset'?{lvl:'lob',lob:f.lob}:f.lvl==='lob'?{lvl:'brand',brand:f.lob.brand}:{lvl:'ent'};
+H.brandClick=br=>{if(S.profile)return;goto({lvl:'brand',brand:br});};
+H.hqClick=()=>{S.entPanel=true;S.panelOpen=true;goto({lvl:'ent'});};
+H.bldClick=b=>{if(S.profile)return;const f=S.focus,l=b.lob;
+ if(f.lvl==='ent'||(f.lvl==='brand'&&f.brand!==l.brand))goto({lvl:'brand',brand:l.brand});
+ else if(!((f.lvl==='lob'||f.lvl==='asset')&&f.lob===l))goto({lvl:'lob',lob:l});};
+H.tileClick=a=>goto({lvl:'asset',lob:a.lob,asset:a});
+const tip=$('#tip');
+function hideTip(){tip.hidden=true;}
+
+function showTip(html,e){const r=stage.getBoundingClientRect();tip.innerHTML=html;tip.hidden=false;tip.style.left=clamp(e.clientX-r.left+16,8,r.width-210)+'px';tip.style.top=clamp(e.clientY-r.top+16,8,r.height-90)+'px';}
+H.hover=(b,on)=>{if(!on||S.focus.lvl==='lob'||S.focus.lvl==='asset'||S.profile)tip.hidden=true;};
+H.hoverMove=(b,e)=>{if(S.focus.lvl==='lob'||S.focus.lvl==='asset'||S.profile)return;const x=lobAt(b.lob,S.m);showTip(`<b>${b.lob.brand.name} › ${b.lob.name}</b><span>${fmt(x.comp)} complaints · ${x.crit+x.warn} open concerns</span>`,e);};
+H.tileHover=(t,on)=>{if(!on){tip.hidden=true;return;}const st=statusOf(t.a,S.m),r=stage.getBoundingClientRect();
+ const p=[(t.pos[0]-cam.x)*cam.k+stage.clientWidth/2,(t.pos[1]-cam.y)*cam.k+stage.clientHeight/2];
+ tip.innerHTML=`<b>${t.a.name}</b><span>${t.a.sub} · ${st==='ok'?'healthy':st==='prog'?'action sent':st==='crit'?'critical':'needs attention'}</span>`;tip.hidden=false;tip.style.left=clamp(p[0]+18,8,r.width-210)+'px';tip.style.top=clamp(p[1]-30,8,r.height-90)+'px';};
+/* pan + zoom */
+let drag=null,moved=false;
+stage.addEventListener('pointerdown',e=>{if(e.button!==0||S.profile&&false)return;drag={x:e.clientX,y:e.clientY,id:e.pointerId};moved=false;});
+window.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+ if(!moved&&Math.hypot(dx,dy)<6)return;if(!moved){moved=true;stage.classList.add('drag');tip.hidden=true;camAnim=null;S.autofit=false;}
+ cam.x-=dx/cam.k;cam.y-=dy/cam.k;drag.x=e.clientX;drag.y=e.clientY;});
+window.addEventListener('pointerup',()=>{drag=null;stage.classList.remove('drag');});
+stage.addEventListener('click',e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false;}},true);
+stage.addEventListener('wheel',e=>{e.preventDefault();camAnim=null;S.autofit=false;const r=stage.getBoundingClientRect(),sx=e.clientX-r.left-r.width/2,sy=e.clientY-r.top-r.height/2,wx=cam.x+sx/cam.k,wy=cam.y+sy/cam.k;
+ cam.k=clamp(cam.k*Math.exp(-e.deltaY*.0015),.25,5);cam.x=wx-sx/cam.k;cam.y=wy-sy/cam.k;},{passive:false});
+
+/* ---------- ui helpers ---------- */
+const scopeLobs=()=>{const f=S.focus;return f.lvl==='ent'?lobs:f.lvl==='brand'?lobs.filter(l=>l.brand===f.brand):[f.lob];};
+const scopeName=()=>{const f=S.focus;return f.lvl==='ent'?ENT.name:f.lvl==='brand'?f.brand.name:f.lob.name;};
+const SEVL={crit:'Critical',warn:'Attention',ok:'Healthy',prog:'Action sent',blk:'Blocked'};
+const sevSq=s=>s==='crit'?'!':s==='warn'?'!':s==='prog'?'→':'✓';
+const chip=s=>`<span class="chip ${s==='ok'?'':s}">${SEVL[s]}</span>`;
+const kpi=(l,v,s)=>`<div><label>${l}</label><b>${v}</b>${s?`<small>${s}</small>`:''}</div>`;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function tween(e,to,f){const from=+e.dataset.v||0;e.dataset.v=to;cancelAnimationFrame(e._r);const t0=performance.now();
+ const st=n=>{const p=RM?1:clamp((n-t0)/650,0,1);e.textContent=f(lerp(from,to,1-Math.pow(1-p,3)));if(p<1)e._r=requestAnimationFrame(st);};e._r=requestAnimationFrame(st);}
+const toastEl=$('#toast');let toastT;
+function toast(m){toastEl.textContent=m;toastEl.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('on'),3800);}
+/* ---------- hud / timeline / crumbs ---------- */
+function renderHud(){
+ const L=scopeLobs(),a=agg(L,S.m),p=S.m>0?agg(L,S.m-1):a,sn=scopeName();
+ $('#h1').textContent=`Complaints · ${MONTHS[S.m]}`;$('#h2').textContent='Concerns';$('#h3').textContent='Assets';
+ $('#metrics').setAttribute('aria-label',`Figures for ${sn}, ${MFULL[S.m]}`);
+ const set=(k,v,f,cls)=>{const e=document.querySelector(`[data-n="${k}"]`);tween(e,v,f);if(cls!==undefined)e.className=v>0?cls:'';};
+ const n0=v=>fmt(v);
+ set('comp',a.comp,n0);set('delta',p.comp?(a.comp/p.comp-1)*100:0,v=>(v>=0?'▲ ':'▼ ')+Math.abs(v).toFixed(0)+'%');set('scam',a.scam,n0);set('spam',a.spam,n0);
+ set('cons',a.cons,v=>v.toFixed(1)+'%');set('crit',a.crit,n0,'crit');set('warn',a.warn,n0,'warn');set('prog',a.prog,n0);
+ set('hdr',a.hdr,n0);set('tpl',a.tpl,n0);set('voice',a.voice,n0);set('exp',a.exp,n0,'warn');
+}
+function renderSpark(){
+ const L=scopeLobs(),ser=MONTHS.map((_,m)=>L.reduce((s,l)=>s+lobAt(l,m).comp,0)),mx=Math.max(...ser)*1.1,mn=Math.min(...ser)*.8;
+ const y=v=>26-((v-mn)/(mx-mn))*24,xs=ser.map((v,i)=>[(i+.5)*10,y(v)]);
+ const line=xs.map((p,i)=>(i?'L':'M')+p[0]+','+p[1].toFixed(1)).join(' ');
+ let h=`<svg viewBox="0 0 120 26" preserveAspectRatio="none"><path d="${line} L115,26 L5,26Z" fill="rgba(31,107,255,.2)"/><path d="${line}" fill="none" stroke="#1f6bff" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
+ L.forEach(l=>l.issues.forEach(i=>{h+=`<span title="${esc(IT[i.type].label)} · ${esc(l.name)}" style="position:absolute;left:${(i.since+.5)/12*100}%;top:${xs[i.since][1]/26*100}%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:${i.sev==='crit'?'#ff4d5e':'#ffb020'};opacity:${i.since<=S.m?1:.25}"></span>`;}));
+ h+=`<span style="position:absolute;left:${(S.m+.5)/12*100}%;top:${xs[S.m][1]/26*100}%;width:11px;height:11px;margin:-5.5px;border-radius:50%;background:#fff;border:2px solid #1f6bff"></span>`;
+ $('#spark').innerHTML=h;
+}
+const monthsEl=$('#months');
+MONTHS.forEach((m,i)=>{const d=document.createElement('div');d.className='mo';d.dataset.m=i;d.innerHTML=`${m}<small>${YEARS[i]}</small>`;monthsEl.appendChild(d);});
+function setMonth(m){m=clamp(m,0,11);if(m===S.m)return;S.m=m;applyLens();bld.forEach(b=>b.dirty=true);renderAll();}
+let mdrag=false;const monthAt=e=>{const r=monthsEl.getBoundingClientRect();return Math.floor((e.clientX-r.left)/r.width*12);};
+monthsEl.addEventListener('pointerdown',e=>{mdrag=true;setMonth(monthAt(e));});window.addEventListener('pointermove',e=>{if(mdrag)setMonth(monthAt(e));});window.addEventListener('pointerup',()=>mdrag=false);
+function renderCrumbs(){
+ const f=S.focus,t=[`<button data-act="crumb:ent">${esc(ENT.name)}</button>`];
+ if(f.lvl!=='ent'){const b=f.lvl==='brand'?f.brand:f.lob.brand;t.push(`<button data-act="crumb:brand">${b.name}</button>`);}
+ if(f.lvl==='lob'||f.lvl==='asset')t.push(`<button data-act="crumb:lob">${f.lob.name}</button>`);
+ if(f.lvl==='asset')t.push(`<button>${esc(f.asset.name)}</button>`);
+ $('#trail').innerHTML=t.join('<span>›</span>');
+ const bb=$('#backBtn');bb.hidden=false;const p=parentOf(f);bb.dataset.act=f.lvl==='ent'?'registry':'back';bb.innerHTML=f.lvl==='ent'?'<span>⟵</span> All enterprises':`<span>⟵</span> Back to ${p.lvl==='ent'?'the whole enterprise':p.lvl==='brand'?p.brand.name:p.lob.name}`;
+}
+function renderRail(){
+ const ic={risk:'M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.500-7-10V6z',comp:'M4 5h16v11H9l-5 4z',scam:'M12 4l9 16H3zM12 10v4M12 17v.5',cons:'M12 3a9 9 0 100 18 9 9 0 000-18zM8 12l3 3 5-6',assets:'M12 4l9 5-9 5-9-5zM3 14l9 5 9-5'};
+ $('#rail').innerHTML=Object.keys(LENS).map(k=>`<button data-act="lens:${k}" class="${S.lens===k?'on':''}" aria-pressed="${S.lens===k}"><svg viewBox="0 0 24 24"><path d="${ic[k]}"/></svg><span>${LENS[k].name}</span></button>`).join('')+'<div class="legend" id="legend"></div>';
+ $('#legend').innerHTML=LENS[S.lens].leg+(S.lens==='risk'?'':'<i></i>cool → hot');
+}
+/* ---------- panel ---------- */
+function threatBlock(i){const t=i.thr,ne=new Set(t.nodes.map(n=>n.ent.id)).size;
+ return `<div class="thr" style="--c:${t.col}"><div class="eyebrow">Template fingerprint · ${t.fp}</div><blockquote>“${esc(t.text)}”</blockquote><p class="sub">${t.kind==='scam'?'Phishing look-alike':'Unsolicited promotion'} · blocked ${t.blocked} · found in ${t.nodes.length} templates across ${ne} enterprises</p>
+ <ul class="rows thr-list">${t.nodes.map((n,k)=>{const o=n.role==='origin',here=n===i.node;return `<li><button class="row ${here?'here':''}" data-act="xnode:${t.id}.${k}"><i class="sq ${o?'blk':TSTATE[n.state].sev}">${o?'⊘':'↗'}</i><div><b>${esc(n.ent.name)}${here?' · this template':''}</b><span>${esc(n.brand.name)} › ${esc(n.lob.name)} · ${o?`blocked here, ${fmt(n.attempts)} sends rejected`:`${TSTATE[n.state].l} · ${fmt(n.attempts)} sends · ${n.match}% match`}</span></div></button></li>`;}).join('')}</ul></div>`;}
+function watchHtml(){const ts=entThreats();if(!ts.length)return'';return `<h3>Shared-template watch</h3><ul class="rows">${ts.map(t=>{const ne=new Set(t.nodes.map(n=>n.ent.id)).size;return `<li><button class="row" data-act="thr:${t.id}"><i class="sq blk">⊘</i><div><b>${esc(t.name)}</b><span>${t.fp} · ${t.nodes.length} templates · ${ne} enterprises</span></div></button></li>`;}).join('')}</ul>`;}
+const eccEvidence=(i)=>{
+ if(i.type==='uc1'){const f=ECC.fixtures.uc1;return `<h3>What we checked</h3><p class="sub">Allegation (“I did not sign up”) opens investigation — it does not alone establish guilt. Authorised review confirmed content–LOB mismatch.</p>
+  <h3>Other affected records</h3>
+  <p><b>Confirmed:</b> ${f.confirmed.join(', ')} · <b>Cleared:</b> ${f.cleared.join(', ')}</p>
+  <p class="sub">Observed exposure: <b>${fmt(f.exposure)}</b> distinct recipients (T101∪T310). T204 idle contributes ${f.t204Recipients}. Cohort complaints 54/900 = 6.0% (demo-labelled, not a production threshold). Savings consents preserved.</p>
+  <h3>Recommended action</h3><p class="sub">Restrict the three templates through simulated template-control. Do not suspend Savings. Correction requires the platform approval process — no remap.</p>`;}
+ if(i.type==='uc2'){const f=ECC.fixtures.uc2;return `<h3>Claim evidence</h3><p class="sub">Synthetic investigation record establishes the deceptive “guaranteed approval” claim. Confirmed ${f.confirmed.join(', ')}; cleared ${f.cleared.join(', ')}.</p>`;}
+ if(i.type==='uc4')return `<h3>Policy boundary</h3><p class="sub"><b>Policy clarification required</b> for revocation precedence across overlapping LOB purposes. No automatic cross-LOB revocation.</p>`;
+ if(i.type==='uc9'){const f=ECC.fixtures.uc9;return `<h3>Submitted URLs & CTAs</h3><p class="sub">Harmful submissions ${f.harmfulSubs.join(', ')}; ordinary use ${f.safeSubs.join(', ')} cleared. CTA review: ${f.ctas.map(c=>c.id+'='+c.state).join('; ')}. No live URL fetches.</p>`;}
+ if(i.type==='uc3')return `<h3>Evidence gap</h3><p class="sub">Signup evidence unavailable in connected data. Valid next step: request evidence — not an invented fraud conclusion.</p>`;
+ return '';
+};
+const issueCard=(i,ctx)=>{const T=IT[i.type];const st=i.execStatus;let chip=i.status==='open'?i.sev:i.status==='prog'?'prog':'';
+ let chipL=i.status==='open'?(SEVL[i.sev]||i.sev):i.status==='prog'?(st==='partial'?'Partly applied':'Awaiting / in progress'):'Resolved';
+ let h=`<div class="issue"><span class="chip ${chip}">${chipL}</span> <span class="eyebrow">${T.label} · UC${(i.type.match(/\d+/)||[''])[0]}</span><h4>${T.title(i.n)}</h4>
+ <p><b>What happened:</b> ${T.detail(i.n,i.lob)}</p>${eccEvidence(i)}${i.thr?threatBlock(i):''}`;
+ if(i.status==='prog'&&st==='partial')h+=`<p><b>Did the action work?</b> Partly applied: 2 of 3 targets (T101, T204 applied; T310 failed). Incomplete actions remain visible.</p><div class="btns"><button class="btn pri" data-act="retry:${i.id}">Retry failed target</button><button class="btn" data-act="resolve:${i.id}">Close monitoring</button></div>`;
+ else if(i.status==='prog')h+=`<p><b>${esc(i.action.label)}</b>${i.action.due?` · due in ${i.action.due} days`:''}</p><div class="btns"><button class="btn pri" data-act="resolve:${i.id}">Mark resolved</button></div>`;
+ else if(i.status==='open')h+=`<div class="btns"><button class="btn pri" data-act="act:${i.id}">${S.role==='approver'&&i.pendingApprove?'Approve simulated action':'Review action'}</button>${ctx==='lob'?`<button class="btn" data-act="show:${i.id}">Show assets</button>`:''}</div>`;
+ return h+'</div>';};
+function panelHtml(){
+ const f=S.focus,m=S.m;
+ if(S.sheet)return sheetHtml();
+ if(f.lvl==='ent'){const a=agg(lobs,m),top=topIssues(m).slice(0,5),openN=a.crit+a.warn,awaitN=ECC.awaitingApproval,incN=ECC.incompleteActions;
+  const sit=ENT.id==='aster'
+    ?`Three loan-offer templates are mapped to Savings. One is idle. 1,100 distinct recipients have observed exposure. Review restrictions on the three templates.`
+    :`${openN} open concern${openN===1?'':'s'} in ${MFULL[m]}.`;
+  return `<div class="eyebrow">Enterprise · sample data · simulated enforcement</div><h2>${esc(ENT.name)}</h2>
+  <p class="sub">${ENT.peId?ENT.peId+' · ':''}${BRANDS.length} brands · ${lobs.length} lines of business · ${MFULL[m]}</p>
+  <p style="margin:10px 0 0;font-size:14px;line-height:1.45">${esc(sit)}</p>
+  <div class="kpis">${kpi('Open concerns',openN)}${kpi('Awaiting approval',awaitN)}${kpi('Incomplete actions',incN)}${kpi('Consent coverage',a.cons.toFixed(1),'%')}</div>
+  <h3>Priority concerns</h3><ul class="rows">${top.length?top.map(i=>{const T=IT[i.type];const cta=i.type==='uc1'||i.type==='uc2'?'Investigate':i.type==='uc3'?'Request evidence':'Investigate';
+   return `<li><button class="row" data-act="issue:${i.id}"><i class="sq ${i.sev}">!</i><div><b>${T.title(i.n)}</b><span>${SEVL[i.sev]||i.sev} · ${T.label} · ${i.lob.brand.name} › ${i.lob.name} · ${cta}</span></div></button></li>`;}).join(''):'<li class="sub">No concerns found in the connected data for this period.</li>'}</ul>
+  ${watchHtml()}<h3>Brands</h3><ul class="rows">${BRANDS.map(b=>{const x=agg(lobs.filter(l=>l.brand===b),m),s=x.crit?'crit':x.warn?'warn':'ok';return `<li><button class="row" data-act="brand:${b.id}"><i class="sq ${s}">${sevSq(s)}</i><div><b>${b.name}</b><span>${b.sector} · ${x.crit+x.warn} open concerns</span></div></button></li>`;}).join('')}</ul>`;}
+ if(f.lvl==='brand'){const b=f.brand,L=lobs.filter(l=>l.brand===b),a=agg(L,m);
+  return `<div class="eyebrow">Brand · ${b.sector}</div><h2>${b.name}</h2><p class="sub">${L.length} lines of business · sender ID prefix ${b.code}</p>
+  <div class="kpis">${kpi('Open concerns',a.crit+a.warn)}${kpi('Complaints',fmt(a.comp))}${kpi('Scam reports',fmt(a.scam))}${kpi('Consent coverage',a.cons.toFixed(1),'%')}</div>
+  <h3>Lines of business</h3><ul class="rows">${L.map(l=>{const x=lobAt(l,m);return `<li><button class="row" data-act="lob:${l.id}"><i class="sq ${x.sev}">${sevSq(x.sev)}</i><div><b>${l.name}</b><span>${x.crit+x.warn+x.prog?`${x.crit+x.warn+x.prog} concern${x.crit+x.warn+x.prog>1?'s':''} · `:''}${fmt(x.comp)} complaints · ${x.cons.toFixed(0)}% consent</span></div></button></li>`;}).join('')}</ul>`;}
+ const l=f.lob,x=lobAt(l,m);
+ if(f.lvl==='lob'){const all=l.issues.filter(i=>i.since<=m),openL=all.filter(i=>i.status!=='resolved'),res=all.filter(i=>i.status==='resolved');
+  return `<div class="eyebrow">${l.brand.name} › line of business</div><h2>${l.name}</h2><p class="sub">${chip(x.sev)} &nbsp;${fmt(l.vol*1000)}k messages a month</p>
+  <div class="kpis">${kpi('Open concerns',x.crit+x.warn)}${kpi('Complaints',fmt(x.comp))}${kpi('Scam reports',fmt(x.scam))}${kpi('Consent coverage',x.cons.toFixed(1),'%')}</div>
+  <h3>Open concerns</h3>${openL.length?openL.map(i=>issueCard(i,'lob')).join(''):'<p class="sub">Nothing open. This line is in good standing.</p>'}
+  ${res.length?`<h3>Resolved</h3>${res.map(i=>`<p class="sub">✓ ${IT[i.type].title(i.n)}</p>`).join('')}`:''}
+  <h3>Inside this building</h3><div class="floorlist">${CATS.slice().reverse().map(c=>{const k=CATS.indexOf(c),as=l.assets.filter(a=>a.cat===c.id),bad=as.filter(a=>statusOf(a,m)!=='ok').length;return `<button data-act="floor:${k}">${c.name}<span>${as.length}${bad?` · ${bad} flagged`:''}</span></button>`;}).join('')}</div>`;}
+ const a=f.asset,st=statusOf(a,m),c=CATS.find(q=>q.id===a.cat);
+ return `<div class="eyebrow">${l.brand.name} › ${l.name} › ${c.s}</div><h2>${esc(a.name)}</h2><p class="sub">${esc(a.sub)} &nbsp;${chip(st)}</p>
+  <div class="kpis">${kpi('Traffic, 30d',fmt(a.vol),'k')}${kpi('Last audit',a.audit,'days ago')}${kpi('Owner',l.name)}${kpi('Registry',st==='ok'?'Active':st==='blk'?'Blocked':'Flagged')}</div>
+  <h3>${a.issue&&a.issue.since<=m?'Linked concern':'Concerns'}</h3>${a.issue&&a.issue.since<=m?issueCard(a.issue,'asset'):'<p class="sub">No open concerns on this asset.</p>'}
+  <div class="btns" style="margin-top:14px"><button class="btn" data-act="lobback">Back to ${l.name}</button></div>`;
+}
+function sheetHtml(){
+ const s=S.sheet,i=s.issue,T=IT[i.type],a=T.actions.find(x=>x[0]===s.choice);
+ if(s.step===1)return `<div class="eyebrow">Action review · ${S.role==='approver'?'Approver':'Investigator'}</div><h2>${a[1]}</h2><dl class="sum"><dt>Finding</dt><dd>${T.title(i.n)} · ${i.lob.name}</dd><dt>Exact targets</dt><dd>${s.choice==='restrict'?'T101, T204, T310 (exclude T400/T405/T410; preserve Savings consents)':s.choice==='restrict2'?'T501, T502, T503 (exclude T504)':s.choice==='restricturl'?'Submitted URLs S601/S602 (not whole template by default)':'As selected'}</dd><dt>Enforcement</dt><dd>Simulated template/URL control — not production</dd><dt>Role</dt><dd>${S.role==='approver'?'Approver will apply simulation':'Investigator proposes; Approver must confirm'}</dd><dt>Note</dt><dd>${s.note?esc(s.note):'None'}</dd></dl>
+  <div class="btns"><button class="btn pri" data-act="sheet-send">${S.role==='approver'?'Confirm simulated apply':'Propose action'}</button><button class="btn" data-act="sheet-edit">Edit</button></div><p class="sub" style="margin-top:12px">Simulated in this prototype. Nothing leaves the page. No remap control is offered.</p>`;
+ return `<div class="eyebrow">Take action · ${i.lob.name}</div><h2>${T.title(i.n)}</h2><h3>Choose an action</h3>${T.actions.map(x=>`<label class="opt"><input type="radio" name="actc" value="${x[0]}" ${x[0]===s.choice?'checked':''}><span><b>${x[1]}</b><span>${x[2]}</span></span></label>`).join('')}
+  <label class="f" for="actNote">Note to the brand (optional)</label><textarea id="actNote" rows="3">${esc(s.note)}</textarea>
+  <label class="f" for="actDue">Response due</label><select id="actDue"><option value="3" ${s.due==='3'?'selected':''}>3 days</option><option value="7" ${s.due==='7'?'selected':''}>7 days</option><option value="14" ${s.due==='14'?'selected':''}>14 days</option></select>
+  <div class="btns" style="margin-top:16px"><button class="btn pri" data-act="sheet-review">Review</button><button class="btn" data-act="sheet-cancel">Cancel</button></div>`;
+}
+function renderPanel(){
+ $('#pBody').innerHTML=panelHtml();$('#pBody').style.animation='none';void $('#pBody').offsetWidth;$('#pBody').style.animation='';
+}
+function renderAll(){renderPanel();renderCrumbs();renderHud();renderSpark();renderRail();monthsEl.querySelectorAll('.mo').forEach((e,i)=>e.classList.toggle('on',i===S.m));
+ hots.forEach(h=>h.refresh());if(S.profile)renderProfile();}
+
+/* ---------- lens, actions ---------- */
+function setLens(k){const was=S.lens;S.lens=k;if(typeof brandHots!=='undefined'&&brandHots&&hqHot)syncHots();applyLens();renderRail();bld.forEach(b=>b.dirty=true);if((k==='reuse'||was==='reuse')&&portalBox&&S.focus.lvl==='ent'&&S.active)fly(currentFit());}
+function startAction(i){
+ S.sheet={issue:i,choice:IT[i.type].actions[0][0],note:'',due:'7',step:0};S.panelOpen=true;if(S.profile)closeProfile(true);
+ setDock('insights');
+ const f=S.focus;if(!((f.lvl==='lob'||f.lvl==='asset')&&f.lob===i.lob))goto({lvl:'lob',lob:i.lob},{keepSheet:true});else{renderAll();fly(currentFit());}
+}
+function collectSheet(){const s=S.sheet;if(!s)return;const n=$('#actNote'),d=$('#actDue'),c=document.querySelector('input[name=actc]:checked');if(n)s.note=n.value;if(d)s.due=d.value;if(c)s.choice=c.value;}
+function sendAction(){
+ const s=S.sheet,i=s.issue,a=IT[i.type].actions.find(x=>x[0]===s.choice);
+ // ECC role gate: investigator proposes; approver confirms simulated apply
+ if(['restrict','restrict2','restricturl'].includes(s.choice)){
+  if(S.role!=='approver'){
+   i.pendingApprove=true;i.proposedAction={choice:s.choice,label:a[1],note:s.note};ECC.awaitingApproval++;
+   S.log.unshift({label:'Proposed: '+a[1],brand:i.lob.brand.name,lob:i.lob.name});S.sheet=null;
+   toast('Proposed — switch to Approver to confirm simulated enforcement');applyLens();bld.forEach(b=>b.dirty=true);renderAll();return;
+  }
+  // Approver path
+  i.pendingApprove=false;i.status='prog';i.action={label:a[1],due:null,note:s.note,simulated:true};
+  if(s.choice==='restrict'){
+   // Demo C partial apply
+   const targets={T101:'applied',T204:'applied',T310:'failed'};
+   i.execStatus='partial';i.execTargets=targets;ECC.incompleteActions++;ECC.awaitingApproval=Math.max(0,ECC.awaitingApproval-1);
+   (i.assets||[]).forEach(a=>{if(targets[a.tplId]==='applied'){a.restricted=true;a.sub=(a.sub||'')+' · restricted (simulated)';}});
+   S.log.unshift({label:'Partly applied 2/3',brand:i.lob.brand.name,lob:i.lob.name});S.sheet=null;
+   toast('Partly applied: 2 of 3 targets (simulated). T310 failed.');
+  } else if(s.choice==='restrict2'){
+   i.execStatus='applied';(i.assets||[]).forEach(a=>{a.restricted=true;});ECC.awaitingApproval=Math.max(0,ECC.awaitingApproval-1);
+   S.sheet=null;toast('Simulated restriction applied to T501–T503');
+  } else {
+   i.execStatus='applied';ECC.awaitingApproval=Math.max(0,ECC.awaitingApproval-1);S.sheet=null;
+   toast('Simulated URL restriction queued (exact submitted URLs). Alias coverage incomplete if destination-only.');
+  }
+  applyLens();bld.forEach(b=>b.dirty=true);renderAll();return;
+ }
+ if(s.choice==='policy'){i.status='prog';i.action={label:a[1],due:s.due,note:s.note};i.execStatus='policy';S.sheet=null;toast('Policy clarification required — no automatic cross-LOB revocation');applyLens();bld.forEach(b=>b.dirty=true);renderAll();return;}
+ if(s.choice==='request'||s.choice==='evidence'||s.choice==='linkuc9'||s.choice==='ctareview'||s.choice==='uc1route'){
+  S.sheet=null;toast(a[1]+' — recorded in sample audit (simulated)');renderPanel();return;
+ }
+ i.status='prog';i.action={label:a[1],due:s.due,note:s.note};
+ S.log.unshift({label:a[1],brand:i.lob.brand.name,lob:i.lob.name});S.sheet=null;toast(`Sent to ${i.lob.brand.name} › ${i.lob.name}: ${a[1]}`);
+ if(i.thr&&s.choice==='netblock'){i.thr.nodes.forEach(x=>{if(x.issue.status==='open'){x.issue.status='prog';x.issue.action={label:a[1],due:s.due,note:s.note};}});toast(`Fingerprint ${i.thr.fp} blocked across ${new Set(i.thr.nodes.map(x=>x.ent.id)).size} enterprises`);}
+ applyLens();bld.forEach(b=>b.dirty=true);renderAll();
+}
+/* ---------- briefing (profile) ---------- */
+const topLob=fn=>lobs.map(l=>({l,x:lobAt(l,S.m)})).sort((a,b)=>fn(b.x)-fn(a.x))[0];
+const STEPS=[
+ {k:'Situation',lens:'risk',focus:()=>({lvl:'ent'}),text:()=>`Aster Finance (PE-ASTER): three loan-offer templates are mapped to Savings. One is idle. 1,100 distinct recipients have observed exposure through the active mismatched templates. Savings consents remain valid.`,
+  stats:()=>[['Confirmed templates',3],['Idle affected',1],['Distinct recipients',1100]]},
+ {k:'Finding',lens:'risk',focus:()=>{const i=issues.find(x=>x.type==='uc1');return i?{lvl:'lob',lob:i.lob}:{lvl:'ent'};},text:()=>`T101 content is a personal loan offer while its single mapped LOB is L-SAV (Savings). Scrub correctly checked Savings consent — that does not make the loan offer appropriate. This is a content–LOB mismatch finding, not invalid consent.`,
+  stats:()=>[['Mapped LOB','L-SAV'],['Purpose','Loan offer'],['Consent outcome','Preserved']]},
+ {k:'Scope',lens:'assets',focus:()=>{const i=issues.find(x=>x.type==='uc1');return i?{lvl:'lob',lob:i.lob,floor:3}:{lvl:'ent'};},text:()=>`Two searches return six unique templates. Confirmed: T101, T204 (idle, 0 recipients), T310. Cleared: T400 and T405 (fit Savings), T410 (loan content correctly on L-LOAN). Cohort 54/900 = 6.0% is demo-labelled only.`,
+  stats:()=>[['Confirmed',3],['Cleared',3],['Exposure',1100]]},
+ {k:'Action',lens:'risk',focus:()=>{const i=issues.find(x=>x.type==='uc1');return i?{lvl:'lob',lob:i.lob}:{lvl:'ent'};},text:()=>`Investigator proposes restricting T101/T204/T310 through simulated template-control. Approver confirms. Demo C: T101 and T204 apply; T310 fails — Partly applied 2 of 3. No Savings-wide suspend. No remap.`,
+  stats:()=>[['Role gate','Investigator → Approver'],['Targets',3],['Demo C','2 of 3 applied']],
+  list:()=>{const i=issues.find(x=>x.type==='uc1');return i?`<div><i class="sq crit" style="width:26px;height:26px;border-radius:4px;display:grid;place-items:center;font-weight:700;background:#ffe1e4;color:#c8283a">!</i><span>Loan-offer templates mapped to Savings<small>UC1 · Review action</small></span><button class="btn pri" data-act="actnow:${i.id}">Review action</button></div>`:'';}}
+];
+$('#steps').innerHTML=STEPS.map((s,i)=>`<button data-act="step:${i}"><span>0${i+1}</span><span>${s.k}</span></button>`).join('');
+let playT=null;
+function renderProfile(){
+ const s=STEPS[S.step];$('#prPeriod').textContent=MFULL[S.m];
+ $('#prMain').innerHTML=`<p class="big">${s.text()}</p><div class="st">${s.stats().map(x=>`<div><label>${x[0]}</label><b>${x[1]}</b></div>`).join('')}</div>${s.list?`<div class="pl">${s.list()}</div>`:''}`;
+ $('#steps').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===S.step));$('#prStep').textContent=`Step ${S.step+1} of ${STEPS.length} · ${s.k}`;
+ $('#playBtn').textContent=playT?'❚❚':'▶';
+}
+function gotoStep(i){S.step=i;const s=STEPS[i];setLens(s.lens);holdingDock(()=>goto(s.focus()));renderProfile();}
+function openProfile(step,play){
+ S.profile=true;app.classList.add('profile');$('#dock').inert=true;$('#menu').hidden=true;tip.hidden=true;S.sheet=null;
+ gotoStep(step||0);if(play)startPlay();
+}
+function closeProfile(skip){S.profile=false;stopPlay();app.classList.remove('profile');$('#dock').inert=!S.active?true:false;if(!skip){setLens('risk');holdingDock(()=>goto({lvl:'ent'}));}}
+function startPlay(){stopPlay();playT=setInterval(()=>{if(S.step>=STEPS.length-1){stopPlay();renderProfile();return;}gotoStep(S.step+1);},8500);renderProfile();}
+function stopPlay(){clearInterval(playT);playT=null;}
+/* ---------- chat ---------- */
+const msgs=$('#msgs');
+function setChips(){const C=['What should I act on first?','Why are Savings consents still valid?','How many recipients were exposed?','Which templates were cleared?','Did the action work?','Policy clarification for UC4','Walk me through it'];$('#chips').innerHTML=C.map(c=>`<button type="button" data-chip="${esc(c)}">${c}</button>`).join('');}
+function setDock(face,opt={}){
+ face=face==='ask'?'ask':'insights';
+ const dock=$('#dock'),changed=dock.dataset.face!==face;
+ S.dock=face;dock.dataset.face=face;app.dataset.dock=face;
+ const ins=$('#panel'),askv=$('#chat');
+ ins.classList.toggle('on',face==='insights');askv.classList.toggle('on',face==='ask');
+ ins.setAttribute('aria-hidden',face==='insights'?'false':'true');askv.setAttribute('aria-hidden',face==='ask'?'false':'true');
+ ins.inert=face!=='insights';askv.inert=face!=='ask';
+ $('#tabInsights').classList.toggle('on',face==='insights');$('#tabAsk').classList.toggle('on',face==='ask');
+ $('#tabInsights').setAttribute('aria-selected',String(face==='insights'));$('#tabAsk').setAttribute('aria-selected',String(face==='ask'));
+ if(face==='ask'&&!msgs.children.length)say('a',`I can take you around ${ENT.name}. Ask about a brand, a line of business, scams, spam, consent or assets, and the map will move to it.`);
+ if(face==='ask'&&(changed||opt.focus))setTimeout(()=>{if(S.dock==='ask'&&!S.profile){$('#askIn').focus({preventScroll:true});}},changed?280:0);
+}
+function openChat(){setDock('ask',{focus:true});}
+function say(role,text,acts){
+ const d=document.createElement('div');d.className='msg '+(role==='u'?'u':'a');msgs.appendChild(d);
+ if(role==='u'){d.textContent=text;}
+ else{let bold=false;text.split(' ').forEach((w,i)=>{const sp=document.createElement('span');if(w.startsWith('**'))bold=true;const b=bold;if(w.endsWith('**'))bold=false;sp.innerHTML=(b?'<b>':'')+esc(w.replace(/\*\*/g,''))+(b?'</b>':'')+' ';sp.style.opacity=RM?1:0;sp.style.transition='opacity .3s';d.appendChild(sp);if(!RM)setTimeout(()=>sp.style.opacity=1,i*24);});
+  if(acts&&acts.length){const ad=document.createElement('div');ad.className='acts';acts.forEach(a=>{const b=document.createElement('button');b.className='btn pri';b.textContent=a[0];b.addEventListener('click',a[1]);ad.appendChild(b);});setTimeout(()=>{d.appendChild(ad);msgs.scrollTop=msgs.scrollHeight;},RM?0:text.split(' ').length*24);}}
+ msgs.scrollTop=msgs.scrollHeight;
+}
+const STOP=new Set(['enterprise','sales','group','services','network','networks','store','stores','offers','club','care','plus','general']);
+const wordsOf=n=>n.toLowerCase().replace(/[^a-z ]/g,' ').split(/\s+/).filter(w=>w.length>2&&!STOP.has(w));
+const hasW=(t,w)=>new RegExp('\\b'+w.slice(0,5)).test(t);
+const findLob=t=>{const bw=new Set(BRANDS.flatMap(b=>wordsOf(b.name))),cnt={};lobs.forEach(l=>new Set(wordsOf(l.name)).forEach(w=>cnt[w]=(cnt[w]||0)+1));
+ return lobs.find(l=>t.includes(l.name.toLowerCase()))||lobs.find(l=>wordsOf(l.name).some(w=>w.length>3&&cnt[w]===1&&!bw.has(w)&&hasW(t,w)))||null;};
+const findBrand=t=>{const ew=new Set(wordsOf(ENT.name));return BRANDS.find(b=>t.includes(b.name.toLowerCase()))||BRANDS.find(b=>wordsOf(b.name).some(w=>!ew.has(w)&&hasW(t,w)))||null;};
+function goL(l,lens){if(lens)setLens(lens);if(S.profile)closeProfile(true);S.panelOpen=true;goto({lvl:'lob',lob:l});}
+function leadIssue(l){return l.issues.filter(i=>i.since<=S.m&&i.status==='open').sort((a,b)=>sevRank(b)-sevRank(a))[0];}
+function ask(q){dockHolds++;try{
+ const t=q.toLowerCase(),m=S.m,mn=MONTHS[m];say('u',q);if(S.profile)closeProfile(true);
+ const lob=findLob(t),brand=lob?lob.brand:findBrand(t);
+ const lens=/scam|phish|fraud|fake|impersonat/.test(t)?'scam':/spam|dnd|unsolicited|promotional|complain/.test(t)?'comp':/consent|opt-?in|opt-?out/.test(t)?'cons':/expir|renew|sender|header|template|asset|idle|link|url|voice/.test(t)?'assets':null;
+ const ranking=/most|worst|highest|biggest|weakest|lowest|where|which|top/.test(t);
+ const actFor=l=>{const i=l&&leadIssue(l);return i?[[`Take action: ${IT[i.type].label.toLowerCase()}`,()=>startAction(i)]]:[];};
+ if(/mismatch|mapped to savings|uc1|t101|loan-offer templates/.test(t)){const i=issues.find(x=>x.type==='uc1');say('a','**UC1 content–LOB mismatch:** T101/T204/T310 contain loan offers while mapped to L-SAV. T400/T405/T410 are cleared for this finding. Savings consents are preserved.',i?[['Open UC1',()=>{goL(i.lob);S.panelOpen=true;}]]:[]);return;}
+ if(/1100|exposure|recipients|observed/.test(t)){say('a','**1,100 distinct observed recipients** across T101 and T310 (900+300−100 overlap). Idle **T204 contributes 0**. This is observed exposure, not 1,100 invalid consents.');return;}
+ if(/cleared|t400|t410|exclud/.test(t)){say('a','**Cleared for UC1:** T400 and T405 fit Savings; **T410** is a loan offer correctly mapped to L-LOAN. Cleared means not affected by this finding — not certified safe for every issue.');return;}
+ if(/partly|did the action|t310 failed|execution|incomplete/.test(t)){say('a','**Demo C:** after Approver confirm, simulated apply reports T101 and T204 applied, **T310 failed** → Partly applied 2 of 3. A wrong acceptance after T310 is effective would be failed-enforcement; before apply it is a containment gap.');return;}
+ if(/policy|uc4|revocation|financial offers|r200/.test(t)){say('a','**UC4:** R200 revoked Personal Loans; later loan offer via **T620** on Financial Offers. Default state: **Policy clarification required** — no automatic cross-LOB revocation.');return;}
+ if(/url|uc9|cta|short\.example|loan-check/.test(t)){say('a','**UC9:** S601/S602 → https://loan-check.example/verify (fictional). S603 safe URL cleared. CTA-A…E reviewed independently; CTA-E unreachable ≠ safe or harmful. No live fetches.');return;}
+ if(/consent.*valid|savings consent|invalid consent/.test(t)){say('a','Mapping defects do **not** invalidate valid Savings consents. The defect is the template–LOB association / content fit.');return;}
+ if(/tour|walk me|walk through|guide|briefing/.test(t)){say('a','Starting the guided tour. The map shrinks so the briefing can sit beside it.');setTimeout(()=>openProfile(0,true),600);return;}
+ if(/shared|reus|clone|same template|blocked template|evad|duplicate|copied|bypass|fingerprint|beat the system/.test(t)){const ts=entThreats();if(S.profile)closeProfile(true);
+  if(!ts.length){say('a',`No blocked template is being reused by, or from, ${ENT.name} right now.`);return;}
+  setLens('reuse');S.entPanel=true;S.panelOpen=true;goto({lvl:'ent'});const ex=new Set();ts.forEach(x=>x.nodes.forEach(n=>{if(n.ent!==ENT)ex.add(n.ent.name);}));
+  say('a',`**${ts.length} blocked template${ts.length>1?'s':''}** link ${ENT.name} to ${ex.size} other enterprise${ex.size===1?'':'s'}: ${[...ex].join(', ')}. Arcs on the map join every place the same text appears. The gateways on the back edge lead to the other enterprises.`,ts.slice(0,2).map(x=>[`Open ${x.name}`,()=>H.openNode(x.nodes.find(n=>n.ent===ENT))]));return;}
+ if(/first|priorit|should|recommend|next step|act on/.test(t)){const i=topIssues(m)[0];if(!i){say('a','Every open concern already has an action on record.');return;}
+  say('a',`Start with **${i.lob.brand.name} › ${i.lob.name}**: ${IT[i.type].title(i.n).toLowerCase()}. ${i.sev==='crit'?'It is critical and':'It'} has been open since ${MFULL[i.since].split(' ')[0]}. Suggested action: ${IT[i.type].actions[0][1].toLowerCase()}.`,[['Take action',()=>startAction(i)]]);goL(i.lob);return;}
+ if(lob){const x=lobAt(lob,m);if(lens)setLens(lens);say('a',`**${lob.brand.name} › ${lob.name}** scores ${Math.round(x.score)} out of 100. ${fmt(x.comp)} complaints in ${mn}, ${fmt(x.scam)} of them scam reports, with ${x.cons.toFixed(0)}% consent coverage. ${x.crit+x.warn?`${x.crit+x.warn} concern${x.crit+x.warn>1?'s are':' is'} open.`:'Nothing is open.'}`,actFor(lob));goL(lob);return;}
+ if(brand&&!(lens&&ranking)){const a=agg(lobs.filter(l=>l.brand===brand),m);if(lens)setLens(lens);say('a',`**${brand.name}** scores ${Math.round(a.score)} with ${fmt(a.comp)} complaints in ${mn} and ${a.crit+a.warn} open concern${a.crit+a.warn===1?'':'s'}. Opening its street.`);if(S.profile)closeProfile(true);S.panelOpen=true;goto({lvl:'brand',brand});return;}
+ if(lens&&ranking){
+  const key=lens==='scam'?'scam':lens==='comp'?(/spam|dnd/.test(t)?'spam':'comp'):lens==='cons'?'cons':'atRisk',asc=lens==='cons',what={scam:'scam reports',spam:'spam complaints',comp:'complaints',cons:'consent coverage',atRisk:'assets with open concerns'}[key];
+  const val=(x,l)=>key==='comp'?x.comp:x[key];
+  if(/brand/.test(t)){const r=BRANDS.map(b=>({b,a:agg(lobs.filter(l=>l.brand===b),m)})).map(o=>({...o,v:key==='cons'?o.a.cons:key==='atRisk'?o.a.crit+o.a.warn:o.a[key]})).sort((a,b)=>asc?a.v-b.v:b.v-a.v)[0];
+   setLens(lens);say('a',`**${r.b.name}** ${asc?'has the weakest':'has the most'} ${what}: ${key==='cons'?r.v.toFixed(1)+'%':fmt(r.v)} in ${mn}. Opening its street.`);if(S.profile)closeProfile(true);S.panelOpen=true;goto({lvl:'brand',brand:r.b});return;}
+  const r=lobs.map(l=>({l,x:lobAt(l,m)})).sort((a,b)=>asc?val(a.x)-val(b.x):val(b.x)-val(a.x))[0];
+  say('a',`**${r.l.brand.name} › ${r.l.name}** ${asc?'has the weakest':'has the most'} ${what}: ${key==='cons'?val(r.x).toFixed(1)+'%':fmt(val(r.x))} in ${mn}. Taking you there.`,actFor(r.l));goL(r.l,lens);return;}
+ if(lens==='assets'||/expir|sender id|renew/.test(t)){const ex=lobs.map(l=>({l,n:lobAt(l,m).exp})).filter(o=>o.n).sort((a,b)=>b.n-a.n);setLens('assets');goto({lvl:'ent'});
+  say('a',ex.length?`**${ex.reduce((s,o)=>s+o.n,0)} sender IDs** expire within 14 days: ${ex.map(o=>`${o.l.brand.name.replace(new RegExp('^'+ENT.name.split(' ')[0]+' '),'')} › ${o.l.name} (${o.n})`).join(', ')}.`:'No sender IDs are close to expiry.',ex.length?[[`Open ${ex[0].l.name}`,()=>goL(ex[0].l,'assets')]]:[]);return;}
+ if(lens){const a=agg(lobs,m);setLens(lens);goto({lvl:'ent'});say('a',lens==='scam'?`**${fmt(a.scam)} scam reports** this month across the group. The map now shows scam volume by line of business. Taller and warmer buildings have more.`:lens==='comp'?`**${fmt(a.comp)} complaints** in ${mn}, of which ${fmt(a.spam)} are spam or DND. Buildings now rise with complaints per million messages.`:`Group consent coverage is **${a.cons.toFixed(1)}%**. Buildings now rise with the consent gap.`);return;}
+ if(/overview|summary|everything|status|home|reset|back|how (is|are)/.test(t)){const a=agg(lobs,m);setLens('risk');goto({lvl:'ent'});say('a',`Across ${BRANDS.length} brands there are **${a.crit+a.warn} open concerns** (${a.critLobs} critical lines). ${fmt(a.comp)} complaints in ${mn}. Awaiting approval: ${ECC.awaitingApproval}; incomplete actions: ${ECC.incompleteActions}.`);return;}
+ say('a','I can answer questions like these. Pick one or type your own.');
+}finally{dockHolds--;}}
+H.openNode=n=>{if(S.profile)closeProfile(true);
+ if(n.ent===ENT){S.panelOpen=true;goto({lvl:'asset',lob:n.lob,asset:n.asset});return;}
+ const target=n.ent;toast(`Opening ${target.name} › ${n.brand.name}`);enter(target);setTimeout(()=>{if(ENT===target){S.panelOpen=true;goto({lvl:'asset',lob:n.lob,asset:n.asset});}},1600);};
+/* ---------- events ---------- */
+function handle(a,arg){
+ const I=id=>issues.find(i=>i.id===id);
+ switch(a){
+  case'back':goto(parentOf(S.focus));break;
+  case'thr':{const t=THREATS.find(x=>x.id===arg);setLens('reuse');if(S.profile)closeProfile(true);S.entPanel=true;S.panelOpen=true;goto({lvl:'ent'});toast(`${t.name}: ${t.nodes.length} templates across ${new Set(t.nodes.map(n=>n.ent.id)).size} enterprises`);break;}
+  case'xnode':{const [id,k]=arg.split('.');H.openNode(THREATS.find(x=>x.id===id).nodes[+k]);break;}
+  case'tn':{const t=THREATS.find(x=>x.id===arg),e=t.nodes[0].ent;const c=document.querySelector(`[data-act="tn:${arg}"]`);if(c)c.classList.add('opening');setTimeout(()=>{enter(e);setTimeout(()=>{if(ENT===e){setLens('reuse');S.entPanel=true;S.panelOpen=true;goto({lvl:'ent'});}},1700);},160);break;}
+  case'crumb':if(arg==='ent')goto({lvl:'ent'});else if(arg==='brand')goto({lvl:'brand',brand:S.focus.lvl==='brand'?S.focus.brand:S.focus.lob.brand});else goto({lvl:'lob',lob:S.focus.lob});break;
+  case'dock':setDock(arg,arg==='ask'?{focus:true}:{});break;
+  case'ask-view':setDock('ask',{focus:true});break;
+  case'profile':$('#menu').hidden=true;openProfile(0,false);break;
+  case'tour':$('#menu').hidden=true;openProfile(0,true);break;
+  case'profile-close':closeProfile();break;
+  case'play':playT?(stopPlay(),renderProfile()):startPlay();break;
+  case'step':stopPlay();gotoStep(+arg);break;
+  case'lens':setLens(arg);break;
+  case'brand':goto({lvl:'brand',brand:BR[arg]});break;
+  case'lob':goto({lvl:'lob',lob:LB[arg]});break;
+  case'issue':goto({lvl:'lob',lob:I(arg).lob});break;
+  case'show':{const i=I(arg);goto({lvl:'lob',lob:i.lob,floor:CATS.findIndex(c=>c.id===IT[i.type].cat)});break;}
+  case'floor':goto({lvl:'lob',lob:S.focus.lob,floor:S.focus.floor===+arg?null:+arg});break;
+  case'lobback':goto({lvl:'lob',lob:S.focus.lob});break;
+  case'act':case'actnow':startAction(I(arg));break;
+  case'resolve':{const i=I(arg);i.status='resolved';toast(`Marked resolved: ${IT[i.type].label} · ${i.lob.name}`);applyLens();bld.forEach(b=>b.dirty=true);renderAll();break;}
+  case'sheet-review':collectSheet();S.sheet.step=1;renderPanel();break;
+  case'sheet-edit':S.sheet.step=0;renderPanel();break;
+  case'sheet-send':sendAction();break;
+  case'sheet-cancel':S.sheet=null;renderPanel();break;
+  case'retry':{const i=I(arg);if(i&&i.execTargets){i.execTargets.T310='applied';i.execStatus='applied';ECC.incompleteActions=Math.max(0,ECC.incompleteActions-1);const a=(i.assets||[]).find(x=>x.tplId==='T310');if(a){a.restricted=true;a.sub=(a.sub||'')+' · restricted (simulated)';}toast('T310 retry succeeded (simulated)');applyLens();bld.forEach(b=>b.dirty=true);renderAll();}break;}
+  case'reset':issues.forEach(i=>{i.status='open';i.action=null;i.execStatus=null;i.execTargets=null;i.pendingApprove=false;});ECC.awaitingApproval=0;ECC.incompleteActions=0;ECC.actions={};S.log=[];$('#menu').hidden=true;applyLens();bld.forEach(b=>b.dirty=true);renderAll();toast('Sample actions reset');break;
+  case'open':{const e=ENTERPRISES.find(x=>x.id===arg);const c=document.querySelector(`[data-act="open:${arg}"]`);if(c)c.classList.add('opening');setTimeout(()=>enter(e),160);break;}
+  case'registry':$('#menu').hidden=true;leave();break;
+  case'chat-close':setDock('insights');break;
+ }
+}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(t){const [a,arg]=t.dataset.act.split(':');handle(a,arg);return;}
+ const c=e.target.closest('[data-chip]');if(c){openChat();ask(c.dataset.chip);}
+ if(!e.target.closest('#menu,#menuBtn'))$('#menu').hidden=true;});
+document.addEventListener('change',e=>{if(e.target.name==='actc'&&S.sheet)S.sheet.choice=e.target.value;if(e.target.id==='actDue'&&S.sheet)S.sheet.due=e.target.value;});
+document.addEventListener('input',e=>{if(e.target.id==='actNote'&&S.sheet)S.sheet.note=e.target.value;});
+$('#roleSwitch').addEventListener('click',e=>{const b=e.target.closest('[data-role]');if(!b)return;S.role=b.dataset.role;ECC.role=S.role;document.querySelectorAll('#roleSwitch button').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-pressed',String(on));});toast(S.role==='approver'?'Approver role — you can confirm simulated apply':'Investigator role — propose actions for approval');if(S.sheet||S.focus)renderPanel();});
+$('#menuBtn').addEventListener('click',e=>{e.stopPropagation();const m=$('#menu');m.hidden=!m.hidden;$('#menuBtn').setAttribute('aria-expanded',String(!m.hidden));});
+$('#askForm').addEventListener('submit',e=>{e.preventDefault();const v=$('#askIn').value.trim();if(!v)return;$('#askIn').value='';setDock('ask');ask(v);});
+document.querySelector('.dock-switch').addEventListener('keydown',e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const face=e.key==='ArrowRight'?'ask':'insights';setDock(face,face==='ask'?{focus:true}:{});(face==='ask'?$('#tabAsk'):$('#tabInsights')).focus();});
+document.addEventListener('keydown',e=>{if(!S.active||e.key!=='Escape')return;if(!$('#menu').hidden){$('#menu').hidden=true;return;}if(S.profile){closeProfile();return;}if(S.dock==='ask'){setDock('insights');return;}if(S.sheet){S.sheet=null;renderPanel();return;}if(S.focus.lvl!=='ent')goto(parentOf(S.focus));});
+/* ---------- enter / leave ---------- */
+function enter(ent){
+ useModel(getModel(ent));resetState();stopPlay();app.classList.remove('profile');msgs.innerHTML='';setDock('insights');$('#menu').hidden=true;tip.hidden=true;toastEl.classList.remove('on');
+ $('#askLaunchLabel').textContent=`Ask about ${ENT.name}…`;$('#askIn').placeholder=`Ask about ${ENT.name}…`;$('#prEnt').textContent=ENT.name;$('#aboutEnt').textContent=ENT.name;
+ svg.setAttribute('aria-label',`Enterprise tree of ${ENT.name}: brands, LOBs and assets`);
+ S.active=true;app.classList.add('in-map');
+ S.tree.brands.clear();S.tree.lobs.clear();
+ layoutFor(getModel(ent));buildScene();buildFeeds();buildHots();buildLinks();setChips();
+ setLens('risk');
+ goto({lvl:'ent'},{instant:true,keepTree:true});
+ fly(currentFit(),true);
+ $('#dock').inert=false;renderAll();dirEl.scrollTop=0;
+}
+function leave(){S.active=false;stopPlay();app.classList.remove('in-map','profile');setDock('insights');$('#dock').inert=true;renderDir();}
+
+/* ---------- registry (enterprise list) ---------- */
+const dirEl=$('#dir'),D={q:'',status:'all',sector:'all',sort:'attention',view:'cards'};
+let REG=[];
+function computeRegistry(){
+ ENTERPRISES.forEach(getModel);applyThreats();
+ REG=ENTERPRISES.map(e=>{useModel(getModel(e));
+  const a=agg(lobs,LAST),p=agg(lobs,LAST-1),ser=MONTHS.map((_,m)=>lobs.reduce((s,l)=>s+lobAt(l,m).comp,0));
+  const sky=BRANDS.map(b=>{const L=lobs.filter(l=>l.brand===b),x=agg(L,LAST);return{h:L.reduce((s,l)=>s+l.vol,0),sev:x.crit?'crit':x.warn?'warn':'ok'};});
+  return{e,score:Math.round(a.score),crit:a.crit,warn:a.warn,comp:a.comp,delta:p.comp?Math.round((a.comp/p.comp-1)*100):0,brands:BRANDS.length,lobs:lobs.length,assets:assets.length,sev:a.crit?'crit':a.warn?'warn':'ok',ser,sky,
+   thr:THREATS.filter(t=>t.nodes.some(n=>n.ent===e)).length,hay:(e.name+' '+e.city+' '+e.sector+' '+BRANDS.map(b=>b.name).join(' ')+' '+THREATS.filter(t=>t.nodes.some(n=>n.ent===e)).map(t=>t.name+' '+t.fp).join(' ')).toLowerCase()};});
+}
+const SKYC={ok:['#3b68b4','#5c8ad6'],warn:['#c98a2c','#eab04e'],crit:['#d8404f','#f2707c']};
+function skyline(r){
+ const n=r.sky.length,w=300,bw=Math.min(44,(w-40)/n-10),mx=Math.max(...r.sky.map(s=>s.h));let h='<svg viewBox="0 0 300 88" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><line x1="0" y1="84" x2="300" y2="84" stroke="rgba(160,200,255,.35)"/>';
+ r.sky.forEach((s,i)=>{const x=w/2-(n*(bw+10)-10)/2+i*(bw+10),ht=26+s.h/mx*36,c=SKYC[s.sev];
+  h+=`<rect x="${x}" y="${84-ht}" width="${bw}" height="${ht}" fill="${c[0]}"/><rect x="${x}" y="${84-ht}" width="${bw}" height="5" fill="${c[1]}"/>`;
+  for(let k=0;k<3;k++)h+=`<rect x="${x+6}" y="${84-ht+14+k*12}" width="${bw-12}" height="3" fill="rgba(255,255,255,.35)"/>`;});
+ return h+'</svg>';
+}
+function sparkSvg(ser,color){
+ const mx=Math.max(...ser)*1.08,mn=Math.min(...ser)*.85,pts=ser.map((v,i)=>[i*(120/11),32-((v-mn)/(mx-mn||1))*30]);
+ const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+ return `<svg viewBox="0 0 120 34" aria-hidden="true"><path d="${d} L120,34 L0,34Z" fill="rgba(31,107,255,.12)"/><path d="${d}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round"/><circle cx="${pts[11][0]}" cy="${pts[11][1]}" r="3" fill="#fff" stroke="${color}" stroke-width="2"/></svg>`;
+}
+const dChips=r=>`${r.crit?`<span class="chip crit">${r.crit} critical</span>`:''}${r.warn?`<span class="chip warn">${r.warn} attention</span>`:''}${!r.crit&&!r.warn?'<span class="chip">All clear</span>':''}${r.thr?`<span class="chip blk">${r.thr} shared template${r.thr>1?'s':''}</span>`:''}`;
+const dDelta=r=>(r.delta>=0?'▲ ':'▼ ')+Math.abs(r.delta)+'%';
+function filtered(){
+ const q=D.q.trim().toLowerCase();
+ let L=REG.filter(r=>(!q||q.split(/\s+/).every(w=>r.hay.includes(w)))&&(D.sector==='all'||r.e.sector===D.sector)&&(D.status==='all'||(D.status==='crit'?r.sev==='crit':D.status==='warn'?r.sev==='warn':r.sev==='ok')));
+ const key={attention:r=>-(r.crit*100+r.warn),score:r=>r.score,name:r=>r.e.name,complaints:r=>-r.comp}[D.sort];
+ return L.sort((a,b)=>{const x=key(a),y=key(b);return typeof x==='string'?x.localeCompare(y):x-y;});
+}
+function renderDir(){
+ computeRegistry();
+ const sectors=[...new Set(ENTERPRISES.map(e=>e.sector))].sort();
+ $('#dirSector').innerHTML='<option value="all">All sectors</option>'+sectors.map(s=>`<option value="${esc(s)}" ${D.sector===s?'selected':''}>${esc(s)}</option>`).join('');
+ const tot=REG.reduce((o,r)=>({c:o.c+r.crit,w:o.w+r.warn,m:o.m+r.comp}),{c:0,w:0,m:0});
+ $('#dirStats').innerHTML=`<div><label>Enterprises</label><b>${REG.length}</b></div><div><label>Critical concerns</label><b class="c">${tot.c}</b></div><div><label>Need attention</label><b class="w">${tot.w}</b></div><div><label>Complaints, ${MONTHS[LAST]}</label><b>${fmt(tot.m)}</b></div><div><label>Blocked templates reused</label><b class="p">${THREATS.length}</b></div>`;
+ $('#dirThr').innerHTML=`<div class="tw-h"><h2>Shared-template watch</h2><p>Blocked templates that other brands and enterprises are filing again to get round the block. Open one to see the links on the map.</p></div><div class="tw-grid">${THREATS.map(t=>{const es=[...new Set(t.nodes.map(n=>n.ent))];return `<button class="tcard" style="--c:${t.col}" data-act="tn:${t.id}"><span class="tk">${t.kind==='scam'?'Phishing look-alike':'Unsolicited promotion'} · ${t.fp}</span><b>${esc(t.name)}</b><q>${esc(t.text)}</q><div class="chain">${es.map((e,i)=>`${i?'<em>→</em>':''}<span class="${i?'':'o'}">${esc(e.name.split(' ')[0])}</span>`).join('')}</div><small>Blocked at ${esc(t.nodes[0].ent.name)} · found in ${t.nodes.length} templates</small></button>`;}).join('')}</div>`;
+ drawDirList();
+}
+function drawDirList(){
+ const L=filtered();$('#dirCount').textContent=`${L.length} of ${REG.length} enterprises`;
+ document.querySelectorAll('#dirStatus button').forEach(b=>b.classList.toggle('on',b.dataset.v===D.status));
+ document.querySelectorAll('#dirView button').forEach(b=>b.classList.toggle('on',b.dataset.v===D.view));
+ if(!L.length){$('#dirList').innerHTML='<div class="empty"><b>No enterprise matches.</b><br>Try a brand name, a city or clear the filters.</div>';return;}
+ if(D.view==='list'){
+  $('#dirList').innerHTML=`<div class="tw"><table class="etable"><thead><tr><th>Enterprise</th><th>Attention</th><th>Critical</th><th>Attention</th><th>Complaints</th><th>Brands</th><th>Assets</th><th>Last audit</th></tr></thead><tbody>${L.map(r=>`<tr tabindex="0" data-act="open:${r.e.id}"><td><b>${esc(r.e.name)}</b><small>${esc(r.e.sector)} · ${esc(r.e.city)}</small></td><td><span class="chip ${r.sev==='ok'?'':r.sev}">${r.score}</span></td><td>${r.crit}</td><td>${r.warn}</td><td>${fmt(r.comp)} <small>${dDelta(r)}</small></td><td>${r.brands}</td><td>${r.assets}</td><td>${r.e.audit}</td></tr>`).join('')}</tbody></table></div>`;
+  return;}
+ $('#dirList').innerHTML=`<div class="egrid">${L.map((r,i)=>`<button class="ecard" data-act="open:${r.e.id}" style="animation-delay:${Math.min(i,11)*35}ms"><div class="skyl">${skyline(r)}</div><div class="ebody">
+  <div class="ehd"><div><h3>${esc(r.e.name)}</h3><p>${esc(r.e.sector)} · ${esc(r.e.city)}</p></div><div class="score s-${r.sev}" style="--v:${r.score}" title="Attention index ${r.score} (derived from open concerns — not a guilt score)"><span>${r.score}</span></div></div>
+  <div class="est"><div><label>Brands</label><b>${r.brands}</b></div><div><label>Lines</label><b>${r.lobs}</b></div><div><label>Assets</label><b>${r.assets}</b></div></div>
+  <div class="erow"><div><label>Complaints, ${MONTHS[LAST]}</label><b>${fmt(r.comp)}</b><small style="color:${r.delta>=0?'#c0283c':'#1b8a55'}">${dDelta(r)}</small></div>${sparkSvg(r.ser,'#1f6bff')}</div>
+  <div class="efoot">${dChips(r)}<span class="go">Open map →</span></div></div></button>`).join('')}</div>`;
+}
+$('#dirSearch').addEventListener('input',e=>{D.q=e.target.value;drawDirList();});
+$('#dirSector').addEventListener('change',e=>{D.sector=e.target.value;drawDirList();});
+$('#dirSort').addEventListener('change',e=>{D.sort=e.target.value;drawDirList();});
+document.querySelectorAll('#dirStatus button,#dirView button').forEach(b=>b.addEventListener('click',()=>{const g=b.parentElement.id==='dirStatus'?'status':'view';D[g]=b.dataset.v;drawDirList();}));
+document.addEventListener('keydown',e=>{if(S.active)return;if(e.key==='/'&&document.activeElement!==$('#dirSearch')){e.preventDefault();$('#dirSearch').focus();}
+ if(e.key==='Enter'&&e.target.matches&&e.target.matches('tr[data-act]'))e.target.click();});
+renderDir();
+requestAnimationFrame(tick);
+window.__tm={S,goto,ask,openProfile,startAction,handle,cam,enter,leave,setDock,ENTERPRISES,rebuildTree,toggleBrand,toggleLob};
+})();
+</script>
+
+</body></html>
