@@ -1,0 +1,1238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Org — Content, Enterprise, Brand, Loopy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#07141c; --text:#e8f2f6; --muted:#8ea6b3; --gold:#e4b86a; --gold-dim:rgba(228,184,106,.22);
+  --blue:#1f6bff; --glass:rgba(8,22,32,.74); --hair:rgba(196,220,232,.14);
+  --ui:'Schibsted Grotesk',system-ui,sans-serif; --serif:'Fraunces',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.65,0,.2,1); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;overflow:hidden;color:var(--text);font:14px/1.45 var(--ui);
+  background:
+    radial-gradient(900px 560px at 40% 46%, rgba(28,72,104,.42), transparent 68%),
+    radial-gradient(640px 420px at 62% 18%, rgba(228,184,106,.07), transparent 70%),
+    linear-gradient(180deg,#061018 0%, #0b1e2c 48%, #07141c 100%)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#stars,.vig,#field{position:absolute;inset:0}
+#stars{width:100%;height:100%;z-index:0}
+.vig{z-index:1;pointer-events:none;background:radial-gradient(68% 62% at 40% 46%, transparent 42%, rgba(4,10,16,.62) 100%)}
+#field{z-index:2;width:100%;height:100%;touch-action:none;cursor:grab}
+#field.drag{cursor:grabbing}
+.ui{position:absolute;inset:0;z-index:3;pointer-events:none}
+.ui button,.ui input,.ui a,.modes,.side,.time,.caption,.top .ask,.crumb,.chip{pointer-events:auto}
+.top{display:flex;align-items:flex-start;gap:18px;padding:16px 22px 0}
+.word{background:none;border:0;text-align:left;padding:0}
+.word strong{display:block;font-family:var(--serif);font-size:32px;font-weight:500;letter-spacing:-.03em;line-height:.9}
+.word em{display:block;margin-top:5px;font-style:normal;font:500 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.crumb{flex:1;min-width:0;display:flex;align-items:center;gap:6px;margin-top:10px;overflow:auto;white-space:nowrap;color:var(--muted);font-size:13px}
+.crumb button{background:none;border:0;padding:4px 0;color:var(--muted)}
+.crumb button:last-of-type,.crumb span.name{color:var(--text);font-weight:600}
+.sep{opacity:.45}
+.chip{margin-top:6px;height:36px;padding:0 12px;border-radius:18px;border:1px solid var(--gold-dim);background:var(--glass);backdrop-filter:blur(12px);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.chip small{font:500 10px var(--mono);color:var(--gold);letter-spacing:.08em}
+.ask{position:relative;width:min(320px,32vw);margin-top:2px}
+.ask input{width:100%;height:42px;border-radius:21px;border:1px solid var(--gold-dim);background:var(--glass);backdrop-filter:blur(12px);padding:0 46px 0 14px}
+.ask input::placeholder{color:var(--muted)}
+.ask button{position:absolute;right:4px;top:4px;width:34px;height:34px;border:0;border-radius:50%;background:var(--blue);color:#fff}
+.modes{position:absolute;left:18px;top:96px;width:210px;display:flex;flex-direction:column;gap:2px}
+.mode{display:grid;grid-template-columns:32px 1fr;gap:8px;text-align:left;background:transparent;border:0;border-left:2px solid transparent;padding:8px 10px;color:var(--muted);border-radius:0 8px 8px 0}
+.mode b{font:500 11px var(--mono);color:var(--gold)}
+.mode span{display:block;color:var(--text);font-weight:550;font-size:13.5px}
+.mode.on{border-left-color:var(--gold);background:linear-gradient(90deg,rgba(228,184,106,.14),transparent)}
+.legend{margin:14px 0 0 12px;display:grid;gap:5px;color:var(--muted);font:11px var(--mono)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.open-loop{margin:12px 0 0 12px;pointer-events:auto}
+.side{position:absolute;right:18px;top:96px;bottom:16px;width:344px;overflow:auto;padding-right:4px}
+.side::-webkit-scrollbar{width:8px}.side::-webkit-scrollbar-thumb{background:rgba(228,184,106,.28);border-radius:8px}
+.card{background:var(--glass);border:1px solid var(--gold-dim);border-radius:16px;backdrop-filter:blur(18px) saturate(1.15);box-shadow:0 18px 50px rgba(0,0,0,.28);padding:14px 14px 12px;margin-bottom:10px}
+.eyebrow{font:500 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.card h2{font-family:var(--serif);font-weight:500;font-size:28px;letter-spacing:-.03em;line-height:1.08;margin:6px 0 8px}
+.card p{margin:0;color:#d5e3ea;font-size:13.5px}
+.principles{list-style:none;margin:12px 0 0;padding:0}
+.principles li{display:grid;grid-template-columns:26px 1fr;gap:8px;padding:8px 0;border-top:1px solid var(--gold-dim);font-size:13px;line-height:1.4}
+.principles b{font:500 10px var(--mono);color:var(--gold);padding-top:3px}
+.enters,.rowbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{height:34px;padding:0 12px;border-radius:8px;border:1px solid var(--gold-dim);background:rgba(255,255,255,.04);font-size:13px;font-weight:550}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--gold-dim);border-radius:10px;overflow:hidden;margin-top:10px}
+.metrics div{background:rgba(6,16,24,.78);padding:8px 10px}
+.metrics small{display:block;font:500 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.metrics b{font:500 16px var(--mono);font-variant-numeric:tabular-nums}
+.links{margin-top:10px}
+.linkrow{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--hair);padding:8px 0;font-size:13px}
+.linkrow span{color:var(--muted);font-size:12px;text-align:right}
+.switch{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.switch button{height:26px;padding:0 8px;border-radius:99px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--muted);font-size:11px;font-weight:600}
+.switch button.on{background:#fff;color:#102033;border-color:#fff}
+.quote{font-family:var(--serif);font-size:18px;font-weight:500;line-height:1.32;margin:10px 0 8px}
+.next{font-size:12.5px;color:var(--muted);margin-top:6px}
+.next b{color:var(--text);font-weight:600}
+.foot{margin-top:8px;color:var(--muted);font-size:11px}
+.caption{position:absolute;left:22px;bottom:96px;width:min(520px, calc(100vw - 430px));color:var(--muted);font-size:13px}
+.caption b{color:var(--text);font-weight:600}
+.time{position:absolute;left:18px;right:380px;bottom:12px;display:flex;flex-direction:column;gap:6px;padding:8px 12px 8px;border-radius:14px;background:var(--glass);border:1px solid var(--gold-dim);backdrop-filter:blur(16px)}
+.time-top{display:flex;align-items:center;gap:10px;min-width:0}
+#when{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
+.evs{display:flex;gap:6px;overflow:auto;min-width:0}
+.evs button{border:1px solid var(--hair);background:rgba(255,255,255,.03);color:var(--muted);border-radius:99px;height:26px;padding:0 10px;white-space:nowrap;font-size:12px}
+.evs button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.months{display:grid;grid-template-columns:repeat(12,1fr);cursor:ew-resize}
+.months button{background:none;border:0;border-left:1px solid rgba(207,224,236,.22);color:var(--muted);text-align:left;padding:3px 0 0 5px;font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+.months button small{display:block;font:9px var(--mono);letter-spacing:0;text-transform:none;opacity:.6}
+.months button.on{color:#fff;font-weight:700;box-shadow:inset 0 3px 0 var(--blue)}
+.months .dot{display:block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin:0 0 3px 2px}
+.quiet{color:var(--muted);font-size:12px;white-space:nowrap}
+.sub{font:600 11px var(--ui);fill:#3d2912}
+.node{cursor:pointer}
+.label{font:500 13px var(--ui);fill:#e8f2f6}
+.label.core{font-family:var(--serif);font-size:26px;font-weight:500}
+.pct{fill:#e4b86a;font-family:var(--mono);font-size:11px}
+.mark{font:500 11px var(--mono);fill:#f4fbff}
+.edge{fill:none}
+.tag{cursor:pointer}
+.tag rect{fill:rgba(8,22,32,.8);stroke:rgba(196,181,253,.7)}
+.tag text{fill:#ddd4ff;font:500 11px var(--ui);text-anchor:middle}
+.orbit{fill:none;stroke:rgba(196,181,253,.55);stroke-width:1.15;stroke-dasharray:2 8;animation:drift 90s linear infinite}
+.primering{fill:none;stroke:rgba(228,184,106,.45);stroke-width:1.2}
+@keyframes drift{to{stroke-dashoffset:-240}}
+.boom{position:absolute;z-index:9;left:12px;top:12px;right:12px;background:#3a1016;color:#ffd0d6;padding:12px;border-radius:8px;white-space:pre-wrap}
+@media (max-width:860px){
+  .top{padding:10px 10px 0;gap:8px}
+  .word em{display:none}
+  .word strong{font-size:26px}
+  .modes{left:8px;right:8px;top:50px;width:auto;flex-direction:row;overflow:auto;gap:0;z-index:5;background:rgba(7,20,28,.92);border:1px solid var(--gold-dim);border-radius:12px;padding:4px}
+  .mode{display:flex;align-items:center;flex:none;width:max-content;padding:6px 10px;border-left:0;border-bottom:2px solid transparent;border-radius:8px}
+  .mode span{font-size:12px;white-space:nowrap}
+  .mode b{display:none}
+  .mode.on{border-bottom-color:var(--gold)}
+  .legend,.caption,.open-loop{display:none}
+  .side{left:8px;right:8px;top:auto;width:auto;height:34vh;bottom:8px}
+  .time{left:8px;right:8px;bottom:calc(34vh + 12px)}
+  .ask{width:42px}.ask input{padding:0;color:transparent}.ask input::placeholder{color:transparent}
+  .crumb{display:none}
+  .chip small{display:none}
+  .card h2{font-size:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  .orbit{animation:none}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="vig" aria-hidden="true"></div>
+<svg id="field" role="application" aria-label="Consent constellation. Content, Enterprise, Brand, and Loopy.">
+  <defs>
+    <radialGradient id="coreg" cx="40%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#fff6df"/>
+      <stop offset="38%" stop-color="#e4b86a"/>
+      <stop offset="78%" stop-color="#8a6230"/>
+      <stop offset="100%" stop-color="#8a6230" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="bloom" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g id="world">
+    <circle id="orbit" class="orbit" r="148"/>
+    <g id="loopyTag" class="tag" role="button" tabindex="0" aria-label="Open Loopy" style="display:none">
+      <rect x="-58" y="-13" width="116" height="26" rx="13"/>
+      <text y="4">Loopy governs</text>
+    </g>
+    <g id="edges"></g>
+    <g id="nodes"></g>
+  </g>
+</svg>
+<div class="ui">
+  <header class="top">
+    <button class="word" type="button" data-act="home" aria-label="Back to the consent center">
+      <strong>Org</strong>
+      <em>Content · Enterprise · Brand · Loopy</em>
+    </button>
+    <nav class="crumb" id="crumb" aria-label="Org path"></nav>
+    <button class="chip" type="button" id="agentChip" data-act="cycle" aria-label="Cycle Loopy agent"></button>
+    <form class="ask" id="askForm">
+      <input id="askIn" type="text" placeholder="Ask the org" aria-label="Ask the org" autocomplete="off">
+      <button type="submit" aria-label="Ask">↵</button>
+    </form>
+  </header>
+  <nav class="modes" aria-label="Ways to read the org">
+    <button class="mode" type="button" data-mode="event"><b>01</b><span>Event insights</span></button>
+    <button class="mode" type="button" data-mode="heat"><b>02</b><span>Network heatmap</span></button>
+    <button class="mode" type="button" data-mode="diag"><b>03</b><span>Zoomed diagnostics</span></button>
+    <button class="mode on" type="button" data-mode="depth"><b>04</b><span>Sub-levels</span></button>
+    <button class="mode" type="button" data-mode="follow"><b>05</b><span>Follow a change</span></button>
+    <div class="legend" aria-hidden="true">
+      <div><i style="background:#e4b86a"></i>Consent · primacy</div>
+      <div><i style="background:#c4b5fd"></i>Loopy · the ring</div>
+      <div><i style="background:#3ec8db"></i>Content</div>
+      <div><i style="background:#4c8dff"></i>Enterprise</div>
+      <div><i style="background:#ff6fae"></i>Brand</div>
+      <div><i style="background:#f0b429"></i>Identity, channel, signal</div>
+    </div>
+    <button class="btn open-loop" type="button" data-go="loopy" data-dive="1">Open the Loopy ring</button>
+  </nav>
+  <aside class="side" id="side" aria-live="polite">
+    <section class="card" id="metrics"></section>
+    <section class="card" id="detail"></section>
+    <section class="card" id="loopy"></section>
+  </aside>
+  <p class="caption" id="caption"></p>
+  <footer class="time" id="time">
+    <div class="time-top"><span id="when"></span><div class="evs" id="evs"></div></div>
+    <div class="months" id="months" role="slider" aria-valuemin="0" aria-valuemax="11" aria-label="Month"></div>
+  </footer>
+</div>
+<script>
+(() => {
+'use strict';
+const NS = 'http://www.w3.org/2000/svg';
+const $ = s => document.querySelector(s);
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const svgEl = (t, a) => { const n = document.createElementNS(NS, t); if (a) for (const k in a) n.setAttribute(k, a[k]); return n; };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const polar = (cx,cy,r,deg) => { const a = deg*Math.PI/180; return [cx+Math.cos(a)*r, cy+Math.sin(a)*r]; };
+const norm = d => ((d % 360) + 360) % 360;
+
+const KIND = {core:'#e4b86a', content:'#3ec8db', enterprise:'#4c8dff', brand:'#ff6fae', identity:'#f0b429', channel:'#7dcea0', signal:'#ff8a3d', enforcement:'#e5484d', agent:'#c4b5fd', loopy:'#c4b5fd', case:'#b7c6d2'};
+const RISK = {ok:'#3ddc97', watch:'#ffb020', high:'#ff8a3d', crit:'#ff4d5e', block:'#c3b2ff'};
+const RISK_LABEL = {ok:'Clear', watch:'Watch', high:'High', crit:'Critical', block:'Blocked', core:'Primacy', agent:'On the ring'};
+const PRIMARY = new Set(['content','enterprise','brand']);
+const ORBIT_R = 148;
+const HUB_POS = {
+  content:{deg:-90,r:292}, enterprise:{deg:30,r:292}, brand:{deg:150,r:292},
+  identity:{deg:-30,r:334}, channel:{deg:90,r:334}, signal:{deg:192,r:348}, enforcement:{deg:232,r:348}
+};
+const AGENT_POS = {nova:{deg:-60}, atlas:{deg:0}, vega:{deg:60}, echo:{deg:120}, orion:{deg:210}};
+const MODES = [
+  {id:'event', line:'What just moved: complaints, blocks, hijacks, and the pauses Orion can arm.'},
+  {id:'heat', line:'Heat is attention. Gold is warm. Red is where the org is already burning.'},
+  {id:'diag', line:'Rays are hierarchy. Chords are what a tree hides. Select any body.'},
+  {id:'depth', line:'Consent, then a domain, then an entity, then the asset. The path stays above.'},
+  {id:'follow', line:'One block, one hijack, one farm. Everyone it still touches stays lit.'}
+];
+const AUTO = {event:'nova', heat:'atlas', diag:'atlas', depth:'vega', follow:'echo'};
+const AGENT_META = {
+  nova:['Nova','Perception'], atlas:['Atlas','Interpretation'], vega:['Vega','Decision'], echo:['Echo','Reflection'], orion:['Orion','Governance']
+};
+const MONTHS = ['Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'];
+const YEARS = [2025,2025,2026,2026,2026,2026,2026,2026,2026,2026,2026,2026];
+const FULL = ['November 2025','December 2025','January 2026','February 2026','March 2026','April 2026','May 2026','June 2026','July 2026','August 2026','September 2026','October 2026'];
+const HUB_ARCS = [['content','enterprise'],['content','brand'],['brand','enterprise'],['identity','enterprise'],['signal','enterprise'],['signal','content'],['enforcement','content'],['channel','brand'],['channel','content']];
+const AGENT_ARCS = [['nova','signal'],['atlas','identity'],['vega','content'],['echo','brand'],['orion','enforcement']];
+
+const RAW = [
+['consent','Consent','core','core',0,40,'Every send has to pass consent. That is the primacy this org is built around.'],
+['loopy','Loopy','loopy','agent',0,72,'The inner ring. Five agents govern the field instead of living in a separate tool.'],
+['content','Content','content','high',0,86,'Templates, fingerprints, and the links inside them. This is where a block either holds or leaks.'],
+['enterprise','Enterprise','enterprise','high',0,80,'The legal entities that file the brands. Ten are in this sample, from a clean anchor to a blacklisted firm.'],
+['brand','Brand','brand','high',0,84,'The names recipients think they are hearing. Two of them are impersonations.'],
+['identity','Identity','identity','high',0,76,'Directors, PANs, and addresses. Shared identity is how separate firms turn out to be one network.'],
+['channel','Channel','channel','watch',0,70,'Sender IDs, voice lines, and the links that carry the text.'],
+['signal','Signal','signal','high',0,82,'Complaints, consent coverage, and volume. Nova reads this before anyone else.'],
+['enforcement','Enforcement','enforcement','watch',0,74,'Blocks, notices, audits, and retirements. The actions Vega recommends land here.'],
+['nova','Nova','agent','agent',0,74,'Perception. Captures what deserves attention and ignores the rest.'],
+['atlas','Atlas','agent','agent',0,70,'Interpretation. Says what a chord means, and how sure we are.'],
+['vega','Vega','agent','agent',0,76,'Decision. Turns a reading into one next step: block, ask, pause, or leave it.'],
+['echo','Echo','agent','agent',0,69,'Reflection. Writes the policy diff so the org does not rediscover the same trick.'],
+['orion','Orion','agent','agent',0,80,'Governance. The only agent who can pause the others.'],
+['finco','FinCo','enterprise','ok',0,12,'Clean anchor. One director, a unique BKC address, no blacklisted headers, 2.3M messages a month.'],
+['halcyon','Halcyon','enterprise','watch',0,62,'Reference group. Prepaid and collections carry the open concerns. The rest of the house is quieter.'],
+['dpay','Digital Pay','enterprise','watch',8,58,'Shares Rajesh Kumar, the Andheri farm, and a PAN with a high-risk lender. The text matches two worse firms.'],
+['qcredit','QuickCredit','enterprise','high',8,81,'Files YONO-branded links. Sits on the Andheri farm and on Rajesh Kumar’s director span.'],
+['mgrow','MoneyGrow','enterprise','crit',8,96,'Center of the shell network. Trust 12. Eight of twelve headers are already blacklisted. Volume has been zero for a year.'],
+['lotus','Lotus365','enterprise','block',8,99,'Blacklisted gambling brand. Shares a director and a PAN with MoneyGrow.'],
+['vantage','Vantage','enterprise','high',0,77,'Origin of the account-verification alert. 1,240 attempts before the block.'],
+['ivory','Ivory','enterprise','high',0,73,'Origin of the pre-approved loan text, and a live clone of the verification alert.'],
+['monarch','Monarch','enterprise','watch',0,64,'Re-filed a blocked verification alert under a new name, and originated the lucky-draw text.'],
+['lumen','Lumen','enterprise','high',0,71,'Communications group. A near match of the loan text is on file here.'],
+['b-hbank','Halcyon Bank','brand','watch',0,48,'Origin of the KYC-expiry notice. The text has since been cloned.'],
+['b-hmob','Halcyon Mobile','brand','high',0,78,'Look-alike links and a near match of FP-7A3C. This is the brand to open if you want the rabbit hole.'],
+['b-hretail','Halcyon Retail','brand','ok',0,22,'Retail brand inside Halcyon. No open impersonation in this sample.'],
+['b-hinsure','Halcyon Insure','brand','watch',0,36,'Claims and motor are on a watch for consent proof and expiry.'],
+['b-htravel','Halcyon Travel','brand','watch',0,30,'Idle headers and an expiry inside the holiday line.'],
+['b-yono','YONO','brand','block',9,93,'SBI brand hijack. Eleven look-alike domains, carried in QuickCredit templates.'],
+['b-lotus','LOTUS365','brand','block',8,97,'Gambling brand on a blacklisted enterprise. The CTA lotus365.cc is already stopped.'],
+['b-vwallet','Vantage Wallet','brand','high',0,70,'Wallet brand on the enterprise that originated FP-7A3C.'],
+['b-ivory','Ivory Housing','brand','high',10,75,'Still sending the blocked verification alert.'],
+['b-meridian','Meridian Bank','brand','watch',11,44,'Live clone of the Halcyon Bank KYC notice.'],
+['b-monarch','Monarch Hotels','brand','watch',11,52,'Lucky-draw origin, and a re-file of the blocked verification text.'],
+['b-lumen','Lumen Mobile','brand','watch',11,49,'Near match of the loan offer.'],
+['fp7','FP-7A3C','content','crit',10,90,'Account verification alert. Blocked 29 Sep 2026. Clones are still sending. The match is on the text, so a new name does not hide it.'],
+['fp19','FP-19D2','content','high',11,68,'Lucky-draw prize claim. Blocked 3 Oct 2026. The same offer came back under other brands.'],
+['fpc8','FP-C84E','content','high',11,72,'Pre-approved loan of a fixed amount. Blocked 8 Oct 2026. It crossed from Ivory into other books.'],
+['fp5b','FP-5B90','content','high',11,70,'KYC expiry notice. Blocked 12 Oct 2026. Born at Halcyon Bank, seen again at Meridian.'],
+['cta-lotus','lotus365.cc','content','block',8,94,'Blacklisted gambling domain inside Lotus365 templates.'],
+['cta-yono','yono8.com','content','block',9,92,'Blacklisted. One of a sequential YONO series, found in QuickCredit templates.'],
+['cta-qf','quickfinance','content','block',8,88,'Blacklisted phishing domain quickfinance.icu, on a high-spam TLD, inside MoneyGrow templates.'],
+['tpl-sim','Similar text','content','high',8,79,'Near-identical template copy across Digital Pay, QuickCredit, and MoneyGrow.'],
+['rajesh','Rajesh Kumar','identity','high',8,84,'DIN 08123456. Director at Digital Pay, QuickCredit, and MoneyGrow. A new firm with this director is not a fresh start.'],
+['amit','Amit Verma','identity','crit',8,90,'DIN 09876543. Director at MoneyGrow and at blacklisted Lotus365. Orion fails new registrations closed.'],
+['priya','Priya Sharma','identity','ok',0,14,'DIN 07654321. Director at FinCo and also at Digital Pay. The risk on Digital Pay is the other director.'],
+['andheri','Andheri farm','identity','crit',8,87,'Three enterprises at 404, Business Hub, Andheri East. Digital Pay, QuickCredit, MoneyGrow.'],
+['bkc','BKC address','identity','ok',0,8,'12, Corporate Park. One entity. Useful because it is unique.'],
+['pan1','PAN AAACF1234M','identity','watch',8,66,'Two firms: Digital Pay and QuickCredit.'],
+['pan2','PAN BBACG5678K','identity','crit',8,91,'MoneyGrow and Lotus365. One of them is already blacklisted.'],
+['hdr-bad','Header blacklist','channel','crit',8,85,'MoneyGrow: 8 of 12 headers blacklisted. No clean path left on those IDs.'],
+['hdr-clean','Clean headers','channel','ok',0,10,'FinCo: 45 headers, none blacklisted.'],
+['voice-h','Voice lines','channel','watch',0,28,'Outbound voice on the sample brands. Expiry and misuse show up here with the headers.'],
+['links-look','Look-alike links','channel','high',0,76,'Short links that mimic a brand sign-in, sent on headers that resemble the real ones.'],
+['domains-unreg','Unregistered domains','channel','watch',0,40,'Shorteners in live templates that are missing from the approved list.'],
+['comp-mg','Complaint spike','signal','crit',8,89,'142 complaints. 18.2 per header at MoneyGrow, past the elevated line.'],
+['sig-consent','Consent gap','signal','high',0,74,'Halcyon collections fell under 85% coverage. Campaigns are live without a retrievable opt-in.'],
+['vol-zero','Zero volume','signal','crit',8,83,'MoneyGrow has registered headers and no traffic for twelve months. A dormant shell, not a quiet business.'],
+['scam-rep','Scam reports','signal','high',0,73,'Look-alike links reported against Halcyon Mobile.'],
+['dnd-promo','DND complaints','signal','watch',0,55,'Promotional templates reaching numbers that had opted out.'],
+['enf-fp','Network block','enforcement','watch',10,78,'Standing action: reject FP-7A3C and its near matches across every enterprise and brand.'],
+['enf-notice','Show-cause','enforcement','watch',0,60,'Ask the brand why a blocked text, or a look-alike link, was filed again.'],
+['enf-domains','Domain blocklist','enforcement','watch',8,72,'lotus365.cc, yono8.com, and quickfinance.icu are already on the blocklist.'],
+['enf-audit','Consent audit','enforcement','watch',0,50,'Ask Halcyon for opt-in samples on the campaigns with no proof.'],
+['enf-retire','Retire headers','enforcement','ok',0,24,'Idle sender IDs. Recommended release, not a pause.'],
+['lob-prepaid','Prepaid','brand','high',0,70,'The Halcyon Mobile line carrying the scam reports.'],
+['iss-scam','Look-alike links','brand','crit',0,86,'Reported sign-in copies on Halcyon Mobile. They arrive from sender IDs that resemble the registered headers.'],
+['iss-headers','Resembled IDs','brand','high',0,64,'Headers on this brand are close enough to the real sender IDs to pass a glance.'],
+['fp7-var','Near match','content','crit',10,82,'Halcyon Mobile’s variant of FP-7A3C. About 94% the same text.'],
+['n-comp','Complaint spike','case','crit',8,89,'Nova is holding MoneyGrow’s complaint rate up where the ring can see it.'],
+['n-zero','Zero volume','case','crit',8,83,'Nova flagged a year of silence on a firm with blacklisted headers.'],
+['n-yono','YONO series','case','block',9,92,'Nova watched a sequential domain pattern, not a single bad link.'],
+['n-clone','Clone after block','case','crit',10,90,'Nova saw FP-7A3C leave the enterprise that was blocked and appear in others.'],
+['a-dir','Director span','case','high',8,84,'Atlas reads Rajesh Kumar as one span across watch, high, and critical.'],
+['a-farm','Address farm','case','crit',8,87,'Atlas does not treat three firms at one Andheri address as a coincidence.'],
+['a-tpl','Shared text','case','high',8,79,'Atlas ties the similar templates to one campaign wearing three names.'],
+['a-pan','PAN cluster','case','crit',8,91,'Atlas marks the MoneyGrow–Lotus365 PAN as fail-closed for anything new.'],
+['v-net','Block the text','case','crit',10,88,'Vega’s step for FP-7A3C: reject the fingerprint everywhere, including near matches.'],
+['v-pause','Hold the gap','case','high',0,74,'Vega’s step for the consent gap: pause the campaigns that cannot show an opt-in.'],
+['v-esc','Escalate Lotus','case','block',8,97,'Vega’s step: Lotus365 is already blacklisted. New activity is an escalation, not a review.'],
+['v-cause','Ask Halcyon','case','high',0,78,'Vega’s step: a show-cause to Halcyon Mobile on the look-alike links.'],
+['e-rename','Rename is not new','case','crit',10,86,'Echo’s diff: a blocked fingerprint re-filed under a new title is the same text.'],
+['e-tld','Bad TLDs','case','high',8,70,'Echo keeps .icu and .cc on the memory of this sample as high-spam shapes, not as a rule for every domain.'],
+['e-clean','FinCo stays clean','case','ok',0,12,'Echo keeps FinCo as the comparison. A network story that cannot tell a clean firm is not finished.'],
+['e-warn','Warn the brand','case','watch',10,60,'Echo’s note to the brands that received a blocked fingerprint: say what was blocked, and why.'],
+['o-pause','Pause MoneyGrow','case','crit',8,96,'Orion’s armed pause. Delivery from this firm stops.'],
+['o-guard','Fail closed','case','crit',8,90,'Orion’s guardrail: a new entity with Amit Verma, or with PAN BBACG5678K, does not proceed.'],
+['o-trail','Leave a trace','case','watch',10,64,'Orion’s rule of record. A pause, a block, and a decision not to pause all stay in the autobiography.'],
+['o-twin','Try the rule','case','watch',0,48,'Orion can run a consent-scrub rule in the policy twin before it touches live sends.']
+];
+
+const N = {};
+const MARK = {consent:'', loopy:'Lp', content:'Ct', enterprise:'En', brand:'Br', identity:'Id', channel:'Ch', signal:'Sg', enforcement:'Ef', nova:'Nv', atlas:'As', vega:'Vg', echo:'Ec', orion:'Or', 'b-hbank':'Bk', 'b-hmob':'Mo', 'b-hretail':'Rt', 'b-hinsure':'In', 'b-htravel':'Tr', 'lob-prepaid':'Pr', 'iss-scam':'Lk', 'iss-headers':'Hd', 'fp7-var':'Nm'};
+RAW.forEach(r => {
+  const [id,name,kind,risk,since,heat,summary] = r;
+  const mark = MARK[id] || name.replace(/[^A-Za-z0-9]/g,'').slice(0,2).toUpperCase();
+  N[id] = {id,name,kind,risk,since,heat,summary,mark,links:[],action:''};
+});
+
+const LINK = {
+  content:[['fp7','Hottest fingerprint'],['enterprise','Crosses legal entities']],
+  enterprise:[['mgrow','Critical entity'],['finco','Clean anchor']],
+  brand:[['b-yono','Hijacked brand'],['b-lotus','Impersonation'],['b-hmob','Open the rabbit hole']],
+  identity:[['rajesh','Director concentration'],['andheri','Address farm']],
+  channel:[['hdr-bad','Blacklist rate'],['links-look','Look-alike links']],
+  signal:[['comp-mg','Loudest complaint rate'],['sig-consent','Coverage gap']],
+  enforcement:[['enf-fp','Standing network block'],['enf-domains','Domains already stopped']],
+  loopy:[['orion','Can pause the ring'],['nova','Hears the field first']],
+  nova:[['comp-mg','Holding'],['vol-zero','Holding'],['cta-yono','Holding'],['fp7','Holding']],
+  atlas:[['rajesh','Reading'],['andheri','Reading'],['tpl-sim','Reading'],['pan2','Reading']],
+  vega:[['enf-fp','Recommended'],['sig-consent','Recommended'],['lotus','Recommended'],['b-hmob','Recommended']],
+  echo:[['fp7','Policy diff'],['finco','Comparison'],['cta-qf','TLD memory']],
+  orion:[['mgrow','Pause armed'],['amit','Fail closed'],['enf-fp','On the record']],
+  finco:[['priya','Director'],['bkc','Unique address'],['hdr-clean','Headers']],
+  halcyon:[['b-hmob','Open concern'],['b-hbank','KYC origin'],['sig-consent','Collections gap']],
+  dpay:[['rajesh','Shared director'],['andheri','Farm'],['pan1','Shared PAN'],['tpl-sim','Similar text']],
+  qcredit:[['rajesh','Shared director'],['andheri','Farm'],['b-yono','Hijack'],['cta-yono','Blacklisted CTA'],['pan1','Shared PAN']],
+  mgrow:[['rajesh','Shared director'],['amit','Shared director'],['andheri','Farm'],['pan2','Shared PAN'],['cta-qf','Phishing CTA'],['hdr-bad','Headers'],['comp-mg','Complaints'],['vol-zero','No traffic']],
+  lotus:[['amit','Shared director'],['pan2','Shared PAN'],['b-lotus','Brand'],['cta-lotus','Blacklisted CTA']],
+  vantage:[['fp7','Origin of the alert'],['fpc8','Loan text also here']],
+  ivory:[['fpc8','Origin of the loan'],['fp7','Live clone']],
+  monarch:[['fp19','Origin of the draw'],['fp7','Re-filed the alert']],
+  lumen:[['fpc8','Near match of the loan']],
+  'b-hbank':[['fp5b','Origin'],['halcyon','Enterprise']],
+  'b-hmob':[['fp7','Near match'],['iss-scam','Reported sign-in copies'],['halcyon','Enterprise']],
+  'b-yono':[['cta-yono','Domain series'],['qcredit','Filed by']],
+  'b-lotus':[['cta-lotus','Domain'],['lotus','Enterprise']],
+  'b-vwallet':[['fp7','Origin brand'],['vantage','Enterprise']],
+  'b-ivory':[['fp7','Still sending'],['ivory','Enterprise']],
+  'b-meridian':[['fp5b','Clone of the KYC notice']],
+  'b-monarch':[['fp19','Lucky-draw brand'],['monarch','Enterprise']],
+  'b-lumen':[['fpc8','Loan near match'],['lumen','Enterprise']],
+  fp7:[['vantage','Origin, 1,240 attempts'],['b-ivory','Live clone'],['b-hmob','Near match'],['monarch','Re-filed under a new name'],['enf-fp','Network block']],
+  fp19:[['monarch','Origin'],['enf-fp','Same block pattern']],
+  fpc8:[['ivory','Origin'],['vantage','Also filed'],['lumen','Near match']],
+  fp5b:[['b-hbank','Origin'],['b-meridian','Clone']],
+  'cta-lotus':[['lotus','In templates'],['b-lotus','Brand']],
+  'cta-yono':[['qcredit','In templates'],['b-yono','Brand hijack']],
+  'cta-qf':[['mgrow','In templates']],
+  'tpl-sim':[['dpay','Same campaign'],['qcredit','Same campaign'],['mgrow','Same campaign']],
+  rajesh:[['dpay','Watch'],['qcredit','High'],['mgrow','Critical']],
+  amit:[['mgrow','Critical'],['lotus','Blacklisted']],
+  priya:[['finco','Clean'],['dpay','The other director is the risk']],
+  andheri:[['dpay','On the farm'],['qcredit','On the farm'],['mgrow','On the farm']],
+  bkc:[['finco','Only resident']],
+  pan1:[['dpay','Holder'],['qcredit','Holder']],
+  pan2:[['mgrow','Holder'],['lotus','Holder']],
+  'hdr-bad':[['mgrow','8 of 12']],
+  'hdr-clean':[['finco','0 of 45']],
+  'links-look':[['b-hmob','Reported here'],['iss-scam','Same pattern']],
+  'comp-mg':[['mgrow','18.2 per header']],
+  'sig-consent':[['halcyon','Collections']],
+  'vol-zero':[['mgrow','Twelve months']],
+  'scam-rep':[['b-hmob','Reported brand']],
+  'enf-fp':[['fp7','Fingerprint'],['content','Where blocks live']],
+  'enf-domains':[['cta-yono','Stopped'],['cta-lotus','Stopped'],['cta-qf','Stopped']],
+  'lob-prepaid':[['b-hmob','Brand'],['scam-rep','Signal']],
+  'iss-scam':[['b-hmob','Brand'],['links-look','Channel']],
+  'iss-headers':[['b-hmob','Brand'],['hdr-bad','The worse version of this pattern']],
+  'fp7-var':[['fp7','94% the same text'],['b-hmob','Filed here']],
+  'n-comp':[['comp-mg','Signal']], 'n-zero':[['vol-zero','Signal']], 'n-yono':[['cta-yono','Content']], 'n-clone':[['fp7','Content']],
+  'a-dir':[['rajesh','Identity']], 'a-farm':[['andheri','Identity']], 'a-tpl':[['tpl-sim','Content']], 'a-pan':[['pan2','Identity']],
+  'v-net':[['fp7','Content'],['enf-fp','Action']], 'v-pause':[['sig-consent','Signal']], 'v-esc':[['lotus','Enterprise']], 'v-cause':[['b-hmob','Brand']],
+  'e-rename':[['fp7','The diff']], 'e-tld':[['cta-qf','Example']], 'e-clean':[['finco','Anchor']], 'e-warn':[['b-hmob','Warn']],
+  'o-pause':[['mgrow','Armed']], 'o-guard':[['amit','Director rule']], 'o-trail':[['enf-fp','Record']], 'o-twin':[['sig-consent','Rule to try']]
+};
+Object.entries(LINK).forEach(([id, rows]) => { if (N[id]) N[id].links = rows.map(([to,rel]) => ({to, rel})); });
+
+const MET = {
+  consent:[['Coverage','91.4%'],['Sends held','2.1M'],['Open fingerprints','4'],['Loop time','6.2h']],
+  content:[['Share of gravity','27%'],['Open fingerprints','4'],['Still sending','3'],['CTAs blocked','3']],
+  enterprise:[['Share of gravity','24%'],['In this sample','10'],['Critical or blocked','2'],['Clean anchor','FinCo']],
+  brand:[['Share of gravity','18%'],['Impersonations','2'],['Hijack domains','11'],['Rabbit hole','Mobile']],
+  loopy:[['Place','Inner ring'],['Agents','5'],['Pauses armed','1'],['Memory','On']],
+  fp7:[['Blocked','29 Sep'],['Origin attempts','1,240'],['Clones in sample','3'],['Match','On the text']],
+  mgrow:[['Trust','12'],['Shell score','87'],['Headers blocked','67%'],['Complaints','18.2']],
+  finco:[['Trust','78'],['Shell score','15'],['Headers blocked','0'],['Volume','2.3M/mo']],
+  'b-yono':[['Offense','SBI hijack'],['Domains','11'],['Filed by','QuickCredit'],['State','Blocked']],
+  rajesh:[['DIN','08123456'],['Enterprises','3'],['Span','Watch to critical'],['New firm','Escalate']],
+  andheri:[['Entities','3'],['Pattern','Address farm'],['Signal','F8 +5'],['City','Mumbai']],
+  lotus:[['Trust','5'],['Shell score','95'],['State','Blacklisted'],['Shared with','MoneyGrow']]
+};
+Object.entries(MET).forEach(([id, rows]) => { N[id].metrics = rows.map(([k,v]) => ({k, v})); });
+N.content.share = 27; N.enterprise.share = 24; N.brand.share = 18; N.identity.share = 12; N.signal.share = 9; N.channel.share = 6; N.enforcement.share = 4;
+
+const NOTES = {
+  consent:{
+    nova:'Four fingerprints moved after a block. MoneyGrow’s complaint rate is still the loudest signal. FinCo is quiet, and that quiet is useful.',
+    atlas:'The same text is crossing brand and enterprise lines. Rajesh Kumar ties three firms together. The Andheri address is one farm. I read that as one network.',
+    vega:'Block FP-7A3C across every enterprise, including near matches. Do not pause FinCo. Ask Halcyon Mobile to explain the look-alike links.',
+    echo:'A rename is not a new template. The autobiography should reject a fingerprint this org has already blocked.',
+    orion:'Pause is armed for MoneyGrow only. A new firm with Amit Verma as director stops for review. Everyone else stays in motion.'
+  },
+  fp7:{
+    nova:'Blocked on 29 Sep. Vantage is the origin. Ivory Housing is still sending it. Halcyon Mobile filed a near match. Monarch re-filed it under a new name.',
+    atlas:'The match is on the text, not the template title. A new name does not make it a different message.',
+    vega:'Reject the text and its near matches across every enterprise and brand. Then trace the shared sender.',
+    echo:'Write the diff: a block on one brand does not stop the others. The next loop should assume reuse.',
+    orion:'If a clone is still sending after the network block is in force, this becomes a pause. Until then I watch, and the block stands.'
+  },
+  mgrow:{
+    nova:'Zero traffic for twelve months, 8 of 12 headers blacklisted, 18.2 complaints per header. The registration is awake. The business is not.',
+    atlas:'This is the center of the shell: shared director, shared address, shared PAN, shared text, and a blacklisted CTA.',
+    vega:'Stop delivery. The domain quickfinance.icu stays blocked. A new header from this firm is not a fresh start.',
+    echo:'Remember the shape, not only the name. Zero volume plus a high blacklist rate is a dormant shell.',
+    orion:'I recommend the pause. Anything new that shares Amit Verma or this PAN fails closed.'
+  },
+  loopy:{
+    nova:'I sit on the signal side of the ring. Complaints, dead volume, and new clones reach me before they reach a dashboard.',
+    atlas:'I do not draw a second graph. I say what the chords already show, and how sure we are.',
+    vega:'I turn a reading into one next step. Block, ask, pause, or leave it alone.',
+    echo:'I keep the policy diff. The org should not have to rediscover that a blocked text came back under a new name.',
+    orion:'I am the only one who pauses the others. A guardrail is a rule with a trace, not a person in a chat box.'
+  },
+  'b-yono':{
+    nova:'The domains arrived as a series, yono8 and its neighbours, not as a one-off typo.',
+    atlas:'This is an SBI brand hijack filed through QuickCredit. The brand node and the CTA node are the same offense.',
+    vega:'Keep the domains blocked and tie any new YONO-shaped domain to this node before it sends.',
+    echo:'Store the series pattern. A single-domain block would have missed the rest.',
+    orion:'No separate pause. The blocklist is the control. QuickCredit stays on a short review because it filed these.'
+  }
+};
+
+function metricsFor(n){
+  if (n.metrics) return n.metrics;
+  return [
+    {k:'Heat', v:String(n.heat)},
+    {k:'State', v:RISK_LABEL[n.risk] || n.risk},
+    {k:'Known', v:FULL[n.since].split(' ')[0]},
+    {k:'Kind', v:n.kind}
+  ];
+}
+function actionFor(n){
+  if (NOTES[n.id] && NOTES[n.id].vega) return NOTES[n.id].vega;
+  if (n.risk==='block' || n.risk==='crit') return 'Block the shared text network-wide and trace the sender. Orion can pause the firm if it keeps sending.';
+  if (n.risk==='high') return 'Ask the brand to explain, and hold the affected templates until the answer arrives.';
+  if (n.risk==='watch') return 'Leave it on Nova’s watch. Do not pause. Echo writes the pattern down.';
+  return 'No action. Echo keeps it as a clean comparison.';
+}
+function speak(n, agent){
+  if (NOTES[n.id] && NOTES[n.id][agent]) return NOTES[n.id][agent];
+  if (agent==='nova') return 'Signal: ' + n.summary;
+  if (agent==='atlas') return 'Reading: ' + n.summary;
+  if (agent==='vega') return actionFor(n);
+  if (agent==='echo') return 'Memory: keep ' + n.name + ' in the autobiography so the next loop starts from here, not from zero.';
+  return (n.risk==='crit' || n.risk==='block')
+    ? 'Pause is available. A new registration that touches this node stops for review.'
+    : 'No pause. Leave a trace and let the field keep moving.';
+}
+
+const KIDS = {
+  consent:['content','enterprise','brand','identity','channel','signal','enforcement'],
+  loopy:['nova','atlas','vega','echo','orion'],
+  nova:['n-comp','n-zero','n-yono','n-clone'],
+  atlas:['a-dir','a-farm','a-tpl','a-pan'],
+  vega:['v-net','v-pause','v-esc','v-cause'],
+  echo:['e-rename','e-tld','e-clean','e-warn'],
+  orion:['o-pause','o-guard','o-trail','o-twin'],
+  content:['fp7','fp19','fpc8','fp5b','cta-lotus','cta-yono','cta-qf','tpl-sim'],
+  enterprise:['finco','halcyon','dpay','qcredit','mgrow','lotus','vantage','ivory','monarch','lumen'],
+  brand:['b-hbank','b-hmob','b-yono','b-lotus','b-vwallet','b-ivory','b-meridian','b-monarch','b-lumen'],
+  identity:['rajesh','amit','priya','andheri','bkc','pan1','pan2'],
+  channel:['hdr-bad','hdr-clean','voice-h','links-look','domains-unreg'],
+  signal:['comp-mg','sig-consent','vol-zero','scam-rep','dnd-promo'],
+  enforcement:['enf-fp','enf-notice','enf-domains','enf-audit','enf-retire'],
+  halcyon:['b-hbank','b-hmob','b-hretail','b-hinsure','b-htravel'],
+  'b-hmob':['lob-prepaid','iss-scam','iss-headers','fp7-var'],
+  mgrow:['hdr-bad','cta-qf','comp-mg','vol-zero','rajesh','andheri'],
+  qcredit:['b-yono','cta-yono','rajesh','pan1'],
+  lotus:['b-lotus','cta-lotus','amit','pan2']
+};
+function kidsOf(id){
+  if (id==='consent') return KIDS.consent.concat(['loopy']);
+  return (KIDS[id] || []).slice();
+}
+function pathFromRoot(id){
+  if (id==='consent') return ['consent'];
+  const q = [['consent']];
+  const seen = new Set(['consent']);
+  while (q.length){
+    const path = q.shift();
+    for (const k of kidsOf(path[path.length-1])){
+      if (seen.has(k)) continue;
+      const next = path.concat(k);
+      if (k===id) return next;
+      seen.add(k);
+      q.push(next);
+    }
+  }
+  return null;
+}
+
+const EVENTS = [
+  {id:'ev-farm', m:8, name:'Address farm flagged', focus:'andheri'},
+  {id:'ev-yono', m:9, name:'YONO domains stopped', focus:'cta-yono'},
+  {id:'ev-fp7', m:10, name:'FP-7A3C blocked', focus:'fp7'},
+  {id:'ev-draw', m:11, name:'Lucky-draw text returns', focus:'fp19'},
+  {id:'ev-loan', m:11, name:'Loan text crosses brands', focus:'fpc8'},
+  {id:'ev-kyc', m:11, name:'KYC notice cloned', focus:'fp5b'}
+];
+
+const S = {mode:'depth', stack:['consent'], sel:'consent', agent:'auto', month:11, follow:'ev-fp7', miss:false};
+const P = {};
+const nodeEls = new Map();
+const edgeEls = new Map();
+let userMoved = false, booted = false, raf = 0;
+const cam = {x:0,y:0,k:1,tx:0,ty:0,tk:1};
+
+const world = $('#world'), edgesG = $('#edges'), nodesG = $('#nodes'), field = $('#field');
+const orbit = $('#orbit'), loopyTag = $('#loopyTag');
+(function placeTag(){
+  const [x,y] = polar(0,0,ORBIT_R+34,168);
+  loopyTag.setAttribute('transform', `translate(${x},${y})`);
+  orbit.setAttribute('r', ORBIT_R);
+})();
+
+function voiceAgent(){
+  if (S.sel && N[S.sel] && N[S.sel].kind==='agent') return S.sel;
+  return S.agent==='auto' ? AUTO[S.mode] : S.agent;
+}
+function followSet(){
+  const ev = EVENTS.find(e => e.id===S.follow) || EVENTS[0];
+  const set = new Set(['consent','loopy','nova','atlas','vega','echo','orion']);
+  const addPath = id => (pathFromRoot(id) || []).forEach(x => set.add(x));
+  addPath(ev.focus);
+  set.add(ev.focus);
+  (N[ev.focus].links||[]).forEach(l => { set.add(l.to); addPath(l.to); });
+  return set;
+}
+function opacityFor(id){
+  const n = N[id];
+  let o = 1;
+  if (n.since > S.month) o *= 0.14;
+  if (S.mode==='follow' && !followSet().has(id)) o *= 0.1;
+  if (S.mode==='event'){
+    const hot = n.heat>=68 || n.since>=10 || id==='consent' || PRIMARY.has(id) || n.kind==='agent' || n.kind==='loopy';
+    if (!hot) o *= 0.3;
+  }
+  return o;
+}
+function hex(h){ const n = parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function mix(a,b,t){ const A=hex(a), B=hex(b); return `rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`; }
+function heatColor(h){ return h<50 ? mix('#1f6bff','#e4b86a',h/50) : mix('#e4b86a','#ff4d5e',(h-50)/50); }
+
+function ghostAngles(items, count){
+  const angs = items.map(i => i.deg).filter(d => typeof d==='number').map(norm).sort((a,b)=>a-b);
+  if (!angs.length) return Array.from({length:count}, (_,i) => -90 + i*360/count);
+  const gaps = [];
+  for (let i=0;i<angs.length;i++){
+    const a = angs[i];
+    const b = i+1===angs.length ? angs[0]+360 : angs[i+1];
+    gaps.push({a, span:b-a});
+  }
+  gaps.sort((x,y)=>y.span-x.span);
+  const total = gaps.reduce((s,g)=>s+g.span,0) || 1;
+  let left = count;
+  const spots = [];
+  gaps.forEach((g,gi) => {
+    if (!left) return;
+    if (g.span < 26 && spots.length) return;
+    let n = gi===gaps.length-1 ? left : Math.max(1, Math.round(count * g.span / total));
+    n = Math.min(n, left);
+    for (let k=1;k<=n;k++) spots.push(g.a + g.span * (k/(n+1)));
+    left -= n;
+  });
+  let fill = 0;
+  while (spots.length < count){ spots.push(norm((angs[0]||0) + (++fill)*23)); }
+  return spots.slice(0, count);
+}
+function addGhosts(items){
+  const placed = new Set(items.map(i => i.id));
+  if (!S.sel || !N[S.sel]) return;
+  const extras = [];
+  const push = id => {
+    if (!id || !N[id] || placed.has(id) || extras.includes(id) || extras.length>=5) return;
+    extras.push(id);
+  };
+  (N[S.sel].links||[]).forEach(l => push(l.to));
+  if (!extras.length) return;
+  const spots = ghostAngles(items, extras.length);
+  const maxR = items.reduce((m,i) => Math.max(m, Math.hypot(i.x,i.y)), 0);
+  const gr = maxR + 132;
+  extras.forEach((id,i) => {
+    const deg = spots[i];
+    const [x,y] = polar(0,0,gr,deg);
+    items.push({id, x, y, r:14, role:'ghost', deg, share:0});
+  });
+}
+function layoutItems(){
+  const center = S.stack[S.stack.length-1];
+  const items = [];
+  if (center==='consent'){
+    items.push({id:'consent', x:0, y:0, r:56, role:'core', deg:null, share:0});
+    Object.entries(AGENT_POS).forEach(([id,pos]) => {
+      const [x,y] = polar(0,0,ORBIT_R,pos.deg);
+      items.push({id, x, y, r:17, role:'agent', deg:pos.deg, share:0});
+    });
+    KIDS.consent.forEach(id => {
+      const pos = HUB_POS[id];
+      const [x,y] = polar(0,0,pos.r,pos.deg);
+      items.push({id, x, y, r:PRIMARY.has(id)?30:22, role:'hub', deg:pos.deg, share:N[id].share||0});
+    });
+  } else {
+    const kids = kidsOf(center).filter(id => N[id]);
+    items.push({id:center, x:0, y:0, r:42, role:'center', deg:null, share:0});
+    const R = kids.length > 8 ? 214 : 186;
+    kids.forEach((id,i) => {
+      const deg = -90 + (kids.length ? i * (360/kids.length) : 0);
+      const [x,y] = polar(0,0,R,deg);
+      items.push({id, x, y, r:kids.length>9?15:18, role:'leaf', deg, share:0});
+    });
+  }
+  addGhosts(items);
+  return items;
+}
+function edgeList(items){
+  const by = Object.fromEntries(items.map(i => [i.id, i]));
+  const center = S.stack[S.stack.length-1];
+  const E = [];
+  const covered = new Set();
+  const add = e => {
+    const key = [e.a,e.b].sort().join('|');
+    if (e.kind!=='ray' && covered.has(key)) return;
+    if (e.kind!=='ray') covered.add(key);
+    if (!by[e.a] || !by[e.b]) return;
+    E.push(e);
+  };
+  items.forEach(it => {
+    if (it.id===center || it.role==='ghost') return;
+    if (N[it.id].kind==='agent' && center==='consent') return;
+    const share = N[it.id].share || 10;
+    add({a:center, b:it.id, kind:'ray', w: it.role==='hub' ? 0.8 + share/18 : 1.15, primary:PRIMARY.has(it.id)});
+  });
+  if (S.mode==='diag' && center==='consent'){
+    HUB_ARCS.forEach(([a,b]) => add({a, b, kind:'chord'}));
+    AGENT_ARCS.forEach(([a,b]) => add({a, b, kind:'agent'}));
+  }
+  const sel = S.sel;
+  if (sel && N[sel]){
+    (N[sel].links||[]).forEach(l => add({a:sel, b:l.to, kind:'focus'}));
+    Object.values(N).forEach(n => (n.links||[]).forEach(l => { if (l.to===sel) add({a:n.id, b:sel, kind:'focus'}); }));
+  }
+  return E;
+}
+
+function makeNode(id){
+  const g = svgEl('g', {class:'node'});
+  g.appendChild(svgEl('circle', {class:'hit', fill:'transparent'}));
+  g.appendChild(svgEl('circle', {class:'ring', fill:'none', 'stroke-width':1.4}));
+  g.appendChild(svgEl('circle', {class:'body'}));
+  g.appendChild(svgEl('circle', {class:'pip', r:4.5, stroke:'#07141c', 'stroke-width':1.4}));
+  g.appendChild(svgEl('text', {class:'mark', 'text-anchor':'middle'}));
+  g.appendChild(svgEl('text', {class:'sub', 'text-anchor':'middle'}));
+  const label = svgEl('text', {class:'label', 'text-anchor':'middle'});
+  g.appendChild(label);
+  g.addEventListener('pointerdown', ev => ev.stopPropagation());
+  g.addEventListener('click', ev => { ev.stopPropagation(); onNode(id, false); });
+  g.addEventListener('dblclick', ev => { ev.stopPropagation(); onNode(id, true); });
+  nodesG.appendChild(g);
+  return g;
+}
+function syncNodes(items){
+  const ids = new Set(items.map(i => i.id));
+  const origin = P[S.stack[S.stack.length-1]] || {x:0,y:0};
+  items.forEach(it => {
+    let p = P[it.id];
+    const o = opacityFor(it.id);
+    if (!p) p = P[it.id] = {x:origin.x||0, y:origin.y||0, r:6, o:0, tx:it.x, ty:it.y, tr:it.r, to:o};
+    else { p.tx=it.x; p.ty=it.y; p.tr=it.r; p.to=o; }
+    p.deg = it.deg; p.role = it.role; p.share = it.share||0; p.ghost = it.role==='ghost';
+    if (!nodeEls.has(it.id)) nodeEls.set(it.id, makeNode(it.id));
+  });
+  Object.keys(P).forEach(id => { if (!ids.has(id)){ P[id].to = 0; P[id].tr = 4; } });
+}
+function syncEdges(list){
+  const next = new Set();
+  list.forEach(e => {
+    const k = e.kind+'|'+e.a+'|'+e.b;
+    next.add(k);
+    if (!edgeEls.has(k)){
+      const path = svgEl('path', {class:'edge'});
+      edgesG.appendChild(path);
+      edgeEls.set(k, {path});
+    }
+    Object.assign(edgeEls.get(k), e);
+  });
+  for (const [k,e] of edgeEls){
+    if (!next.has(k)){ e.path.remove(); edgeEls.delete(k); }
+  }
+}
+function pads(){
+  if (innerWidth < 860) return {l:28, r:28, t:148, b:Math.round(innerHeight*0.42)+96};
+  return {l:248, r:390, t:108, b:132};
+}
+function fit(items, immediate){
+  if (userMoved && booted) return;
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  items.forEach(it => {
+    const r = it.r + 78;
+    minX=Math.min(minX,it.x-r); maxX=Math.max(maxX,it.x+r);
+    minY=Math.min(minY,it.y-r); maxY=Math.max(maxY,it.y+r);
+  });
+  const pad = pads();
+  const vw = Math.max(80, field.clientWidth - pad.l - pad.r);
+  const vh = Math.max(80, field.clientHeight - pad.t - pad.b);
+  const bw = Math.max(80, maxX-minX), bh = Math.max(80, maxY-minY);
+  const k = clamp(Math.min(vw/bw, vh/bh), 0.28, 1.7);
+  const cx=(minX+maxX)/2, cy=(minY+maxY)/2;
+  cam.tx = pad.l + vw/2 - cx*k;
+  cam.ty = pad.t + vh/2 - cy*k;
+  cam.tk = k;
+  if (immediate || RM){ cam.x=cam.tx; cam.y=cam.ty; cam.k=cam.tk; }
+}
+function step(obj, keys, dt){
+  const k = RM ? 1 : 1 - Math.exp(-dt/240);
+  let moved = false;
+  keys.forEach(key => {
+    const t = obj['t'+key];
+    const d = t - obj[key];
+    if (Math.abs(d) < 0.02){ if (d){ obj[key]=t; moved=true; } }
+    else { obj[key] += d*k; moved=true; }
+  });
+  return moved;
+}
+function applyNode(id){
+  const p = P[id], n = N[id], g = nodeEls.get(id);
+  if (!p || !g || !n) return;
+  g.setAttribute('transform', `translate(${p.x.toFixed(1)},${p.y.toFixed(1)})`);
+  g.style.opacity = String(Math.max(0, p.o));
+  g.setAttribute('aria-label', n.name+', '+n.kind);
+  const hot = S.mode==='heat' && id!=='consent';
+  const col = hot ? heatColor(n.heat) : (KIND[n.kind] || '#d5e3ea');
+  const body = g.querySelector('.body');
+  body.setAttribute('r', p.r.toFixed(1));
+  body.setAttribute('fill', id==='consent' ? 'url(#coreg)' : col);
+  body.setAttribute('fill-opacity', id==='consent' ? '1' : (p.ghost ? '0.04' : '0.16'));
+  body.setAttribute('stroke', col);
+  body.setAttribute('stroke-width', id===S.sel ? '2.6' : '1.3');
+  body.setAttribute('stroke-dasharray', p.ghost ? '3 3' : '');
+  body.setAttribute('filter', (id==='consent' || id===S.sel) ? 'url(#bloom)' : 'none');
+  const ring = g.querySelector('.ring');
+  ring.setAttribute('r', (p.r+8).toFixed(1));
+  ring.setAttribute('stroke', id===S.sel ? '#e4b86a' : 'transparent');
+  const pip = g.querySelector('.pip');
+  const show = RISK[n.risk] && p.r>12;
+  pip.style.display = show ? '' : 'none';
+  if (show){
+    pip.setAttribute('cx', (p.r*0.62).toFixed(1));
+    pip.setAttribute('cy', (-p.r*0.62).toFixed(1));
+    pip.setAttribute('fill', RISK[n.risk]);
+  }
+  g.querySelector('.hit').setAttribute('r', Math.max(p.r+8, 20).toFixed(1));
+  const mark = g.querySelector('.mark');
+  const label = g.querySelector('.label');
+  const sub = g.querySelector('.sub');
+  if (id==='consent'){
+    mark.textContent = '';
+    label.setAttribute('class','label core');
+    label.setAttribute('x','0'); label.setAttribute('y','2');
+    label.textContent = 'Consent';
+    sub.textContent = 'Loopy governs';
+    sub.setAttribute('x','0'); sub.setAttribute('y','24');
+    sub.style.display = '';
+  } else if (p.role==='center'){
+    sub.style.display = 'none';
+    mark.setAttribute('y','4');
+    mark.textContent = n.mark;
+    label.textContent = '';
+    label.dataset.key = '';
+  } else {
+    sub.style.display = 'none';
+    label.setAttribute('class','label');
+    mark.setAttribute('y','4');
+    mark.textContent = p.r>=16 ? n.mark : '';
+    const a = (p.deg||0) * Math.PI/180;
+    const c = Math.cos(a), s = Math.sin(a);
+    const dist = p.r + 22;
+    let x = c * dist, y = s * dist;
+    if (c > 0.45){ label.setAttribute('text-anchor','start'); y += 4; }
+    else if (c < -0.45){ label.setAttribute('text-anchor','end'); y += 4; }
+    else { label.setAttribute('text-anchor','middle'); y += s < 0 ? -6 : 14; }
+    label.setAttribute('x', x.toFixed(1));
+    label.setAttribute('y', y.toFixed(1));
+    setLabel(label, n.name, p.share);
+  }
+}
+function setLabel(label, name, share){
+  const key = name+'|'+(share||'');
+  if (label.dataset.key===key) return;
+  label.dataset.key = key;
+  label.textContent = '';
+  label.appendChild(document.createTextNode(name));
+  if (share){
+    const t = svgEl('tspan', {class:'pct'});
+    t.textContent = '  '+share+'%';
+    label.appendChild(t);
+  }
+}
+function applyEdges(){
+  edgeEls.forEach(e => {
+    const a = P[e.a], b = P[e.b];
+    if (!a || !b){ e.path.style.opacity='0'; return; }
+    const dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy)||1;
+    const x1=a.x+dx/len*(a.r+2), y1=a.y+dy/len*(a.r+2);
+    const x2=b.x-dx/len*(b.r+3), y2=b.y-dy/len*(b.r+3);
+    let d;
+    if (e.kind==='ray'){
+      d = `M${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)}`;
+      e.path.setAttribute('stroke', e.primary ? 'rgba(228,184,106,.9)' : 'rgba(228,184,106,.38)');
+      e.path.setAttribute('stroke-width', String(e.w||1.2));
+    } else {
+      const mx=(x1+x2)/2, my=(y1+y2)/2;
+      const px=-dy/len, py=dx/len;
+      let cx=mx+px*42, cy=my+py*42;
+      if (cx*cx+cy*cy < mx*mx+my*my){ cx=mx-px*42; cy=my-py*42; }
+      d = `M${x1.toFixed(1)},${y1.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`;
+      e.path.setAttribute('stroke', e.kind==='agent' ? 'rgba(196,181,253,.7)' : e.kind==='focus' ? '#e4b86a' : 'rgba(62,200,219,.55)');
+      e.path.setAttribute('stroke-width', e.kind==='focus' ? '1.7' : '1.15');
+      e.path.setAttribute('stroke-dasharray', e.kind==='focus' ? '' : '4 6');
+    }
+    e.path.setAttribute('d', d);
+    e.path.style.opacity = String(Math.max(0.05, Math.min(a.o, b.o)));
+  });
+}
+function applyCam(){
+  world.setAttribute('transform', `translate(${cam.x.toFixed(1)},${cam.y.toFixed(1)}) scale(${cam.k.toFixed(4)})`);
+  const root = S.stack.length===1;
+  orbit.style.opacity = root ? '1' : '0';
+  loopyTag.style.opacity = root ? '1' : '0';
+  loopyTag.style.pointerEvents = root ? 'auto' : 'none';
+}
+function kick(){ if (!raf) raf = requestAnimationFrame(loop); }
+function loop(now){
+  const dt = Math.min(48, now - (loop.last||now));
+  loop.last = now;
+  let moved = false;
+  Object.keys(P).forEach(id => {
+    const p = P[id];
+    if (step(p, ['x','y','r','o'], dt)) moved = true;
+    if (p.to===0 && p.o<0.03){
+      nodeEls.get(id)?.remove();
+      nodeEls.delete(id);
+      delete P[id];
+      moved = true;
+      return;
+    }
+    applyNode(id);
+  });
+  if (step(cam, ['x','y','k'], dt)) moved = true;
+  applyCam();
+  applyEdges();
+  if (moved) raf = requestAnimationFrame(loop);
+  else { raf = 0; loop.last = 0; }
+}
+
+function connections(id){
+  const out = [], seen = new Set();
+  const push = (oid, rel) => {
+    if (!N[oid] || seen.has(oid) || out.length>=8) return;
+    seen.add(oid);
+    out.push({id:oid, rel, name:N[oid].name});
+  };
+  (N[id].links||[]).forEach(l => push(l.to, l.rel));
+  Object.values(N).forEach(n => (n.links||[]).forEach(l => { if (l.to===id) push(n.id, l.rel); }));
+  return out;
+}
+function placeOf(id){
+  const c = S.stack[S.stack.length-1];
+  if (id===c) return 'center';
+  if (c==='consent' && (KIDS.consent.includes(id) || KIDS.loopy.includes(id))) return 'child';
+  if (kidsOf(c).includes(id)) return 'child';
+  return 'ghost';
+}
+function paintCrumb(){
+  const bits = S.stack.map((id,i) => `<button type="button" data-crumb="${i}">${esc(N[id].name)}</button>`);
+  if (S.sel!==S.stack[S.stack.length-1]) bits.push(`<span class="name">${esc(N[S.sel].name)}</span>`);
+  $('#crumb').innerHTML = bits.join('<span class="sep">/</span>');
+}
+function paintModes(){
+  document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('on', b.dataset.mode===S.mode));
+  const mode = MODES.find(m => m.id===S.mode);
+  const extra = S.month<11 ? ` Known by ${FULL[S.month]}.` : '';
+  const title = {event:'Event insights', heat:'Network heatmap', diag:'Zoomed diagnostics', depth:'Sub-levels', follow:'Follow a change'}[S.mode] || '';
+  $('#caption').innerHTML = `<b>${esc(title)}.</b> ${esc((mode?mode.line:'')+extra)} Click a body. Double-click to go deeper. Esc steps back.`;
+}
+function paintTime(){
+  $('#when').textContent = FULL[S.month];
+  $('#months').setAttribute('aria-valuenow', String(S.month));
+  document.querySelectorAll('#months button').forEach((b,i) => b.classList.toggle('on', i===S.month));
+  const list = EVENTS.filter(e => e.m===S.month);
+  $('#evs').innerHTML = list.length
+    ? list.map(ev => `<button type="button" data-ev="${ev.id}" class="${S.mode==='follow' && S.follow===ev.id ? 'on' : ''}">${esc(ev.name)}</button>`).join('')
+    : '<span class="quiet">Nothing new discovered this month</span>';
+}
+function paintChip(){
+  const id = voiceAgent();
+  const [name, role] = AGENT_META[id];
+  const prefix = S.agent==='auto' ? 'Auto · ' : '';
+  $('#agentChip').innerHTML = `${esc(prefix+name)} <small>+4 · ${esc(role)}</small>`;
+}
+function paint(){
+  paintCrumb(); paintModes(); paintTime(); paintChip();
+  const n = N[S.sel];
+  const home = S.sel==='consent' && S.stack.length===1;
+  $('#metrics').innerHTML = `
+    <div class="eyebrow">${home ? 'Summary · sample field' : 'Summary'}</div>
+    <div class="metrics">${metricsFor(home?N.consent:n).map(m => `<div><small>${esc(m.k)}</small><b>${esc(m.v)}</b></div>`).join('')}</div>`;
+  if (home){
+    $('#detail').innerHTML = `
+      <div class="eyebrow">Orchestration</div>
+      <h2>Consent at the center. Loopy on the ring.</h2>
+      <p>A statute map puts one constitution in the middle and files everything else as a topic. This org does not work that way. Consent is the center, because a send that cannot show consent does not leave. Loopy is not another department. It is the ring that governs the field. Content, Enterprise, and Brand are the three bodies that move risk. Identity, channel, signal, and enforcement stay quieter until a diagnosis pulls them in.</p>
+      <ol class="principles">
+        <li><b>01</b><span>Gold rays are primacy. They mark what consent allows, not a decoration.</span></li>
+        <li><b>02</b><span>Nova watches, Atlas reads, Vega chooses, Echo remembers, Orion can pause the rest.</span></li>
+        <li><b>03</b><span>Content, Enterprise, and Brand carry the mass. The other hubs answer to them.</span></li>
+        <li><b>04</b><span>Chords cross the tree. A blocked text under a second brand stays visible.</span></li>
+        <li><b>05</b><span>Sub-levels leave a breadcrumb, so the rabbit hole has a way back.</span></li>
+      </ol>
+      <div class="enters">
+        <button class="btn pri" type="button" data-go="content" data-dive="1">Enter Content</button>
+        <button class="btn" type="button" data-go="enterprise" data-dive="1">Enter Enterprise</button>
+        <button class="btn" type="button" data-go="brand" data-dive="1">Enter Brand</button>
+        <button class="btn" type="button" data-go="loopy" data-dive="1">Enter Loopy</button>
+      </div>`;
+  } else {
+    const cons = connections(S.sel);
+    const where = placeOf(S.sel);
+    const buttons = [];
+    if (kidsOf(S.sel).length && where!=='center') buttons.push(`<button class="btn pri" type="button" data-act="dive">Open sub-level</button>`);
+    if (where==='ghost') buttons.push(`<button class="btn" type="button" data-act="place">Place in its domain</button>`);
+    if (S.stack.length>1 || S.sel!==S.stack[S.stack.length-1]) buttons.push(`<button class="btn" type="button" data-act="back">Back</button>`);
+    $('#detail').innerHTML = `
+      <div class="eyebrow">${esc(n.kind)} · ${esc(RISK_LABEL[n.risk] || n.risk)}</div>
+      <h2>${esc(n.name)}</h2>
+      <p>${esc(n.summary)}</p>
+      <div class="links">${cons.map(c => `<button class="linkrow" type="button" data-go="${esc(c.id)}"><b>${esc(c.name)}</b><span>${esc(c.rel)}</span></button>`).join('')}</div>
+      <div class="rowbtns">${buttons.join('')}</div>`;
+  }
+  const agent = voiceAgent();
+  const [an, ar] = AGENT_META[agent];
+  const subject = N[S.sel];
+  $('#loopy').innerHTML = `
+    <div class="eyebrow">Loopy · ${esc(ar)}</div>
+    <div class="switch" role="group" aria-label="Loopy agent">
+      ${['auto','nova','atlas','vega','echo','orion'].map(id => `<button type="button" data-agent="${id}" class="${S.agent===id?'on':''}">${id==='auto'?'Auto':AGENT_META[id][0]}</button>`).join('')}
+    </div>
+    <p class="quote">${esc(speak(subject, agent))}</p>
+    ${speak(subject, agent)===actionFor(subject) ? '' : `<p class="next"><b>Next step.</b> ${esc(actionFor(subject))}</p>`}
+    <p class="next"><b>Speaking as ${esc(an)}</b> about ${esc(subject.name)}. Sample data, not a live order.</p>
+    ${S.miss ? '<p class="next">Try a fingerprint, YONO, Rajesh Kumar, the address farm, or MoneyGrow.</p>' : ''}
+    <p class="foot">Illustrative sample from the enterprise trust map and the ConsentOS graph. Nothing here sends, blocks, or pauses for real.</p>`;
+}
+
+function commit(light){
+  const items = layoutItems();
+  syncNodes(items);
+  syncEdges(edgeList(items));
+  fit(items, !booted);
+  if (!booted){
+    Object.values(P).forEach(p => { p.x=p.tx; p.y=p.ty; p.r=p.tr; p.o=p.to; });
+    cam.x=cam.tx; cam.y=cam.ty; cam.k=cam.tk;
+    booted = true;
+  }
+  if (light){ paintModes(); paintTime(); }
+  else paint();
+  kick();
+}
+function onNode(id, dive){
+  S.miss = false;
+  if (dive && kidsOf(id).length){
+    const last = S.stack[S.stack.length-1];
+    let path = id===last ? S.stack.slice() : kidsOf(last).includes(id) ? S.stack.concat(id) : pathFromRoot(id);
+    if (path){ S.stack = path; S.sel = id; userMoved = false; commit(); }
+    return;
+  }
+  S.sel = id;
+  commit();
+}
+function focusPlaced(id){
+  const last = S.stack[S.stack.length-1];
+  let path = kidsOf(last).includes(id) ? S.stack.concat(id) : pathFromRoot(id);
+  if (!path) return;
+  const hubs = new Set(['content','enterprise','brand','identity','channel','signal','enforcement','loopy']);
+  if (hubs.has(id) && kidsOf(id).length){ S.stack = path; S.sel = id; }
+  else {
+    S.stack = path.slice(0,-1);
+    if (!S.stack.length) S.stack = ['consent'];
+    S.sel = id;
+  }
+  userMoved = false;
+  commit();
+}
+function back(){
+  if (S.sel !== S.stack[S.stack.length-1]){ S.sel = S.stack[S.stack.length-1]; commit(); return; }
+  if (S.stack.length>1){ S.stack.pop(); S.sel = S.stack[S.stack.length-1]; userMoved = false; commit(); }
+}
+function setMode(id){
+  S.mode = id;
+  if (id==='follow' && !S.follow) S.follow = 'ev-fp7';
+  userMoved = false;
+  commit();
+}
+function setMonth(m){
+  m = clamp(m,0,11);
+  if (m===S.month) return;
+  S.month = m;
+  commit(true);
+}
+function ask(q){
+  const s = q.trim().toLowerCase();
+  if (!s) return;
+  const rules = [
+    [/fp-?\s?7|verification alert|fingerprint|blocked template|reuse|still sending/, 'fp7'],
+    [/yono|hijack/, 'b-yono'],
+    [/lotus/, 'lotus'],
+    [/rajesh|director/, 'rajesh'],
+    [/andheri|address farm|\bfarm\b/, 'andheri'],
+    [/money\s?grow/, 'mgrow'],
+    [/finco|clean anchor/, 'finco'],
+    [/consent gap|coverage/, 'sig-consent'],
+    [/orion|pause/, 'orion'],
+    [/nova/, 'nova'], [/vega|next step/, 'vega'], [/echo|remember/, 'echo'], [/atlas/, 'atlas'],
+    [/halcyon mobile|look-?alike/, 'b-hmob'],
+    [/halcyon/, 'halcyon'],
+    [/quick\s?credit/, 'qcredit'],
+    [/pan|bbacg|aaacf/, 'pan2'],
+    [/header/, 'hdr-bad'],
+    [/loopy|the ring/, 'loopy'],
+    [/^content$/, 'content'], [/enterprise/, 'enterprise'], [/^brand$/, 'brand'],
+    [/enforcement|blocklist/, 'enforcement'], [/channel|sender/, 'channel'], [/identity/, 'identity'],
+    [/signal|complaint/, 'signal']
+  ];
+  if (/^consent$|back to the cent/.test(s)){
+    S.stack=['consent']; S.sel='consent'; S.miss=false; userMoved=false; commit(); return;
+  }
+  let id = null;
+  for (const [re, dest] of rules) if (re.test(s)){ id = dest; break; }
+  if (!id || !N[id]){ S.miss = true; paint(); return; }
+  S.miss = false;
+  if (/fingerprint|reuse|yono|director|farm|hijack|still sending/.test(s)) S.mode = 'diag';
+  focusPlaced(id);
+}
+
+document.body.addEventListener('click', ev => {
+  const mode = ev.target.closest('[data-mode]');
+  if (mode){ setMode(mode.dataset.mode); return; }
+  const agent = ev.target.closest('[data-agent]');
+  if (agent){ S.agent = agent.dataset.agent; paint(); return; }
+  const crumb = ev.target.closest('[data-crumb]');
+  if (crumb){
+    const i = +crumb.dataset.crumb;
+    S.stack = S.stack.slice(0, i+1);
+    S.sel = S.stack[S.stack.length-1];
+    userMoved = false;
+    commit();
+    return;
+  }
+  const month = ev.target.closest('[data-month]');
+  if (month){ setMonth(+month.dataset.month); return; }
+  const evb = ev.target.closest('[data-ev]');
+  if (evb){
+    const item = EVENTS.find(x => x.id===evb.dataset.ev);
+    S.follow = item.id; S.mode = 'follow'; S.month = Math.max(S.month, item.m);
+    focusPlaced(item.focus);
+    return;
+  }
+  const go = ev.target.closest('[data-go]');
+  if (go){
+    const id = go.dataset.go;
+    if (go.dataset.dive==='1'){
+      const path = pathFromRoot(id);
+      if (path){
+        S.stack = kidsOf(id).length ? path : path.slice(0,-1);
+        if (!S.stack.length) S.stack=['consent'];
+        S.sel = id; S.miss=false; userMoved=false; commit();
+      }
+    } else {
+      S.miss = false;
+      if (S.mode==='depth') S.mode = 'diag';
+      focusPlaced(id);
+    }
+    return;
+  }
+  const act = ev.target.closest('[data-act]');
+  if (!act) return;
+  if (act.dataset.act==='home'){ S.stack=['consent']; S.sel='consent'; S.mode='depth'; S.miss=false; userMoved=false; commit(); }
+  if (act.dataset.act==='back') back();
+  if (act.dataset.act==='dive') onNode(S.sel, true);
+  if (act.dataset.act==='place') focusPlaced(S.sel);
+  if (act.dataset.act==='cycle'){
+    const order = ['auto','nova','atlas','vega','echo','orion'];
+    S.agent = order[(order.indexOf(S.agent)+1) % order.length];
+    paint();
+  }
+});
+$('#askForm').addEventListener('submit', ev => { ev.preventDefault(); ask($('#askIn').value); });
+loopyTag.addEventListener('click', ev => {
+  ev.stopPropagation();
+  S.stack = ['consent','loopy']; S.sel = 'loopy'; userMoved = false; commit();
+});
+loopyTag.addEventListener('keydown', ev => { if (ev.key==='Enter') loopyTag.click(); });
+
+let drag = null, movedPx = 0, scrub = false;
+field.addEventListener('pointerdown', ev => {
+  if (ev.target.closest('.node') || ev.target.closest('#loopyTag')) return;
+  drag = {x:ev.clientX, y:ev.clientY, cx:cam.x, cy:cam.y};
+  movedPx = 0;
+  field.classList.add('drag');
+  field.setPointerCapture(ev.pointerId);
+});
+field.addEventListener('pointermove', ev => {
+  if (!drag) return;
+  const dx = ev.clientX-drag.x, dy = ev.clientY-drag.y;
+  movedPx += Math.abs(dx)+Math.abs(dy);
+  cam.x = cam.tx = drag.cx + dx;
+  cam.y = cam.ty = drag.cy + dy;
+  userMoved = true;
+  applyCam();
+});
+field.addEventListener('pointerup', () => { drag=null; field.classList.remove('drag'); });
+field.addEventListener('click', ev => {
+  if (movedPx>5) return;
+  if (ev.target.closest('.node') || ev.target.closest('#loopyTag')) return;
+  if (S.sel!==S.stack[S.stack.length-1]){ S.sel = S.stack[S.stack.length-1]; commit(); }
+});
+field.addEventListener('wheel', ev => {
+  ev.preventDefault();
+  const k = clamp(cam.k * (ev.deltaY>0 ? 0.92 : 1.08), 0.25, 3.2);
+  const rect = field.getBoundingClientRect();
+  const mx = ev.clientX-rect.left, my = ev.clientY-rect.top;
+  const wx = (mx-cam.x)/cam.k, wy = (my-cam.y)/cam.k;
+  cam.k = cam.tk = k;
+  cam.x = cam.tx = mx - wx*k;
+  cam.y = cam.ty = my - wy*k;
+  userMoved = true;
+  applyCam();
+}, {passive:false});
+window.addEventListener('keydown', ev => {
+  if (ev.target.matches('input,textarea')){ if (ev.key==='Escape') ev.target.blur(); return; }
+  if (ev.key==='Escape') back();
+  if (ev.key==='Enter') onNode(S.sel, true);
+  if (ev.key==='/'){ ev.preventDefault(); $('#askIn').focus(); }
+  if (ev.key>='1' && ev.key<='5') setMode(['event','heat','diag','depth','follow'][ev.key-1]);
+});
+window.addEventListener('resize', () => { if (!userMoved){ booted = true; fit(layoutItems(), false); kick(); } else applyCam(); drawStars(); });
+
+const months = $('#months');
+months.innerHTML = MONTHS.map((m,i) => {
+  const dot = EVENTS.some(e => e.m===i) ? '<i class="dot"></i>' : '<i class="dot" style="opacity:0"></i>';
+  return `<button type="button" data-month="${i}">${dot}<b>${m}</b><small>${YEARS[i]}</small></button>`;
+}).join('');
+months.addEventListener('pointerdown', ev => { scrub = true; });
+window.addEventListener('pointermove', ev => {
+  if (!scrub) return;
+  const r = months.getBoundingClientRect();
+  setMonth(Math.floor((ev.clientX-r.left)/r.width*12));
+});
+window.addEventListener('pointerup', () => { scrub = false; });
+
+function drawStars(){
+  const c = $('#stars'), dpr = Math.min(devicePixelRatio||1, 2);
+  c.width = innerWidth*dpr; c.height = innerHeight*dpr;
+  const g = c.getContext('2d');
+  g.setTransform(dpr,0,0,dpr,0,0);
+  g.clearRect(0,0,innerWidth,innerHeight);
+  STAR.forEach(s => {
+    g.globalAlpha = s.a;
+    g.fillStyle = s.gold ? '#e4b86a' : '#d5e4ee';
+    g.beginPath();
+    g.arc(s.x*innerWidth, s.y*innerHeight, s.r, 0, 6.3);
+    g.fill();
+  });
+}
+const STAR = Array.from({length:150}, (_,i) => {
+  const n = Math.sin(i*997)*10000, r = n-Math.floor(n);
+  const n2 = Math.sin(i*613)*10000, r2 = n2-Math.floor(n2);
+  const n3 = Math.sin(i*241)*10000, r3 = n3-Math.floor(n3);
+  return {x:r, y:r2, r:r3*1.3+0.3, a:0.15+r*0.55, gold:r3>0.92};
+});
+drawStars();
+
+const bad = [];
+Object.entries(KIDS).forEach(([p, kids]) => {
+  if (!N[p]) bad.push('missing parent '+p);
+  kids.forEach(k => { if (!N[k]) bad.push('missing child '+p+' → '+k); });
+});
+Object.values(N).forEach(n => (n.links||[]).forEach(l => { if (!N[l.to]) bad.push('missing link '+n.id+' → '+l.to); }));
+if (bad.length){
+  const pre = document.createElement('pre');
+  pre.className = 'boom';
+  pre.textContent = bad.join('\n');
+  document.body.appendChild(pre);
+}
+commit();
+})();
+</script>
+</body>
+</html>
