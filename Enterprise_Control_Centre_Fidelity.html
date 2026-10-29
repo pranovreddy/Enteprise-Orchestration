@@ -69,9 +69,9 @@ button{cursor:pointer}
 .hitrow span,.ans{display:block;color:var(--muted);font-size:12px;line-height:1.45}
 .chips{display:flex;flex-wrap:wrap;gap:6px;padding:4px}
 .chipbtn{width:auto;border:1px solid var(--line);border-radius:99px;padding:5px 8px;font-size:12px;color:#345}
-#roles{display:flex;background:#f3f6fa;border-radius:10px;padding:3px;gap:2px}
-#roles button{border:0;background:transparent;height:28px;padding:0 10px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--muted)}
-#roles button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(23,32,51,.08)}
+#roles,#floors{display:flex;background:#f3f6fa;border-radius:10px;padding:3px;gap:2px;flex:none}
+#roles button,#floors button{border:0;background:transparent;height:28px;padding:0 10px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--muted)}
+#roles button.on,#floors button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(23,32,51,.08)}
 .badge{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6a5620;background:#fff6dd;border-radius:99px;padding:5px 8px;white-space:nowrap}
 #demoMenu,#entMenu{
   position:absolute;top:46px;right:0;background:#fff;border:1px solid var(--line);border-radius:12px;
@@ -96,7 +96,7 @@ button{cursor:pointer}
 
 #overlay{position:fixed;inset:0;z-index:8;pointer-events:none}
 .pin{
-  position:absolute;width:22px;height:22px;margin:-26px 0 0 -11px;border:0;border-radius:5px;
+  position:absolute;z-index:6;width:22px;height:22px;margin:-26px 0 0 -11px;border:0;border-radius:5px;
   background:#14181f;color:#fff;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:560;
   display:grid;place-items:center;pointer-events:auto;
   box-shadow:0 8px 16px rgba(20,24,31,.28);
@@ -105,16 +105,18 @@ button{cursor:pointer}
 .pin.crit{background:var(--crit)}
 .pin.on{box-shadow:0 0 0 3px #fff, 0 0 0 5px var(--blue), 0 8px 16px rgba(20,24,31,.28)}
 .wlabel,.brandplate,.tilecap,.baylab,.node{pointer-events:none}
+.wlabel.front{transform:translate(-50%,4px)}
 .wlabel{
-  position:absolute;transform:translate(-50%,-115%);text-align:center;white-space:nowrap;
+  position:absolute;z-index:2;transform:translate(-50%,-115%);text-align:center;white-space:nowrap;
   background:rgba(255,255,255,.94);border:1px solid rgba(23,32,51,.06);border-radius:8px;
   padding:3px 8px 4px;font-size:12px;font-weight:680;letter-spacing:-.01em;color:#172033;
   box-shadow:0 8px 18px rgba(23,32,51,.08)
 }
 .brandplate{
   position:absolute;transform:translate(-50%,8px);display:flex;align-items:center;gap:8px;
-  background:rgba(255,255,255,.96);border:1px solid rgba(23,32,51,.06);border-radius:14px;
-  padding:5px 12px 5px 5px;box-shadow:0 12px 28px rgba(23,32,51,.1);white-space:nowrap
+  background:linear-gradient(90deg, color-mix(in srgb, var(--brand,#4c8dff) 18%, #fff), #fff 46%);
+  border:1px solid color-mix(in srgb, var(--brand,#4c8dff) 42%, #e6ebf2);border-radius:14px;
+  padding:5px 12px 5px 5px;box-shadow:0 12px 28px rgba(23,32,51,.1), inset 3px 0 0 var(--brand,#4c8dff);white-space:nowrap
 }
 .brandplate .mark{width:32px;height:32px;display:grid}
 .brandplate .mark svg{width:32px;height:32px;display:block}
@@ -136,6 +138,16 @@ button{cursor:pointer}
   box-shadow:0 8px 18px rgba(23,32,51,.08);font-size:12px;font-weight:720;letter-spacing:-.01em
 }
 .baylab svg{width:14px;height:14px;display:block}
+.baylab.partlab{
+  transform:translate(-50%,-58%);z-index:3;font-size:11.5px;gap:4px;padding:3px 8px 3px 4px;
+  border:1px solid rgba(23,32,51,.08);background:#fff;color:#172033
+}
+.baylab.partlab.icononly{padding:3px;gap:0}
+.baylab.partlab.icononly b{display:none}
+.baylab.partlab svg{width:13px;height:13px}
+.baylab.partlab.bad{box-shadow:0 8px 16px rgba(23,32,51,.1), inset 3px 0 0 #e23d4a}
+.baylab.partlab.warn{box-shadow:0 8px 16px rgba(23,32,51,.1), inset 3px 0 0 #d4892a}
+.baylab.partlab.dim{opacity:.35}
 .blogo{width:28px;height:28px;flex:none;display:grid}
 .blogo svg{width:28px;height:28px;display:block}
 .brandhead{display:flex;gap:12px;align-items:flex-start;margin-bottom:4px}
@@ -143,10 +155,16 @@ button{cursor:pointer}
 .brandhead h2{margin:2px 0 4px}
 .node{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #2f6bff, 0 0 0 5px rgba(47,107,255,.16)}
 .fcard{
-  position:absolute;width:300px;background:#fff;border-radius:16px;pointer-events:auto;
+  position:absolute;z-index:5;width:300px;background:#fff;border-radius:16px;pointer-events:auto;
   box-shadow:0 18px 50px rgba(23,32,51,.16), 0 0 0 1px rgba(23,32,51,.05);
-  padding:12px 12px 10px;
+  padding:12px 12px 10px
 }
+.fcard.above:after,.fcard.below:after{
+  content:"";position:absolute;width:12px;height:12px;background:#fff;left:var(--caret,150px);
+  transform:translateX(-50%) rotate(45deg);border-radius:2px
+}
+.fcard.above:after{bottom:-6px;box-shadow:3px 3px 6px rgba(23,32,51,.08)}
+.fcard.below:after{top:-6px;box-shadow:-2px -2px 4px rgba(23,32,51,.06)}
 .fcard .row1{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .fcard h3{margin:8px 0 4px;font-size:15px;letter-spacing:-.02em;line-height:1.3;text-transform:none;color:var(--ink)}
 .maplab{position:absolute;transform:translate(-50%,-115%);pointer-events:none;max-width:148px;background:rgba(255,255,255,.94);border:1px solid #e6ebf2;border-radius:10px;padding:5px 8px;box-shadow:0 8px 20px rgba(23,32,51,.08);text-align:left}
@@ -258,8 +276,6 @@ table.grid td{padding:5px 4px;border-top:1px solid #eef2f6}
   position:fixed;z-index:28;left:16px;right:calc(var(--ins) + 16px);top:118px;
   display:flex;justify-content:center;pointer-events:none
 }
-body.has-card #toast{top:304px;left:16px;right:auto;width:300px;justify-content:flex-start}
-body.has-card #toast .box{max-width:300px}
 #toast .box{pointer-events:auto;background:#172033;color:#fff;border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;max-width:560px;box-shadow:0 12px 30px rgba(23,32,51,.25);font-size:13px}
 #toast button{border:0;background:#fff;color:#172033;border-radius:8px;height:28px;padding:0 8px;font-weight:750;font-size:12px}
 #tour{
@@ -321,6 +337,10 @@ body.ins-closed #collapse{left:-44px}
     </div>
   </div>
   <span class="badge">Sample · simulated</span>
+  <div id="floors" role="group" aria-label="Floor detail">
+    <button data-act="floor:overview" class="on" aria-pressed="true" title="Brands and lines of business">Overview</button>
+    <button data-act="floor:detail" aria-pressed="false" title="Brands, lines of business, and the labeled parts inside each line">Detailed</button>
+  </div>
 </header>
 
 <div id="nav">
@@ -448,7 +468,7 @@ const CNSN=['App sign-up','Branch form','Web checkout','IVR opt-in','Partner ref
 function rng(seed){let a=seed>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
 function ri(r,a,b){return a+Math.floor(r()*(b-a+1));}
 
-const S={ent:'aster',level:'ent',brand:null,lob:null,cat:null,asset:null,concern:null,role:'investigator',plan:false,filter:null,sheet:null,tour:null,inspector:true};
+const S={ent:'aster',level:'ent',brand:null,lob:null,cat:null,asset:null,concern:null,role:'investigator',plan:false,detail:false,filter:null,sheet:null,tour:null,inspector:true};
 const cam={tx:80,ty:120,s:1,anim:null};
 let wallK=1, wallTarget=1, SCENE=null, toastTimer=0, askTimer=0;
 const models={};
@@ -477,6 +497,18 @@ function M(){return getModel(S.ent);}
 function lobBy(m,id){return m.lob[id];}
 function issueBy(id){return M().issue[id];}
 function assetBy(id){return M().asset[id];}
+function issueCat(issue){
+  if(!issue) return 'tpl';
+  if(issue.cat && CATS.some(c=>c.id===issue.cat)) return issue.cat;
+  const a=issue.assetIds&&issue.assetIds[0]&&assetBy(issue.assetIds[0]);
+  return a?a.cat:'tpl';
+}
+function detailOn(){return !!S.detail && (S.level==='ent'||S.level==='brand');}
+function shadeBrand(hex){
+  return {top:mix(hex,0.56), left:mix(hex,0.30), right:mix(hex,0.40), edge:mix(hex,0.16), wash:mix(hex,0.74)};
+}
+function bayPinPoint(bay){return {x:bay.ax+bay.w*0.78, y:bay.ay+0.46, z:1.22};}
+function roofPinPoint(b){return {x:b.ax+b.w*0.74, y:b.ay+b.d*0.16, z:0.22+b.h+0.46};}
 
 function makeModel(ent){
   const m={ent,brands:[],lobs:[],assets:[],issues:[],brand:{},lob:{},asset:{},issue:{}};
@@ -936,18 +968,20 @@ function drawCampus(m,layers,texts,labels,pins){
   });
 }
 function drawDistrict(m,d,layers,texts,labels,pins,solo){
-  const tint=mix(d.brand.color,0.93);
-  pushBox(layers,0,{x:d.x-0.22,y:d.y-0.16,z:0,w:d.w+0.44,d:d.d+0.4,h:0.05,fill:['#d5e0ec','#cdd8e4','#c3cedb','#c3cedb']});
-  pushBox(layers,1,{x:d.x,y:d.y,z:0.05,w:d.w,d:d.d,h:0.12,fill:[tint,'#f6f9fc','#e7eef6','#e7eef6'],hit:'brand:'+d.brand.id});
-  labels.push({x:d.x+d.w/2, y:d.y+d.d-0.15, z:0.36, cls:'brandplate', text:d.brand.name, sub:d.brand.code, logo:brandLogo(d.brand)});
-  d.buildings.forEach(b=>drawClosedBuilding(m,b,layers,texts,labels,pins));
+  const c=shadeBrand(d.brand.color);
+  pushBox(layers,0,{x:d.x-1.35,y:d.y-0.9,z:0,w:d.w+2.7,d:d.d+1.8,h:0.07,fill:[c.edge,c.edge,c.edge,c.edge]});
+  pushBox(layers,1,{x:d.x,y:d.y,z:0.07,w:d.w,d:d.d,h:0.18,fill:[c.top,c.left,c.right,c.edge],hit:'brand:'+d.brand.id});
+  labels.push({x:d.x+d.w/2, y:d.y+d.d-0.15, z:0.42, cls:'brandplate', text:d.brand.name, sub:d.brand.code, logo:brandLogo(d.brand), color:d.brand.color});
+  d.buildings.forEach(b=>detailOn()?drawDetailedBuilding(m,b,layers,texts,labels,pins):drawClosedBuilding(m,b,layers,texts,labels,pins));
 }
 function drawClosedBuilding(m,b,layers,texts,labels,pins){
   const lob=b.lob;
+  const brand=m.brand[lob.brandId];
+  const c=shadeBrand(brand.color);
   const k=(S.level==='lob'||S.level==='bay')&&S.lob===lob.id?wallK:1;
   const h=0.22+(b.h-0.22)*k;
   const z0=0.22;
-  pushBox(layers,2,{x:b.ax-0.18,y:b.ay-0.12,z:z0-0.08,w:b.w+0.36,d:b.d+0.28,h:0.08,fill:['#e4edf6','#d7e2ee','#cbd7e4','#cbd7e4'],hit:'lob:'+lob.id});
+  pushBox(layers,2,{x:b.ax-0.72,y:b.ay-0.42,z:z0-0.1,w:b.w+1.44,d:b.d+0.95,h:0.09,fill:[c.edge,c.left,c.right,c.edge],hit:'lob:'+lob.id});
   pushBox(layers,2,{x:b.ax,y:b.ay,z:z0,w:b.w,d:b.d,h,fill:['#ffffff','#e8eef6','#d6e1ed','#d6e1ed'],hit:'lob:'+lob.id, op:1});
   if(k>0.35){
     b.bays.forEach(bay=>{
@@ -963,9 +997,49 @@ function drawClosedBuilding(m,b,layers,texts,labels,pins){
   const active=roofIssues(m,lob.id);
   if(active.length && k>0.5){
     const crit=active.some(i=>i.sev==='crit'&&i.status==='open')||active.some(i=>i.execStatus==='partial');
-    pins.push({lobId:lob.id, x:b.ax+b.w*0.74, y:b.ay+b.d*0.16, z:z0+h+0.46, count:active.length, crit, on:S.concern&&active.some(i=>i.id===S.concern)});
+    const p=roofPinPoint(b);
+    pins.push({lobId:lob.id, x:p.x, y:p.y, z:z0+h+0.46, count:active.length, crit, on:S.concern&&active.some(i=>i.id===S.concern)});
   }
   if(k>0.7) labels.push({x:b.ax+b.w/2, y:b.ay+b.d*0.78, z:z0+h+0.18, cls:'wlabel', text:lob.name});
+}
+function drawDetailedBuilding(m,b,layers,texts,labels,pins){
+  const lob=b.lob;
+  const c=shadeBrand(m.brand[lob.brandId].color);
+  const z0=0.22;
+  pushBox(layers,2,{x:b.ax-0.72,y:b.ay-0.42,z:z0-0.1,w:b.w+1.44,d:b.d+0.95,h:0.09,fill:[c.edge,c.left,c.right,c.edge],hit:'lob:'+lob.id});
+  pushBox(layers,2,{x:b.ax,y:b.ay,z:z0,w:b.w,d:b.d,h:0.14,fill:['#ffffff','#f7fafc','#e7eef6','#d5e0ec'],hit:'lob:'+lob.id});
+  b.bays.forEach(bay=>{
+    const tone=bayTone(m,lob,bay.cat);
+    const faded=!!(S.filter&&S.filter!==bay.cat);
+    const f=FILL[tone]||FILL.ok;
+    const hot=tone==='crit'||tone==='failed'||tone==='warn'||tone==='proposed'||tone==='restricted';
+    const slab=tone==='ok'?['#e7eef6','#dce7f2','#d0dce8','#b7c6d6']:f;
+    const inset=0.18;
+    pushBox(layers,3,{
+      x:bay.ax+inset,y:bay.ay+inset,z:z0+0.14,
+      w:Math.max(0.55,bay.w-inset*2),d:Math.max(0.55,bay.d-inset*2),
+      h:hot?0.28:0.12, fill:slab, hit:'bay:'+lob.id+':'+bay.cat,
+      op:faded?0.28:1, hatch:tone==='restricted',
+      stroke:hot?slab[3]:'#c5d3e0', sw:hot?1.8:1.15
+    });
+    const cat=CATS.find(x=>x.id===bay.cat);
+    const toneCls=tone==='crit'||tone==='failed'?'bad':(hot?'warn':'');
+    labels.push({
+      x:bay.ax+bay.w*0.5, y:bay.ay+bay.d*0.58, z:z0+0.14+(hot?0.5:0.32),
+      cls:'baylab partlab'+(toneCls?' '+toneCls:'')+(faded?' dim':''),
+      text:cat.s, icon:ICO[bay.cat], ww:bay.w, dd:bay.d
+    });
+    const issues=roofIssues(m,lob.id).filter(i=>issueCat(i)===bay.cat);
+    if(issues.length && !faded){
+      const p=bayPinPoint(bay);
+      pins.push({
+        lobId:lob.id, cat:bay.cat, x:p.x, y:p.y, z:p.z, count:issues.length,
+        crit:issues.some(i=>(i.sev==='crit'&&i.status==='open')||i.execStatus==='partial'),
+        on:!!(S.concern&&issues.some(i=>i.id===S.concern))
+      });
+    }
+  });
+  labels.push({x:b.ax+b.w*0.5, y:b.ay+b.d+1.15, z:0.42, cls:'wlabel front', text:lob.name});
 }
 function drawOpenBuilding(m,loc,layers,texts,labels,pins){
   const b=loc.b, lob=b.lob;
@@ -983,7 +1057,8 @@ function drawOpenBuilding(m,loc,layers,texts,labels,pins){
   const active=roofIssues(m,lob.id);
   if(active.length){
     const focus=S.concern&&active.find(i=>i.id===S.concern);
-    const bay=b.bays.find(bay=>bay.cat===(focus?focus.cat:active[0].cat))||b.bays[0];
+    const cat=issueCat(focus||active[0]);
+    const bay=b.bays.find(bay=>bay.cat===cat)||b.bays[0];
     pins.push({lobId:lob.id, x:bay.ax+bay.w*0.82, y:bay.ay+0.35, z:0.95, count:active.length, crit:active.some(i=>i.sev==='crit'&&i.status==='open')||active.some(i=>i.execStatus==='partial'), on:!!focus});
   }
 }
@@ -1021,9 +1096,9 @@ function addRoute(m,issue,routes,nodes){
   if(!issue) return;
   const loc=findBuilding(m,issue.lobId); if(!loc) return;
   const {d,b}=loc;
-  const bay=b.bays.find(x=>x.cat===issue.cat)||b.bays[0];
+  const bay=b.bays.find(x=>x.cat===issueCat(issue))||b.bays[0];
   const open=(S.level==='lob'||S.level==='bay')&&S.lob===issue.lobId;
-  const zR=open?0.72:b.h+0.42;
+  const zR=open?0.72:detailOn()?0.78:b.h+0.42;
   const bayC={x:bay.ax+bay.w/2, y:bay.ay+bay.d*0.42, z:zR};
   let pts;
   if(open){
@@ -1046,9 +1121,10 @@ function addRoute(m,issue,routes,nodes){
 function cardAnchor(m,issue){
   const loc=findBuilding(m,issue.lobId); if(!loc) return null;
   const open=(S.level==='lob'||S.level==='bay')&&S.lob===issue.lobId;
-  const bay=loc.b.bays.find(b=>b.cat===issue.cat)||loc.b.bays[0];
+  const bay=loc.b.bays.find(b=>b.cat===issueCat(issue))||loc.b.bays[0];
   if(open) return {x:bay.ax+bay.w*0.15, y:bay.ay, z:1.3};
-  return {x:loc.b.ax+loc.b.w*0.7, y:loc.b.ay+loc.b.d*0.2, z:loc.b.h+1.1};
+  if(detailOn()) return bayPinPoint(bay);
+  return roofPinPoint(loc.b);
 }
 function popAnchor(m,id){
   const loc=findBuilding(m, assetBy(id).lobId); if(!loc) return null;
@@ -1093,14 +1169,14 @@ function mix(hex,amt){
 }
 
 /* ---------- camera ---------- */
-function cardOn(){
-  return !!(S.concern && (S.level==='ent'||S.level==='brand') && innerWidth>=1200);
+function showCard(){
+  return !!(S.concern && (S.level==='ent'||S.level==='brand') && innerWidth>860);
 }
 function insets(){
   const ins=S.inspector&&innerWidth>860?400:0;
   const top=innerWidth>860?76:120;
   const bottom=innerWidth>860?78:(S.inspector?innerHeight*0.46+70:70);
-  return {left:cardOn()?336:28, right:ins+78, top, bottom};
+  return {left:28, right:ins+78, top, bottom};
 }
 function fitCurrent(animate){
   if(!SCENE) return;
@@ -1185,6 +1261,10 @@ function renderChrome(){
     return `<button data-filter="${c.id}" class="${on?'on':''}" title="${esc(c.name)}" aria-label="${esc(c.name)}" aria-pressed="${on}">${c.icon}${on?`<span>${esc(c.s)}</span>`:''}</button>`;
   }).join('');
   document.querySelectorAll('#viewtog button').forEach(b=>b.classList.toggle('on',(b.dataset.act==='view:plan')===S.plan));
+  document.querySelectorAll('#floors button').forEach(b=>{
+    const on=(b.dataset.act==='floor:detail')===!!S.detail;
+    b.classList.toggle('on',on); b.setAttribute('aria-pressed',String(on));
+  });
   const sibs = S.level==='ent' ? m.brands.map(b=>({act:'brand:'+b.id,label:b.name,on:false}))
     : S.level==='brand' ? m.brands.map(b=>({act:'brand:'+b.id,label:b.name,on:b.id===S.brand}))
     : (S.level==='bay'||S.level==='map') ? CATS.map(c=>({act:'cat:'+c.id,label:c.s,on:c.id===S.cat}))
@@ -1193,7 +1273,6 @@ function renderChrome(){
   const pe=m.ent.peId||m.ent.name.toUpperCase();
   $id('statusline').textContent=`${pe} · ${m.brands.length} BRANDS · ${m.lobs.length} LOBS · ${m.assets.length} ASSETS · ${c.open} OPEN`;
   document.body.classList.toggle('ins-closed',!S.inspector);
-  document.body.classList.toggle('has-card', cardOn());
   const tour=$id('tour');
   if(S.tour!=null){
     const step=TOUR[S.tour];
@@ -1210,15 +1289,20 @@ function overlayPieces(){
     if(S.level==='ent' && l.cls==='wlabel' && cam.s<0.48) return;
     let inner;
     if(l.cls==='brandplate') inner=`<i class="mark">${l.logo}</i><span><b>${esc(l.text)}</b><small>${esc(l.sub||'')}</small></span>`;
-    else if(l.cls==='baylab') inner=`${l.icon||''}<b>${esc(l.text)}</b>`;
+    else if((l.cls||'').split(' ').includes('baylab')) inner=`${l.icon||''}<b>${esc(l.text)}</b>`;
     else if(l.cls==='tilecap') inner=`<b>${esc(l.text)}</b>${l.sub?`<small>${esc(l.sub)}</small>`:''}`;
     else if(l.cls==='maplab') inner=`<small>${esc(l.sub||'')}</small><b>${esc(l.text)}</b>`;
     else inner=esc(l.text);
     const tone=l.cls==='tilecap'&&l.tone?(' '+l.tone):'';
-    pieces.push({x:l.x,y:l.y,z:l.z,kind:'label',html:`<div class="ov ${l.cls||'wlabel'}${tone}" data-wx="${l.x}" data-wy="${l.y}" data-wz="${l.z}">${inner}</div>`});
+    const brand=l.color?` style="--brand:${l.color}"`:'';
+    const span=l.ww?` data-ww="${l.ww}" data-dd="${l.dd}"`:'';
+    const title=(l.cls||'').includes('partlab')?` title="${esc(l.text)}"`:'';
+    pieces.push({x:l.x,y:l.y,z:l.z,kind:'label',html:`<div class="ov ${l.cls||'wlabel'}${tone}"${brand}${span}${title} data-wx="${l.x}" data-wy="${l.y}" data-wz="${l.z}">${inner}</div>`});
   });
   SCENE.pins.forEach(p=>{
-    pieces.push({x:p.x,y:p.y,z:p.z,kind:'pin',html:`<button class="ov pin ${p.crit?'crit':''} ${p.on?'on':''}" data-wx="${p.x}" data-wy="${p.y}" data-wz="${p.z}" data-act="pin:${p.lobId}" aria-label="${p.count} open concerns">${p.count}</button>`});
+    const cat=p.cat?(CATS.find(c=>c.id===p.cat)||{}).s:'';
+    const act=p.cat?`pin:${p.lobId}:${p.cat}`:`pin:${p.lobId}`;
+    pieces.push({x:p.x,y:p.y,z:p.z,kind:'pin',html:`<button class="ov pin ${p.crit?'crit':''} ${p.on?'on':''}" data-wx="${p.x}" data-wy="${p.y}" data-wz="${p.z}" data-act="${act}" aria-label="${p.count} open concern${p.count===1?'':'s'}${cat?' in '+esc(cat):''}">${p.count}</button>`});
   });
   SCENE.nodes.forEach(p=>{
     pieces.push({x:p.x,y:p.y,z:p.z,kind:'node',html:`<i class="ov node" data-wx="${p.x}" data-wy="${p.y}" data-wz="${p.z}"></i>`});
@@ -1226,7 +1310,7 @@ function overlayPieces(){
   if(SCENE.card && S.concern){
     const issue=issueBy(S.concern);
     const c=SCENE.card;
-    pieces.push({x:c.x,y:c.y,z:c.z,kind:'card',html:floatingCard(issue,0,0).replace('class="fcard"','class="ov fcard"').replace(/style="[^"]*"/, `data-wx="${c.x}" data-wy="${c.y}" data-wz="${c.z}"`)});
+    pieces.push({x:c.x,y:c.y,z:c.z,kind:'card',html:floatingCard(issue,0,0).replace('class="fcard above"','class="ov fcard above"').replace('style=""', `data-wx="${c.x}" data-wy="${c.y}" data-wz="${c.z}"`)});
   }
   if(SCENE.pop){
     const a=SCENE.pop.asset, st=styleOf(a,M()), p=SCENE.pop;
@@ -1237,26 +1321,52 @@ function overlayPieces(){
 function placeOv(el,x,y,z){
   const [sx,sy]=screen(x,y,z);
   if(el.classList.contains('fcard')){
-    if(!cardOn()){el.style.display='none';return;}
+    if(!showCard()){el.style.display='none';return;}
     el.style.display='';
-    el.style.left='16px'; el.style.top='118px'; return;
+    const w=el.offsetWidth||300;
+    const h=el.offsetHeight||168;
+    const reserve=S.inspector&&innerWidth>860?430:12;
+    const pinTop=sy-30;
+    let left=sx-w/2;
+    let top=pinTop-h-24;
+    let above=true;
+    if(top<62){
+      if(pinTop-h-6>=62) top=62;
+      else {above=false; top=sy+14;}
+    }
+    if(left<12) left=12;
+    if(left+w>innerWidth-reserve) left=Math.max(12, innerWidth-reserve-w);
+    if(!above && top+h>innerHeight-16){above=true; top=Math.max(68, pinTop-h-12);}
+    if(top+h>innerHeight-12) top=Math.max(68, innerHeight-h-12);
+    const caret=Math.max(16, Math.min(w-16, sx-left));
+    el.style.left=left+'px';
+    el.style.top=top+'px';
+    el.style.setProperty('--caret', caret+'px');
+    el.classList.toggle('above', above);
+    el.classList.toggle('below', !above);
+    return;
   }
   if(el.classList.contains('pop')){el.style.left=(sx+14)+'px'; el.style.top=(sy-10)+'px'; return;}
   el.style.left=sx+'px'; el.style.top=sy+'px';
+  if(el.classList.contains('partlab')){
+    const hot=el.classList.contains('bad')||el.classList.contains('warn');
+    el.classList.toggle('icononly', cam.s<0.98 && !hot);
+    el.style.transform='translate(-50%,-58%)';
+  }
 }
 function positionOverlay(){
   if(!SCENE) return;
-  document.body.classList.toggle('has-card', cardOn());
   const root=$id('overlay');
   const issue=S.concern&&issueBy(S.concern);
   const pieces=overlayPieces();
-  const sig=[S.level,S.ent,S.concern,S.asset,S.filter,S.plan,S.role,S.sheet?1:0,
+  const sig=[S.level,S.ent,S.concern,S.asset,S.filter,S.plan,S.detail?1:0,S.role,S.sheet?1:0,
     issue?issue.status+'/'+issue.execStatus+'/'+issue.pendingApprove:'',
     pieces.map(p=>p.kind+p.html.length).join(',')].join('|');
   if(sig!==ovSig){ovSig=sig; root.innerHTML=pieces.map(p=>p.html).join('');}
   const els=root.querySelectorAll('.ov');
   pieces.forEach((p,i)=>{if(els[i]) placeOv(els[i],p.x,p.y,p.z);});
   separateLabels();
+  settleParts();
 }
 function separateLabels(){
   if(S.level!=='ent'&&S.level!=='brand') return;
@@ -1266,7 +1376,7 @@ function separateLabels(){
   if(!labs.length) return;
   const box=el=>{const r=el.getBoundingClientRect();return {l:r.left,t:r.top,r:r.right,b:r.bottom,w:r.width};};
   const hit=(a,b)=>a.l<b.r-2 && a.r>b.l+2 && a.t<b.b+4 && a.b>b.t-4;
-  const minL=cardOn()?332:12;
+  const minL=12;
   const maxR=innerWidth-(S.inspector&&innerWidth>860?424:16);
   labs.forEach(el=>{
     const w=el.offsetWidth||box(el).w;
@@ -1293,21 +1403,52 @@ function separateLabels(){
     if(!moved) break;
   }
 }
+function settleParts(){
+  if(!detailOn()) return;
+  const root=$id('overlay');
+  const labs=[...root.querySelectorAll('.partlab')];
+  if(labs.length<2) return;
+  const box=el=>{const r=el.getBoundingClientRect(); return {l:r.left,t:r.top,r:r.right,b:r.bottom};};
+  const hit=(a,b)=>a.l<b.r-8 && a.r>b.l+8 && a.t<b.b-3 && a.b>b.t+3;
+  const bad=el=>el.classList.contains('bad')||el.classList.contains('warn');
+  labs.forEach(el=>{el.dataset.nudge='0';});
+  for(let n=0;n<6;n++){
+    let moved=false;
+    for(let i=0;i<labs.length;i++){
+      for(let j=i+1;j<labs.length;j++){
+        if(!hit(box(labs[i]), box(labs[j]))) continue;
+        const ai=labs[i], aj=labs[j];
+        const move=bad(ai)!==bad(aj) ? (bad(ai)?aj:ai) : (parseFloat(ai.style.top)<=parseFloat(aj.style.top)?aj:ai);
+        if(+move.dataset.nudge>=3) continue;
+        const ra=box(ai), rb=box(aj);
+        const overlap=Math.min(ra.b, rb.b)-Math.max(ra.t, rb.t);
+        move.style.top=(parseFloat(move.style.top)+Math.max(10, overlap+6))+'px';
+        move.dataset.nudge=+move.dataset.nudge+1;
+        moved=true;
+      }
+    }
+    if(!moved) break;
+  }
+  labs.forEach(el=>{el.style.visibility='';});
+  for(let i=0;i<labs.length;i++){
+    if(bad(labs[i])||labs[i].style.visibility==='hidden') continue;
+    const a=box(labs[i]);
+    for(let j=0;j<labs.length;j++){
+      if(i===j||labs[j].style.visibility==='hidden') continue;
+      if(!hit(a, box(labs[j]))) continue;
+      if(bad(labs[j])||labs[j].classList.contains('icononly')===false && labs[i].classList.contains('icononly')) labs[i].style.visibility='hidden';
+    }
+  }
+}
 function floatingCard(issue,x,y){
   const T=IT[issue.type];
   const lob=M().lob[issue.lobId];
-  let left=x+18, top=y-24;
-  const reserve=S.inspector&&innerWidth>860?420:16;
-  if(left>innerWidth-reserve-310) left=x-318;
-  if(left<12) left=12;
-  if(top<70) top=74;
-  if(top>innerHeight-180) top=innerHeight-190;
   const chip=issueChip(issue);
   const exp=issue.type==='uc1'?` · ${fmt(FX.uc1.exposure)} exposed`:'';
-  return `<article class="fcard" style="left:${left}px;top:${top}px">
+  return `<article class="fcard above" style="">
     <div class="row1"><span class="chip ${chip.cls}">${esc(chip.label)}</span><button class="x" data-act="clear-concern" aria-label="Close">×</button></div>
     <h3>${esc(T.title(issue.n))}</h3>
-    <p>${esc(lob.brand.name)} → ${esc(lob.name)} → ${esc(CATS.find(c=>c.id===issue.cat).s)}${exp}</p>
+    <p>${esc(lob.brand.name)} → ${esc(lob.name)} → ${esc(CATS.find(c=>c.id===issueCat(issue)).s)}${exp}</p>
     <button class="go" data-act="zoom-concern">Open on the floor</button>
   </article>`;
 }
@@ -1532,11 +1673,13 @@ function setRole(role){
 }
 function focusConcern(id, opt={}){
   const i=issueBy(id); if(!i) return;
+  const before=S.level+'|'+S.brand+'|'+S.lob;
   S.concern=id; S.sheet=null;
   if(opt.keepAsset){} else S.asset=null;
-  if(opt.zoom){S.level='bay'; S.brand=i.brandId; S.lob=i.lobId; S.cat=i.cat; wallK=1; wallTarget=0;}
+  if(opt.zoom){S.level='bay'; S.brand=i.brandId; S.lob=i.lobId; S.cat=issueCat(i); wallK=1; wallTarget=0;}
   else if(!concernInView(i)){S.level='ent'; S.brand=S.lob=S.cat=null; S.asset=null;}
-  render();
+  const after=S.level+'|'+S.brand+'|'+S.lob;
+  render({fit: opt.fit===false && before===after ? false : true});
 }
 function concernInView(i){
   if(S.level==='ent') return true;
@@ -1656,7 +1799,7 @@ function goMap(id){
 }
 function resetSim(){
   Object.keys(models).forEach(k=>{delete models[k];});
-  Object.assign(S,{ent:'aster',level:'ent',brand:null,lob:null,cat:null,asset:null,concern:null,role:'investigator',plan:false,filter:null,sheet:null,tour:null});
+  Object.assign(S,{ent:'aster',level:'ent',brand:null,lob:null,cat:null,asset:null,concern:null,role:'investigator',plan:false,detail:false,filter:null,sheet:null,tour:null});
   wallK=1; wallTarget=1;
   toast('Sample reset. Enforcement state cleared.');
   render();
@@ -1777,6 +1920,8 @@ function doAct(act){
   if(act==='fit'){fitCurrent(true);return;}
   if(act==='view:iso'){S.plan=false;render();return;}
   if(act==='view:plan'){S.plan=true;render();return;}
+  if(act==='floor:overview'){S.detail=false;render();return;}
+  if(act==='floor:detail'){S.detail=true;render();return;}
   if(act==='toggle-demo'){$id('demoMenu').hidden=!$id('demoMenu').hidden;$id('entMenu').hidden=true;return;}
   if(act==='toggle-ent'){$id('entMenu').hidden=!$id('entMenu').hidden;$id('demoMenu').hidden=true;return;}
   if(act==='clear-concern'){S.concern=null;S.sheet=null;render({fit:false});return;}
@@ -1797,7 +1942,14 @@ function doAct(act){
   if(k==='bay'){goBay(a,b);return;}
   if(k==='cat'){if(S.lob) goBay(S.lob,a); else S.filter=a||null, render({fit:false}); return;}
   if(k==='issue'){focusConcern(a);return;}
-  if(k==='pin'){const list=openConcerns(M(),a); if(!list.length){goLob(a);return;} const idx=list.findIndex(i=>i.id===S.concern); focusConcern(list[(idx+1)%list.length].id); return;}
+  if(k==='pin'){
+    let list=openConcerns(M(),a);
+    if(b) list=list.filter(i=>issueCat(i)===b);
+    if(!list.length){ if(b) goBay(a,b); else goLob(a); return; }
+    const idx=list.findIndex(i=>i.id===S.concern);
+    focusConcern(list[(idx+1)%list.length].id, {fit:false});
+    return;
+  }
   if(k==='act'){openSheet(a);return;}
   if(k==='goto'){gotoAsset(a);return;}
   if(k==='retry'){retryIssue(a);return;}
